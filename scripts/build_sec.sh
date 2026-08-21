@@ -6,7 +6,7 @@ OUTPUT_DIR="$KERNEL_DIR/build_sec"
 
 cd "$KERNEL_DIR"
 make O="$OUTPUT_DIR" defconfig
-make O="$OUTPUT_DIR" kvmconfig
+make O="$OUTPUT_DIR" kvm_guest.config
 
 # Storage / filesystem (Persistent Disk)
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_EXT4_FS
