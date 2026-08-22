@@ -18,23 +18,23 @@ scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_USER_NS
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_NET_NS
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_XFRM
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_XFRM_USER
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_INET6_ESP
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_INET6_ESPINTCP
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_INET_ESP
 
-# Crypto dependencies
+# Crypto dependencies (Copy Fail + Dirty Frag ESP/RxRPC)
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_AES
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_GCM
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_USER_API
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_USER_API_SKCIPHER
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_USER_API_AEAD
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_AUTHENC
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_CBC
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_HMAC
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_SHA256
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_CBC
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_AUTHENC
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_USER_API
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_USER_API_AEAD
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_USER_API_SKCIPHER
 
-# Enable Debug Symbols & Panic-on-Oops
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_DEBUG_INFO
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_PANIC_ON_OOPS
+# Dirty Frag RxRPC fallback
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_AF_RXRPC
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_RXKAD
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_FCRYPT
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_PCBC
 
 make O="$OUTPUT_DIR" olddefconfig
 make O="$OUTPUT_DIR" -j"$(nproc)"
