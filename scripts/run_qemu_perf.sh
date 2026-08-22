@@ -6,43 +6,45 @@ set -euo pipefail
 # Usage: ./run_qemu_perf.sh
 #
 # This script boots the mitigated kernel for the "implementation" run.
-# The control baseline run is handled by run_qemu_control.sh.
+# It uses KVM if available; otherwise falls back to TCG (not recommended
+# for performance measurements).
 #
-# Memory handicap:
-#   Control VM boots with mem=3840M (no pool reserved).
-#   Mitigated VM boots with mem=4096M (kernel reserves 256M pool),
-#   leaving 3840M usable, exactly matching the control environment.
+# Memory handicap: The control VM boots with mem=3840M (no pool reserved).
+# The mitigated VM boots with mem=4096M (kernel reserves 256M pool),
+# leaving 3840M usable, matching the control environment.
 # ----------------------------------------------------------------------
 
 # User-configurable variables
-DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-$HOME/src/linux-pks-dev}"
+DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}"
 DISK_IMG="${DISK_IMG:-$HOME/src/env/images/disk.img}"
 SMP="${SMP:-4}"
 CONSOLE="${CONSOLE:-ttyS0}"
 QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
+TASKSET_CPUS="${TASKSET_CPUS:-}"          # optional, e.g., "4-7"
 
-# CPU pinning (optional, e.g., TASKSET_CPUS=4-7)
-TASKSET_CPUS="${TASKSET_CPUS:-}"
+# CPU pinning
 if [ -n "$TASKSET_CPUS" ]; then
     TASKSET_CMD="taskset -c $TASKSET_CPUS"
 else
     TASKSET_CMD=""
 fi
 
-# Total memory: 4G (kernel reserves 256M pool; usable remains 3840M)
-TOTAL_MEM="${TOTAL_MEM:-4096M}"
+TOTAL_MEM="${TOTAL_MEM:-4096M}"           # 4G total, 256M reserved for pool
 
 KERNEL="$DEV_KERNEL_DIR/build_perf/arch/x86/boot/bzImage"
-if [ ! -f "$KERNEL" ]; then
-    echo "Error: Development kernel image not found at $KERNEL"
-    echo "Run build_perf.sh first."
-    exit 1
-fi
+[ -f "$KERNEL" ] || { echo "Error: Kernel not found at $KERNEL. Run build_perf.sh first."; exit 1; }
+[ -f "$DISK_IMG" ] || { echo "Error: Disk image not found at $DISK_IMG"; exit 1; }
 
-if [ ! -f "$DISK_IMG" ]; then
-    echo "Error: Disk image not found at $DISK_IMG"
-    echo "Provision the disk image first."
-    exit 1
+# CPU mode
+CPU_ARGS=()
+MODE=""
+if [ -e /dev/kvm ]; then
+    MODE="KVM / host"
+    CPU_ARGS=(-enable-kvm -cpu host)
+else
+    MODE="TCG / max"
+    CPU_ARGS=(-cpu max)
+    echo "WARNING: KVM not available, using TCG. Performance numbers will be meaningless."
 fi
 
 echo "-----------------------------------------------------"
@@ -51,16 +53,17 @@ echo "   Kernel:      $KERNEL"
 echo "   Disk:        $DISK_IMG"
 echo "   PKS state:   on"
 echo "   Total RAM:   $TOTAL_MEM"
+echo "   CPU mode:    $MODE"
 echo "   CPU pinning: ${TASKSET_CPUS:-none}"
 echo "-----------------------------------------------------"
 
 $TASKSET_CMD "$QEMU_BIN" \
-    -machine q35,accel=kvm \
-    -cpu host \
+    -machine q35 \
+    "${CPU_ARGS[@]}" \
     -smp "$SMP" \
     -m "$TOTAL_MEM" \
     -kernel "$KERNEL" \
-    -append "root=/dev/vda rw console=$CONSOLE nokaslr pcache_pks=on" \
+    -append "root=/dev/vda1 rw console=$CONSOLE nokaslr pcache_pks=on" \
     -drive file="$DISK_IMG",format=raw,if=virtio,cache=none,aio=native \
     -nographic \
     -no-reboot
