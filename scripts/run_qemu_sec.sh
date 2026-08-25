@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # ----------------------------------------------------------------------
-# Security Validation Launcher (flexible CPU mode)
+# Security Validation Launcher
 # Usage: ./run_qemu_sec.sh [off|on]
 #   off  -> boot with pcache_pks=off (vulnerable state)
 #   on   -> boot with pcache_pks=on  (mitigated state)
