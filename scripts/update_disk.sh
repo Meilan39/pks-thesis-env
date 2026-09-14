@@ -51,6 +51,12 @@ if [ -d "$GUEST_ASSETS_DIR/exploit" ]; then
     if [ -f "$MOUNT_POINT/exploit/run_tests.sh" ]; then
         sudo chmod +x "$MOUNT_POINT/exploit/run_tests.sh"
     fi
+    if [ -f "$MOUNT_POINT/exploit/dirty-frag/exp.c" ]; then
+        echo "Compiling dirty-frag harness inside chroot ..."
+        sudo chroot "$MOUNT_POINT" /bin/bash -c "
+            cd /exploit/dirty-frag && gcc -O0 -Wall -o exp exp.c -lutil
+        " 2>/dev/null || true
+    fi
 fi
 
 # Replace /benchmark if present in guest-assets

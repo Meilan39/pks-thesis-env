@@ -146,6 +146,14 @@ if [ -f "$MOUNT_POINT/benchmark/run_benchmarks.sh" ]; then
     sudo chmod +x "$MOUNT_POINT/benchmark/run_benchmarks.sh"
 fi
 
+# Compile dirty-frag inside chroot if exp.c is present
+if [ -f "$MOUNT_POINT/exploit/dirty-frag/exp.c" ]; then
+    echo "=== Compiling dirty-frag harness inside chroot ==="
+    sudo chroot "$MOUNT_POINT" /bin/bash -c "
+        cd /exploit/dirty-frag && gcc -O0 -Wall -o exp exp.c -lutil
+    " || echo "WARN: dirty-frag compilation failed inside chroot"
+fi
+
 # Unmount chroot mounts
 sudo umount "$MOUNT_POINT/dev"
 sudo umount "$MOUNT_POINT/proc"
