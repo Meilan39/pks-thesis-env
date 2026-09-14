@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KERNEL_DIR="${1:-$HOME/src/linux-control}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_CONTROL="$(cd "$SCRIPT_DIR/../../linux-control" 2>/dev/null && pwd || true)"
+WORKSPACE_CONTROL_ALT="$(cd "$SCRIPT_DIR/../../linux-pks-thesis-control" 2>/dev/null && pwd || true)"
+KERNEL_DIR="${1:-${CONTROL_KERNEL_DIR:-${WORKSPACE_CONTROL:-${WORKSPACE_CONTROL_ALT:-$HOME/src/linux-control}}}}"
 OUTPUT_DIR="$KERNEL_DIR/build_perf"
 
 cd "$KERNEL_DIR"

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-KERNEL_DIR="${1:-$HOME/src/linux-pks-dev}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_KERNEL="$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
+KERNEL_DIR="${1:-${DEV_KERNEL_DIR:-${WORKSPACE_KERNEL:-$HOME/src/linux-pks-dev}}}"
 OUTPUT_DIR="$KERNEL_DIR/build_sec"
 
 cd "$KERNEL_DIR"
@@ -35,6 +37,16 @@ scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_AF_RXRPC
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_RXKAD
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_FCRYPT
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_PCBC
+
+# PKS Subsystem & Page-Cache Protection
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_PKS_TEST
+scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_PKS_TEST_ALL_KEYS
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_PCACHE_PKS
+scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_PAGE_POISONING
+scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_DEBUG_PAGEALLOC
+scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_INIT_ON_ALLOC_DEFAULT_ON
+scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_INIT_ON_FREE_DEFAULT_ON
+scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_HIBERNATION
 
 # Enable debug features for security validation
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_DEBUG_INFO
