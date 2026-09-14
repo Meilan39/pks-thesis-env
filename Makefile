@@ -6,11 +6,14 @@ GUEST_ASSETS := $(ENV_DIR)/guest-assets
 IMAGES_DIR := $(ENV_DIR)/images
 RESULTS_DIR := $(ENV_DIR)/results
 
-KERNEL_DEV ?= $(HOME)/src/linux-pks-thesis
-KERNEL_CONTROL ?= $(HOME)/src/linux-control
-DISK_IMG ?= $(IMAGES_DIR)/disk.img
+WORKSPACE_DIR := $(abspath $(CURDIR)/..)
+KERNEL_DEV ?= $(if $(wildcard $(WORKSPACE_DIR)/linux-5.18-rc3),$(WORKSPACE_DIR)/linux-5.18-rc3,$(HOME)/src/linux-pks-thesis)
+KERNEL_CONTROL ?= $(if $(wildcard $(WORKSPACE_DIR)/linux-control),$(WORKSPACE_DIR)/linux-control,$(HOME)/src/linux-control)
+export DISK_IMG ?= $(IMAGES_DIR)/disk.img
+export DEV_KERNEL_DIR ?= $(KERNEL_DEV)
+export CONTROL_KERNEL_DIR ?= $(KERNEL_CONTROL)
 
-.PHONY: all build-sec build-perf build-control provision-image \
+.PHONY: all build-sec build-perf build-control provision-image update-disk \
         run-sec-off run-sec-on run-perf run-control clean
 
 all: build-sec build-perf build-control
@@ -32,6 +35,11 @@ build-control:
 provision-image:
 	@echo "=== Provisioning disk image: $(DISK_IMG) ==="
 	$(SCRIPTS_DIR)/provision_disk.sh $(DISK_IMG)
+
+## Synchronize guest assets into existing disk image
+update-disk:
+	@echo "=== Syncing guest assets into disk image: $(DISK_IMG) ==="
+	$(SCRIPTS_DIR)/update_disk.sh
 
 ## Run security validation
 run-sec-off:
