@@ -1,72 +1,89 @@
 #!/usr/bin/env bash
+# ==============================================================================
+# scripts/run_qemu_sec.sh - Security validation launcher (off/on)
+# ==============================================================================
+# Usage: ./run_qemu_sec.sh <off|on> [--batch|--interactive]
+# ==============================================================================
 set -euo pipefail
 
-# ----------------------------------------------------------------------
-# Security Validation Launcher
-# Usage: ./run_qemu_sec.sh [off|on]
-#   off  -> boot with pcache_pks=off (vulnerable state)
-#   on   -> boot with pcache_pks=on  (mitigated state)
-#
-# The script attempts to use KVM with -cpu host if the host supports PKS.
-# If not, it falls back to TCG with -cpu max,pks=on and prints a warning.
-# ----------------------------------------------------------------------
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
 ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 WORKSPACE_KERNEL="$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
 
 DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-${WORKSPACE_KERNEL:-$HOME/src/linux-pks-thesis}}"
 DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
-MEM="${MEM:-4G}"
+MEM="${MEM_SEC:-4G}"
 SMP="${SMP:-4}"
 CONSOLE="${CONSOLE:-ttyS0}"
 QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
+RESULTS_DIR="${RESULTS_DIR:-$ENV_DIR/results}"
 
-# Parse argument
-if [ $# -ne 1 ] || [[ "$1" != "off" && "$1" != "on" ]]; then
-    echo "Usage: $0 [off|on]"
+if [ $# -lt 1 ] || [[ "$1" != "off" && "$1" != "on" ]]; then
+    echo "Usage: $0 <off|on> [--batch|--interactive]"
     exit 1
 fi
 PKS_STATE="$1"
+RUN_MODE="${2:---interactive}"
 
 KERNEL="$DEV_KERNEL_DIR/build_sec/arch/x86/boot/bzImage"
-[ -f "$KERNEL" ] || { echo "Error: Kernel not found at $KERNEL. Run build_sec.sh first."; exit 1; }
-[ -f "$DISK_IMG" ] || { echo "Error: Disk image not found at $DISK_IMG. Provision it first."; exit 1; }
+[ -f "$KERNEL" ] || die "Security kernel not found at $KERNEL. Run 'make build-sec' first."
+[ -f "$DISK_IMG" ] || die "Disk image not found at $DISK_IMG. Run 'make provision-image' first."
+require_cmds "$QEMU_BIN"
 
-# Determine CPU mode
+# Determine CPU virtualization mode
 CPU_ARGS=()
-MODE=""
+CPU_MODE=""
 if [ -e /dev/kvm ] && grep -qw pks /proc/cpuinfo; then
-    MODE="KVM / host"
+    CPU_MODE="KVM / host (Hardware PKS verified)"
     CPU_ARGS=(-enable-kvm -cpu host)
 elif [ -e /dev/kvm ]; then
-    MODE="KVM / host (host lacks PKS, falling back to TCG)"
+    CPU_MODE="KVM / host (Host lacks PKS, falling back to TCG)"
     CPU_ARGS=(-cpu max,pks=on)
-    echo "WARNING: Host CPU does not expose supervisor PKS."
-    echo "         Falling back to TCG emulation. Security validation results will be INVALID."
-    echo "         For meaningful results, use a host with supervisor PKS."
+    log_warn "Host CPU lacks supervisor PKS; falling back to TCG emulation."
 else
-    MODE="TCG / max,pks=on"
+    CPU_MODE="TCG / max,pks=on"
     CPU_ARGS=(-cpu max,pks=on)
-    echo "WARNING: KVM not available, using TCG emulation."
-    echo "         Security validation results will be INVALID."
+    log_warn "KVM not available; using TCG emulation (functional only, not publication-grade)."
 fi
 
-echo "-----------------------------------------------------"
-echo " Security Validation Boot"
-echo "   Kernel:    $KERNEL"
-echo "   Disk:      $DISK_IMG"
-echo "   PKS state: $PKS_STATE"
-echo "   CPU mode:  $MODE"
-echo "-----------------------------------------------------"
+EXTRA_CMDLINE=""
+LOG_FILE=""
+if [ "$RUN_MODE" = "--batch" ]; then
+    mkdir -p "$RESULTS_DIR"
+    LOG_FILE="$RESULTS_DIR/sec_${PKS_STATE}.log"
+    EXTRA_CMDLINE="pks_auto=sec panic=1"
+fi
 
-"$QEMU_BIN" \
-    -machine q35 \
-    "${CPU_ARGS[@]}" \
-    -smp "$SMP" \
-    -m "$MEM" \
-    -kernel "$KERNEL" \
-    -append "root=/dev/vda1 rw console=$CONSOLE nokaslr pcache_pks=$PKS_STATE" \
-    -drive file="$DISK_IMG",format=raw,if=virtio,cache=none,aio=native \
-    -nographic \
+log_header "Launching Security Validation Boot"
+log_kv "PKS State"   "$PKS_STATE"
+log_kv "Execution"   "$RUN_MODE"
+log_kv "Kernel"      "$KERNEL"
+log_kv "Disk Image"  "$DISK_IMG"
+log_kv "CPU Mode"    "$CPU_MODE"
+log_kv "RAM / Cores" "$MEM / $SMP"
+if [ -n "$LOG_FILE" ]; then
+    log_kv "Serial Log"  "$LOG_FILE"
+fi
+
+QEMU_CMD=(
+    "$QEMU_BIN"
+    -machine q35
+    "${CPU_ARGS[@]}"
+    -smp "$SMP"
+    -m "$MEM"
+    -kernel "$KERNEL"
+    -append "root=/dev/vda1 rw console=$CONSOLE nokaslr pcache_pks=$PKS_STATE $EXTRA_CMDLINE"
+    -drive file="$DISK_IMG",format=raw,if=virtio,cache=none,aio=native
+    -nographic
     -no-reboot
+)
+
+if [ "$RUN_MODE" = "--batch" ]; then
+    log_step "Running automated batch security validation (logging to $LOG_FILE)..."
+    "${QEMU_CMD[@]}" 2>&1 | tee "$LOG_FILE"
+    log_ok "Batch execution finished for pcache_pks=$PKS_STATE"
+else
+    "${QEMU_CMD[@]}"
+fi

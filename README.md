@@ -2,111 +2,114 @@
 
 This repository provides an automated test harness, disk provisioning pipeline, and QEMU orchestration environment for evaluating Supervisor Protection Keys (PKS) page-cache isolation in the Linux kernel (`v5.18-rc3`).
 
+The entire workflow is controllable from the top-level `Makefile`, featuring headless batch execution, automatic result harvesting, interactive debugging consoles, and unified logging.
+
 ---
 
 ## Directory Layout
 
 ```
 pks-thesis-env/
+├── config.mk               # Centralized configuration overrides (paths, RAM, SMP, etc.)
 ├── guest-assets/
+│   ├── autorun/            # Headless automated execution service (systemd)
+│   │   ├── pks-autorun.sh
+│   │   └── pks-autorun.service
 │   ├── exploit/
-│   │   ├── copy-fail/      # Copy Fail (CVE-2026-31431) headless exploit
-│   │   ├── dirty-frag/     # Dirty Frag (CVE-2026-43284, CVE-2026-43500) headless exploit
-│   │   └── run_tests.sh    # Automated security validation harness
+│   │   ├── copy-fail/      # Copy Fail (CVE-2026-31431) exploit
+│   │   ├── dirty-frag/     # Dirty Frag (CVE-2026-43284, CVE-2026-43500) exploit
+│   │   └── run_tests.sh    # Security validation harness (A/B testing)
 │   └── benchmark/
-│       └── run_benchmarks.sh # Automated fio buffered I/O scaling benchmark suite
+│       └── run_benchmarks.sh # Synchronous buffered fio scaling benchmark suite
 ├── scripts/
+│   ├── common.sh           # Unified minimal logging utilities & pre-flight checks
 │   ├── build_sec.sh        # Compiles debug-enabled security kernel (pcache_pks)
 │   ├── build_perf.sh       # Compiles optimized mitigated performance kernel
-│   ├── build_control.sh    # Compiles vanilla upstream control baseline
-│   ├── provision_disk.sh   # Provisions dual-partition raw ext4 disk image (Debian)
-│   ├── update_disk.sh      # Incremental sync of guest-assets into disk image
-│   ├── run_qemu_sec.sh     # QEMU launcher for security causality validation (off/on)
-│   ├── run_qemu_perf.sh    # QEMU launcher for mitigated performance benchmarks
-│   └── run_qemu_control.sh # QEMU launcher for control baseline benchmarks
+│   ├── build_control.sh    # Compiles baseline upstream control kernel
+│   ├── provision_disk.sh   # Provisions dual-partition ext4 disk image (Debian)
+│   ├── update_disk.sh      # Synchronizes guest-assets into existing disk image
+│   ├── fetch_results.sh    # Extracts artifacts from disk image to host results/
+│   ├── analyze_bench.py    # Generates thesis-ready comparison tables & overhead
+│   ├── run_qemu_sec.sh     # QEMU launcher for security tests (batch / interactive)
+│   ├── run_qemu_perf.sh    # QEMU launcher for mitigated benchmarks
+│   └── run_qemu_control.sh # QEMU launcher for baseline benchmarks
+├── results/                # Host-side captured serial logs and extracted data
 └── Makefile                # Pipeline automation entry point
 ```
 
 ---
 
-## Quick Start
+## Quick Reference: `make help`
 
-### 1. Build Kernels
+Run `make help` to inspect all available targets:
 
-```bash
-# Build the security kernel with PKS enabled and debug diagnostics
-make build-sec
+| Category | Command | Description |
+| :--- | :--- | :--- |
+| **Kernel Build** | `make build-sec` | Compile security kernel (`pcache_pks` diagnostics) |
+| | `make build-perf` | Compile mitigated performance kernel |
+| | `make build-control` | Compile baseline upstream control kernel |
+| | `make build-all` | Compile all three kernel configurations |
+| **Disk Image** | `make provision-disk` | Bootstrap fresh 8GB Debian raw disk image |
+| | `make update-disk` | Synchronize guest assets & autorun into image |
+| **Batch Security** | `make test-sec-off` | Automated headless run with `pcache_pks=off` |
+| | `make test-sec-on` | Automated headless run with `pcache_pks=on` |
+| | `make test-sec` | Run both off/on tests sequentially & summarize |
+| **Batch Benchmarks**| `make bench-control` | Headless fio benchmark on vanilla control kernel |
+| | `make bench-mitigated`| Headless fio benchmark on mitigated kernel |
+| | `make bench-all` | Run control + mitigated runs and analyze |
+| **Analysis** | `make fetch-results` | Extract JSONs and logs from VM disk to host |
+| | `make analyze-bench` | Parse fio JSONs and print overhead table |
+| **Interactive** | `make run-sec-off` | Interactive console with `pcache_pks=off` |
+| | `make run-sec-on` | Interactive console with `pcache_pks=on` |
+| | `make run-perf` | Interactive console for mitigated kernel |
+| | `make run-control` | Interactive console for control kernel |
+| **Housekeeping** | `make check-deps` | Verify host prerequisites and tools |
+| | `make clean-results` | Clear host results directory |
+| | `make clean-all` | Clear results and disk image container |
 
-# Build the performance benchmarking kernels
-make build-perf
-make build-control
-```
+---
 
-### 2. Provision the Disk Image
+## Configuration (`config.mk`)
 
-The provisioning script creates a raw 8GB image partitioned into:
-* Partition 1 (`/dev/vda1`, 6GB): Debian Bookworm root filesystem (`/`).
-* Partition 2 (`/dev/vda2`, 2GB): Dedicated ext4 partition mounted at `/mnt/protected`.
+All parameters are centralized in `config.mk` and can be overridden via environment variables or CLI arguments:
 
-```bash
-make provision-image
-```
+```makefile
+# Override kernel source tree path
+make build-sec DEV_KERNEL_DIR=/path/to/linux-5.18-rc3
 
-If guest-assets are modified, sync them into the disk without re-provisioning:
-```bash
-make update-disk
+# Override CPU cores and RAM allocation
+make test-sec-on SMP=8 MEM_SEC=8G
+
+# Pin benchmark execution to dedicated host cores
+make bench-all TASKSET_CPUS="4-7"
 ```
 
 ---
 
-## Evaluation Workflow
+## Evaluation Workflows
 
-### A. Security Causality Validation (A/B Testing)
+### 1. Automated Security Validation (`make test-sec`)
 
-#### 1. Baseline Test (Vulnerable / PKS Disabled)
-Boot with PKS disabled:
-```bash
-make run-sec-off
-```
-Inside the guest VM:
-```bash
-sudo /exploit/run_tests.sh
-```
-* **Expected Result**: Both `copy-fail` and `dirty-frag` report `SUCCEEDED` (target file checksum altered in page cache).
+Executing `make test-sec` automatically runs both test phases in batch mode:
+1. Boots the security kernel with `pcache_pks=off` and `pks_auto=sec`.
+2. The in-guest autorun service executes `/exploit/run_tests.sh`, logs results, and powers off.
+3. Boots the security kernel with `pcache_pks=on` and `pks_auto=sec`.
+4. Executes the tests against PKS-protected storage, detects supervisor `#PF` events, logs results, and powers off.
+5. Displays an A/B delta summary verifying that exploits succeeded in the off state and were neutralized in the on state.
 
-#### 2. Mitigated Test (PKS Active)
-Boot with PKS enabled:
+### 2. Automated Micro-benchmarking (`make bench-all`)
+
+Executing `make bench-all`:
+1. Boots the control kernel in batch mode (`pks_auto=bench`), executes the synchronous buffered write scaling and 4KB random read suites, and powers off.
+2. Extracts control benchmark JSONs into `results/extracted/bench/control/`.
+3. Boots the mitigated kernel in batch mode (`pcache_pks=on`), runs the identical benchmark suite, and powers off.
+4. Extracts mitigated benchmark JSONs into `results/extracted/bench/mitigated/`.
+5. Invokes `analyze_bench.py` to print a Markdown table with mean throughput (MB/s), IOPS, latency, and throughput overhead percentage.
+
+### 3. Interactive Debugging
+
+To manually explore the guest environment or run custom experiments:
 ```bash
 make run-sec-on
 ```
-Inside the guest VM:
-```bash
-sudo /exploit/run_tests.sh
-```
-* **Expected Result**: Both exploits are `BLOCKED` (page cache protected, file checksum unchanged, supervisor `#PF` trace logged in `dmesg`).
-
----
-
-### B. Performance Micro-benchmarking (`fio`)
-
-#### 1. Control Baseline Run
-Boot the vanilla kernel (usable memory equalized to 3840MB, taskset CPU core pinning):
-```bash
-TASKSET_CPUS="2-5" make run-control
-```
-Inside the guest VM:
-```bash
-sudo /benchmark/run_benchmarks.sh
-```
-
-#### 2. Mitigated Run
-Boot the PKS-mitigated kernel (4096MB RAM total, 256MB static pool reserved = 3840MB usable):
-```bash
-TASKSET_CPUS="2-5" make run-perf
-```
-Inside the guest VM:
-```bash
-sudo /benchmark/run_benchmarks.sh
-```
-
-Benchmark output JSON files are saved to `/tmp/bench_results/` for latency and throughput comparison across block sizes (4KB to 1MB).
+The VM boots directly to a serial login prompt (`testuser` / `testuser`, or root passwordless sudo).

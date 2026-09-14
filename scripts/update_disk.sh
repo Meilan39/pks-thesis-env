@@ -1,48 +1,49 @@
 #!/usr/bin/env bash
+# ==============================================================================
+# scripts/update_disk.sh - Synchronize updated guest assets into disk image
+# ==============================================================================
+# Usage: ./update_disk.sh [disk.img]
+# ==============================================================================
 set -euo pipefail
 
-# ----------------------------------------------------------------------
-# update_disk.sh - Update /exploit inside the persistent disk image
-# Usage: sudo ./update_disk.sh
-# ----------------------------------------------------------------------
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$SCRIPT_DIR/common.sh"
 
-DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
+ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+DISK_IMG="${1:-${DISK_IMG:-$ENV_DIR/images/disk.img}}"
 GUEST_ASSETS_DIR="${GUEST_ASSETS_DIR:-$ENV_DIR/guest-assets}"
 
-if [ ! -f "$DISK_IMG" ]; then
-    echo "Error: Disk image not found at $DISK_IMG"
-    exit 1
-fi
+[ -f "$DISK_IMG" ] || die "Disk image not found: $DISK_IMG"
+[ -d "$GUEST_ASSETS_DIR" ] || die "Guest assets directory not found: $GUEST_ASSETS_DIR"
+require_cmds losetup mount umount chroot sudo
 
-if [ ! -d "$GUEST_ASSETS_DIR" ]; then
-    echo "Error: Source guest-assets directory not found at $GUEST_ASSETS_DIR"
-    exit 1
-fi
+log_header "Updating Guest Assets in Disk Image"
+log_kv "Disk Image"  "$DISK_IMG"
+log_kv "Assets Dir"  "$GUEST_ASSETS_DIR"
 
-echo "=== Updating guest assets in $DISK_IMG ==="
-
-# Attach the image as a loop device with partition scanning
+log_step "Attaching loop device with partition scanning"
 LOOP=$(sudo losetup --find --show --partscan "$DISK_IMG")
-echo "Loop device: $LOOP"
-
-# The root partition is ${LOOP}p1
 ROOT_PART="${LOOP}p1"
+
 if [ ! -b "$ROOT_PART" ]; then
-    echo "Error: Partition $ROOT_PART not found. Is the image partitioned?"
     sudo losetup -d "$LOOP"
-    exit 1
+    die "Partition $ROOT_PART not found. Ensure the disk image is partitioned."
 fi
 
-# Mount it
 MOUNT_POINT="$(mktemp -d)"
+
+cleanup() {
+    log_step "Detaching mounts and loop devices"
+    sudo umount "$MOUNT_POINT" 2>/dev/null || true
+    sudo losetup -d "$LOOP" 2>/dev/null || true
+    rmdir "$MOUNT_POINT" 2>/dev/null || true
+}
+trap cleanup EXIT
+
 sudo mount "$ROOT_PART" "$MOUNT_POINT"
 
-# Replace /exploit if present in guest-assets
 if [ -d "$GUEST_ASSETS_DIR/exploit" ]; then
-    echo "Syncing /exploit ..."
+    log_step "Synchronizing /exploit into guest rootfs"
     sudo rm -rf "$MOUNT_POINT/exploit"
     sudo mkdir -p "$MOUNT_POINT/exploit"
     sudo cp -a "$GUEST_ASSETS_DIR/exploit/." "$MOUNT_POINT/exploit/"
@@ -52,16 +53,15 @@ if [ -d "$GUEST_ASSETS_DIR/exploit" ]; then
         sudo chmod +x "$MOUNT_POINT/exploit/run_tests.sh"
     fi
     if [ -f "$MOUNT_POINT/exploit/dirty-frag/exp.c" ]; then
-        echo "Compiling dirty-frag harness inside chroot ..."
+        log_step "Recompiling dirty-frag harness inside chroot"
         sudo chroot "$MOUNT_POINT" /bin/bash -c "
             cd /exploit/dirty-frag && gcc -O0 -Wall -o exp exp.c -lutil
-        " 2>/dev/null || true
+        " 2>/dev/null || log_warn "dirty-frag compilation inside chroot skipped"
     fi
 fi
 
-# Replace /benchmark if present in guest-assets
 if [ -d "$GUEST_ASSETS_DIR/benchmark" ]; then
-    echo "Syncing /benchmark ..."
+    log_step "Synchronizing /benchmark into guest rootfs"
     sudo rm -rf "$MOUNT_POINT/benchmark"
     sudo mkdir -p "$MOUNT_POINT/benchmark"
     sudo cp -a "$GUEST_ASSETS_DIR/benchmark/." "$MOUNT_POINT/benchmark/"
@@ -72,12 +72,22 @@ if [ -d "$GUEST_ASSETS_DIR/benchmark" ]; then
     fi
 fi
 
-# Ensure /mnt/protected mount point exists
+# Synchronize headless autorun components
+if [ -d "$GUEST_ASSETS_DIR/autorun" ]; then
+    log_step "Updating headless autorun service"
+    if [ -f "$GUEST_ASSETS_DIR/autorun/pks-autorun.sh" ]; then
+        sudo cp "$GUEST_ASSETS_DIR/autorun/pks-autorun.sh" "$MOUNT_POINT/usr/local/bin/pks-autorun.sh"
+        sudo chmod 755 "$MOUNT_POINT/usr/local/bin/pks-autorun.sh"
+    fi
+    if [ -f "$GUEST_ASSETS_DIR/autorun/pks-autorun.service" ]; then
+        sudo cp "$GUEST_ASSETS_DIR/autorun/pks-autorun.service" "$MOUNT_POINT/etc/systemd/system/pks-autorun.service"
+        sudo mkdir -p "$MOUNT_POINT/etc/systemd/system/multi-user.target.wants"
+        sudo ln -sf /etc/systemd/system/pks-autorun.service \
+            "$MOUNT_POINT/etc/systemd/system/multi-user.target.wants/pks-autorun.service"
+    fi
+fi
+
+# Ensure /mnt/protected mount directory exists
 sudo mkdir -p "$MOUNT_POINT/mnt/protected"
 
-# Unmount and detach
-sudo umount "$MOUNT_POINT"
-sudo losetup -d "$LOOP"
-rmdir "$MOUNT_POINT"
-
-echo "=== Update complete ==="
+log_ok "Disk image updated successfully"

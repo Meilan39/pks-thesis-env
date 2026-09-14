@@ -1,0 +1,14 @@
+[Unit]
+Description=PKS Evaluation Suite Automated Test Runner
+After=multi-user.target
+ConditionKernelCommandLine=|pks_auto
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/pks-autorun.sh
+StandardOutput=journal+console
+StandardError=journal+console
+TimeoutStartSec=0
+
+[Install]
+WantedBy=multi-user.target

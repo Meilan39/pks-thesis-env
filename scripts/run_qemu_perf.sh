@@ -1,20 +1,14 @@
 #!/usr/bin/env bash
+# ==============================================================================
+# scripts/run_qemu_perf.sh - Mitigated performance benchmark launcher
+# ==============================================================================
+# Usage: ./run_qemu_perf.sh [--batch|--interactive]
+# ==============================================================================
 set -euo pipefail
 
-# ----------------------------------------------------------------------
-# Performance Benchmark Launcher - Development Kernel (pcache_pks=on)
-# Usage: ./run_qemu_perf.sh
-#
-# This script boots the mitigated kernel for the "implementation" run.
-# It uses KVM if available; otherwise falls back to TCG (not recommended
-# for performance measurements).
-#
-# Memory handicap: The control VM boots with mem=3840M (no pool reserved).
-# The mitigated VM boots with mem=4096M (kernel reserves 256M pool),
-# leaving 3840M usable, matching the control environment.
-# ----------------------------------------------------------------------
-
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common.sh"
+
 ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 WORKSPACE_KERNEL="$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
 
@@ -23,50 +17,76 @@ DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 SMP="${SMP:-4}"
 CONSOLE="${CONSOLE:-ttyS0}"
 QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
-TASKSET_CPUS="${TASKSET_CPUS:-}"          # optional, e.g., "4-7"
+TASKSET_CPUS="${TASKSET_CPUS:-}"
+TOTAL_MEM="${MEM_PERF_MITIGATED:-4096M}"
+RESULTS_DIR="${RESULTS_DIR:-$ENV_DIR/results}"
 
-# CPU pinning
-if [ -n "$TASKSET_CPUS" ]; then
-    TASKSET_CMD="taskset -c $TASKSET_CPUS"
-else
-    TASKSET_CMD=""
-fi
-
-TOTAL_MEM="${TOTAL_MEM:-4096M}"           # 4G total, 256M reserved for pool
+RUN_MODE="${1:---interactive}"
 
 KERNEL="$DEV_KERNEL_DIR/build_perf/arch/x86/boot/bzImage"
-[ -f "$KERNEL" ] || { echo "Error: Kernel not found at $KERNEL. Run build_perf.sh first."; exit 1; }
-[ -f "$DISK_IMG" ] || { echo "Error: Disk image not found at $DISK_IMG"; exit 1; }
+[ -f "$KERNEL" ] || die "Performance kernel not found at $KERNEL. Run 'make build-perf' first."
+[ -f "$DISK_IMG" ] || die "Disk image not found at $DISK_IMG. Run 'make provision-image' first."
+require_cmds "$QEMU_BIN"
 
-# CPU mode
+# CPU virtualization mode
 CPU_ARGS=()
-MODE=""
-if [ -e /dev/kvm ]; then
-    MODE="KVM / host"
+CPU_MODE=""
+if [ -e /dev/kvm ] && grep -qw pks /proc/cpuinfo; then
+    CPU_MODE="KVM / host (Hardware PKS verified)"
     CPU_ARGS=(-enable-kvm -cpu host)
+elif [ -e /dev/kvm ]; then
+    CPU_MODE="KVM / host (Host lacks PKS, falling back to TCG)"
+    CPU_ARGS=(-cpu max,pks=on)
+    log_warn "Host CPU lacks supervisor PKS; benchmark latencies under TCG will not be representative."
 else
-    MODE="TCG / max"
-    CPU_ARGS=(-cpu max)
-    echo "WARNING: KVM not available, using TCG. Performance numbers will be meaningless."
+    CPU_MODE="TCG / max,pks=on"
+    CPU_ARGS=(-cpu max,pks=on)
+    log_warn "KVM not available; using TCG. Micro-benchmark results will not be representative."
 fi
 
-echo "-----------------------------------------------------"
-echo " Performance Benchmark Boot (Mitigated Kernel)"
-echo "   Kernel:      $KERNEL"
-echo "   Disk:        $DISK_IMG"
-echo "   PKS state:   on"
-echo "   Total RAM:   $TOTAL_MEM"
-echo "   CPU mode:    $MODE"
-echo "   CPU pinning: ${TASKSET_CPUS:-none}"
-echo "-----------------------------------------------------"
+TASKSET_CMD=()
+if [ -n "$TASKSET_CPUS" ]; then
+    TASKSET_CMD=(taskset -c "$TASKSET_CPUS")
+fi
 
-$TASKSET_CMD "$QEMU_BIN" \
-    -machine q35 \
-    "${CPU_ARGS[@]}" \
-    -smp "$SMP" \
-    -m "$TOTAL_MEM" \
-    -kernel "$KERNEL" \
-    -append "root=/dev/vda1 rw console=$CONSOLE nokaslr pcache_pks=on" \
-    -drive file="$DISK_IMG",format=raw,if=virtio,cache=none,aio=native \
-    -nographic \
+EXTRA_CMDLINE=""
+LOG_FILE=""
+if [ "$RUN_MODE" = "--batch" ]; then
+    mkdir -p "$RESULTS_DIR"
+    LOG_FILE="$RESULTS_DIR/perf_mitigated.log"
+    EXTRA_CMDLINE="pks_auto=bench panic=1"
+fi
+
+log_header "Launching Mitigated Performance Benchmark VM"
+log_kv "Kernel"      "$KERNEL"
+log_kv "Disk Image"  "$DISK_IMG"
+log_kv "Execution"   "$RUN_MODE"
+log_kv "PKS State"   "on"
+log_kv "Total RAM"   "$TOTAL_MEM (256MB pool -> 3840MB usable)"
+log_kv "CPU Mode"    "$CPU_MODE"
+log_kv "CPU Pinning" "${TASKSET_CPUS:-none}"
+if [ -n "$LOG_FILE" ]; then
+    log_kv "Serial Log"  "$LOG_FILE"
+fi
+
+QEMU_CMD=(
+    "${TASKSET_CMD[@]}"
+    "$QEMU_BIN"
+    -machine q35
+    "${CPU_ARGS[@]}"
+    -smp "$SMP"
+    -m "$TOTAL_MEM"
+    -kernel "$KERNEL"
+    -append "root=/dev/vda1 rw console=$CONSOLE nokaslr pcache_pks=on $EXTRA_CMDLINE"
+    -drive file="$DISK_IMG",format=raw,if=virtio,cache=none,aio=native
+    -nographic
     -no-reboot
+)
+
+if [ "$RUN_MODE" = "--batch" ]; then
+    log_step "Running automated batch benchmark (logging to $LOG_FILE)..."
+    "${QEMU_CMD[@]}" 2>&1 | tee "$LOG_FILE"
+    log_ok "Mitigated benchmark run finished"
+else
+    "${QEMU_CMD[@]}"
+fi

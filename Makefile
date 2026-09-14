@@ -1,60 +1,189 @@
-# Top-level orchestration for the PKS evaluation pipeline
+# ==============================================================================
+# Makefile - Top-level Orchestration for PKS Thesis Evaluation Pipeline
+# ==============================================================================
+# Controls kernel compilation, disk provisioning, automated batch tests,
+# interactive debugging, and benchmark harvesting/analysis.
+# ==============================================================================
+
 SHELL := /bin/bash
-ENV_DIR := $(CURDIR)
-SCRIPTS_DIR := $(ENV_DIR)/scripts
-GUEST_ASSETS := $(ENV_DIR)/guest-assets
-IMAGES_DIR := $(ENV_DIR)/images
-RESULTS_DIR := $(ENV_DIR)/results
+.DEFAULT_GOAL := help
 
-WORKSPACE_DIR := $(abspath $(CURDIR)/..)
-KERNEL_DEV ?= $(if $(wildcard $(WORKSPACE_DIR)/linux-5.18-rc3),$(WORKSPACE_DIR)/linux-5.18-rc3,$(HOME)/src/linux-pks-thesis)
-KERNEL_CONTROL ?= $(if $(wildcard $(WORKSPACE_DIR)/linux-control),$(WORKSPACE_DIR)/linux-control,$(HOME)/src/linux-control)
-export DISK_IMG ?= $(IMAGES_DIR)/disk.img
-export DEV_KERNEL_DIR ?= $(KERNEL_DEV)
-export CONTROL_KERNEL_DIR ?= $(KERNEL_CONTROL)
+-include config.mk
 
-.PHONY: all build-sec build-perf build-control provision-image update-disk \
-        run-sec-off run-sec-on run-perf run-control clean
+# Export variables for child scripts
+export DEV_KERNEL_DIR CONTROL_KERNEL_DIR DISK_IMG DISK_SIZE ROOTFS_SIZE PROT_SIZE
+export DEBIAN_SUITE DEBIAN_ARCH DEBIAN_MIRROR SCRIPTS_DIR GUEST_ASSETS_DIR
+export IMAGES_DIR RESULTS_DIR QEMU_BIN SMP CONSOLE TASKSET_CPUS
+export MEM_SEC MEM_PERF_MITIGATED MEM_PERF_CONTROL BATCH_TIMEOUT_SEC
 
-all: build-sec build-perf build-control
+.PHONY: all help check-deps \
+        build-sec build-perf build-control build-all \
+        provision-disk update-disk \
+        test-sec-off test-sec-on test-sec \
+        bench-control bench-mitigated bench-all \
+        fetch-results analyze-bench \
+        run-sec-off run-sec-on run-perf run-control \
+        clean-results clean-all
 
-## Build kernels
+# ==============================================================================
+# Help Target
+# ==============================================================================
+help:
+	@echo "======================================================================"
+	@echo " PKS Thesis Evaluation Environment - Available Commands"
+	@echo "======================================================================"
+	@echo ""
+	@echo "  Kernel Compilation:"
+	@echo "    make build-sec           Compile security kernel (pcache_pks diagnostics)"
+	@echo "    make build-perf          Compile mitigated performance kernel (pcache_pks)"
+	@echo "    make build-control       Compile baseline upstream control kernel"
+	@echo "    make build-all           Compile all three kernel configurations"
+	@echo ""
+	@echo "  Disk Image Lifecycle:"
+	@echo "    make provision-disk      Bootstrap and partition fresh 8GB Debian disk"
+	@echo "    make update-disk         Incrementally sync guest-assets into disk image"
+	@echo ""
+	@echo "  Automated Security Validation (Headless Batch):"
+	@echo "    make test-sec-off        Run exploit suite with pcache_pks=off (vulnerable)"
+	@echo "    make test-sec-on         Run exploit suite with pcache_pks=on (mitigated)"
+	@echo "    make test-sec            Execute both off/on tests and summarize results"
+	@echo ""
+	@echo "  Automated Micro-benchmarks (Headless Batch):"
+	@echo "    make bench-control       Run fio write/read suite on control kernel"
+	@echo "    make bench-mitigated     Run fio write/read suite on mitigated kernel"
+	@echo "    make bench-all           Run control + mitigated benchmarks and analyze"
+	@echo ""
+	@echo "  Artifact Extraction & Analysis:"
+	@echo "    make fetch-results       Extract JSONs & logs from disk image to host"
+	@echo "    make analyze-bench       Parse extracted fio JSONs and print overhead"
+	@echo ""
+	@echo "  Interactive Debugging Shells:"
+	@echo "    make run-sec-off         Interactive serial console (pcache_pks=off)"
+	@echo "    make run-sec-on          Interactive serial console (pcache_pks=on)"
+	@echo "    make run-perf            Interactive serial console (mitigated kernel)"
+	@echo "    make run-control         Interactive serial console (control kernel)"
+	@echo ""
+	@echo "  Environment & Cleanup:"
+	@echo "    make check-deps          Verify host tools and dependencies"
+	@echo "    make clean-results       Remove host-side logs and extracted results"
+	@echo "    make clean-all           Remove results and disk image"
+	@echo "======================================================================"
+
+# ==============================================================================
+# Pre-flight Dependency Check
+# ==============================================================================
+check-deps:
+	@$(SCRIPTS_DIR)/common.sh
+	@echo "Checking host dependencies..."
+	@for cmd in $(QEMU_BIN) gcc make sfdisk losetup mkfs.ext4 debootstrap sudo python3; do \
+		if command -v $$cmd >/dev/null 2>&1; then \
+			printf "  [OK]   %-16s found\n" "$$cmd"; \
+		else \
+			printf "  [MISS] %-16s NOT FOUND\n" "$$cmd"; \
+		fi; \
+	done
+
+# ==============================================================================
+# Kernel Build Targets
+# ==============================================================================
 build-sec:
-	@echo "=== Building security kernel (build_sec) ==="
-	$(SCRIPTS_DIR)/build_sec.sh $(KERNEL_DEV)
+	@$(SCRIPTS_DIR)/build_sec.sh $(DEV_KERNEL_DIR)
 
 build-perf:
-	@echo "=== Building performance kernel (build_perf, dev) ==="
-	$(SCRIPTS_DIR)/build_perf.sh $(KERNEL_DEV)
+	@$(SCRIPTS_DIR)/build_perf.sh $(DEV_KERNEL_DIR)
 
 build-control:
-	@echo "=== Building control kernel (build_perf, control) ==="
-	$(SCRIPTS_DIR)/build_control.sh $(KERNEL_CONTROL)
+	@$(SCRIPTS_DIR)/build_control.sh $(CONTROL_KERNEL_DIR)
 
-## Provision the persistent disk image
-provision-image:
-	@echo "=== Provisioning disk image: $(DISK_IMG) ==="
-	$(SCRIPTS_DIR)/provision_disk.sh $(DISK_IMG)
+build-all: build-sec build-perf build-control
 
-## Synchronize guest assets into existing disk image
+# ==============================================================================
+# Disk Lifecycle Targets
+# ==============================================================================
+provision-disk:
+	@$(SCRIPTS_DIR)/provision_disk.sh $(DISK_IMG)
+
 update-disk:
-	@echo "=== Syncing guest assets into disk image: $(DISK_IMG) ==="
-	$(SCRIPTS_DIR)/update_disk.sh
+	@$(SCRIPTS_DIR)/update_disk.sh $(DISK_IMG)
 
-## Run security validation
+# ==============================================================================
+# Automated Security Testing (Batch Mode)
+# ==============================================================================
+test-sec-off:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch
+
+test-sec-on:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch
+
+test-sec: test-sec-off test-sec-on
+	@echo ""
+	@echo "======================================================================"
+	@echo " Security Validation Summary (A/B Test)"
+	@echo "======================================================================"
+	@echo "  pcache_pks=off Log: $(RESULTS_DIR)/sec_off.log"
+	@echo "  pcache_pks=on  Log: $(RESULTS_DIR)/sec_on.log"
+	@echo "----------------------------------------------------------------------"
+	@if [ -f "$(RESULTS_DIR)/sec_off.log" ]; then \
+		echo "Off state results:"; \
+		grep -E "(RESULT:|pre-run|post-run)" "$(RESULTS_DIR)/sec_off.log" || true; \
+	fi
+	@echo "----------------------------------------------------------------------"
+	@if [ -f "$(RESULTS_DIR)/sec_on.log" ]; then \
+		echo "On state results:"; \
+		grep -E "(RESULT:|pre-run|post-run|Security event|Oops)" "$(RESULTS_DIR)/sec_on.log" || true; \
+	fi
+	@echo "======================================================================"
+
+# ==============================================================================
+# Automated Benchmarking (Batch Mode)
+# ==============================================================================
+bench-control:
+	@mkdir -p $(RESULTS_DIR)/extracted/bench/control
+	@$(SCRIPTS_DIR)/run_qemu_control.sh --batch
+	@$(SCRIPTS_DIR)/fetch_results.sh $(RESULTS_DIR)/extracted_control
+	@cp -a $(RESULTS_DIR)/extracted_control/bench/*.json $(RESULTS_DIR)/extracted/bench/control/ 2>/dev/null || true
+
+bench-mitigated:
+	@mkdir -p $(RESULTS_DIR)/extracted/bench/mitigated
+	@$(SCRIPTS_DIR)/run_qemu_perf.sh --batch
+	@$(SCRIPTS_DIR)/fetch_results.sh $(RESULTS_DIR)/extracted_mitigated
+	@cp -a $(RESULTS_DIR)/extracted_mitigated/bench/*.json $(RESULTS_DIR)/extracted/bench/mitigated/ 2>/dev/null || true
+
+bench-all: bench-control bench-mitigated analyze-bench
+
+# ==============================================================================
+# Results Harvesting and Parsing
+# ==============================================================================
+fetch-results:
+	@$(SCRIPTS_DIR)/fetch_results.sh $(RESULTS_DIR)/extracted
+
+analyze-bench:
+	@$(SCRIPTS_DIR)/analyze_bench.py \
+		--control-dir $(RESULTS_DIR)/extracted/bench/control \
+		--mitigated-dir $(RESULTS_DIR)/extracted/bench/mitigated
+
+# ==============================================================================
+# Interactive QEMU Shells (Manual / Debugging Mode)
+# ==============================================================================
 run-sec-off:
-	$(SCRIPTS_DIR)/run_qemu_sec.sh off
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --interactive
 
 run-sec-on:
-	$(SCRIPTS_DIR)/run_qemu_sec.sh on
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --interactive
 
-## Run performance benchmarks
 run-perf:
-	$(SCRIPTS_DIR)/run_qemu_perf.sh
+	@$(SCRIPTS_DIR)/run_qemu_perf.sh --interactive
 
 run-control:
-	$(SCRIPTS_DIR)/run_qemu_control.sh
+	@$(SCRIPTS_DIR)/run_qemu_control.sh --interactive
 
-clean:
-	@echo "Removing results and temporary files"
-	rm -rf $(RESULTS_DIR)/*
+# ==============================================================================
+# Cleanup
+# ==============================================================================
+clean-results:
+	@echo "Removing results and extracted artifacts..."
+	@rm -rf $(RESULTS_DIR)/*
+
+clean-all: clean-results
+	@echo "Removing disk image container..."
+	@rm -f $(DISK_IMG)
