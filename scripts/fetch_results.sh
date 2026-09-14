@@ -35,7 +35,7 @@ cleanup() {
 }
 trap cleanup EXIT
 
-mkdir -p "$DEST_DIR/bench" "$DEST_DIR/exploit"
+mkdir -p "$DEST_DIR/bench" "$DEST_DIR/exploit" "$DEST_DIR/unit"
 
 # 1. Check protected partition (partition 2)
 if [ -b "$PROT_PART" ]; then
@@ -48,6 +48,10 @@ if [ -b "$PROT_PART" ]; then
         if [ -d "$MOUNT_POINT/exploit_results" ]; then
             log_info "Harvesting exploit logs from protected partition..."
             sudo cp -a "$MOUNT_POINT/exploit_results/." "$DEST_DIR/exploit/" 2>/dev/null || true
+        fi
+        if [ -d "$MOUNT_POINT/unit_results" ]; then
+            log_info "Harvesting unit test logs from protected partition..."
+            sudo cp -a "$MOUNT_POINT/unit_results/." "$DEST_DIR/unit/" 2>/dev/null || true
         fi
         sudo umount "$MOUNT_POINT"
     fi
@@ -63,6 +67,9 @@ if [ -b "$ROOT_PART" ]; then
         if [ -d "$MOUNT_POINT/tmp/exploit_results" ]; then
             sudo cp -a "$MOUNT_POINT/tmp/exploit_results/." "$DEST_DIR/exploit/" 2>/dev/null || true
         fi
+        if [ -d "$MOUNT_POINT/tmp/unit_results" ]; then
+            sudo cp -a "$MOUNT_POINT/tmp/unit_results/." "$DEST_DIR/unit/" 2>/dev/null || true
+        fi
         sudo umount "$MOUNT_POINT"
     fi
 fi
@@ -71,7 +78,9 @@ sudo chown -R "$(id -u):$(id -g)" "$DEST_DIR" 2>/dev/null || true
 
 BENCH_COUNT=$(find "$DEST_DIR/bench" -type f -name "*.json" 2>/dev/null | wc -l || echo 0)
 EXPLOIT_COUNT=$(find "$DEST_DIR/exploit" -type f 2>/dev/null | wc -l || echo 0)
+UNIT_COUNT=$(find "$DEST_DIR/unit" -type f 2>/dev/null | wc -l || echo 0)
 
 log_ok "Artifact extraction complete:"
 log_kv "Benchmark JSONs" "$BENCH_COUNT files in $DEST_DIR/bench"
 log_kv "Exploit Logs"    "$EXPLOIT_COUNT files in $DEST_DIR/exploit"
+log_kv "Unit Test Logs"  "$UNIT_COUNT files in $DEST_DIR/unit"

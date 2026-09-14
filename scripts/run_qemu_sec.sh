@@ -51,9 +51,14 @@ fi
 EXTRA_CMDLINE=""
 LOG_FILE=""
 if [ "$RUN_MODE" = "--batch" ]; then
+    AUTO_MODE="${3:-sec}"
     mkdir -p "$RESULTS_DIR"
-    LOG_FILE="$RESULTS_DIR/sec_${PKS_STATE}.log"
-    EXTRA_CMDLINE="pks_auto=sec panic=1"
+    if [ "$AUTO_MODE" = "unit" ]; then
+        LOG_FILE="$RESULTS_DIR/pks_unit.log"
+    else
+        LOG_FILE="$RESULTS_DIR/sec_${PKS_STATE}.log"
+    fi
+    EXTRA_CMDLINE="pks_auto=$AUTO_MODE panic=1"
 fi
 
 log_header "Launching Security Validation Boot"

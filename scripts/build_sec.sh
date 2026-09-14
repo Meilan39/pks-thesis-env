@@ -64,9 +64,11 @@ scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_INIT_ON_ALLOC_DEFAU
 scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_INIT_ON_FREE_DEFAULT_ON
 scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_HIBERNATION
 
-log_step "Configuring diagnostic debug options"
+log_step "Configuring diagnostic debug options and fail-open handling"
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_DEBUG_INFO
-scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_PANIC_ON_OOPS
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_DEBUG_FS
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_DYNAMIC_DEBUG
+scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_PANIC_ON_OOPS
 
 log_step "Finalizing configuration and compiling bzImage"
 make O="$OUTPUT_DIR" olddefconfig >/dev/null

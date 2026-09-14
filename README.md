@@ -15,6 +15,8 @@ pks-thesis-env/
 │   ├── autorun/            # Headless automated execution service (systemd)
 │   │   ├── pks-autorun.sh
 │   │   └── pks-autorun.service
+│   ├── unit-tests/         # In-kernel built-in PKS self-tests (debugfs)
+│   │   └── run_pks_unit.sh
 │   ├── exploit/
 │   │   ├── copy-fail/      # Copy Fail (CVE-2026-31431) exploit
 │   │   ├── dirty-frag/     # Dirty Frag (CVE-2026-43284, CVE-2026-43500) exploit
@@ -51,7 +53,8 @@ Run `make help` to inspect all available targets:
 | | `make build-all` | Compile all three kernel configurations |
 | **Disk Image** | `make provision-disk` | Bootstrap fresh 8GB Debian raw disk image |
 | | `make update-disk` | Synchronize guest assets & autorun into image |
-| **Batch Security** | `make test-sec-off` | Automated headless run with `pcache_pks=off` |
+| **Batch Security** | `make test-pks-unit` | Automated in-kernel PKS unit tests (`/sys/kernel/debug/x86/run_pks`) |
+| | `make test-sec-off` | Automated headless run with `pcache_pks=off` |
 | | `make test-sec-on` | Automated headless run with `pcache_pks=on` |
 | | `make test-sec` | Run both off/on tests sequentially & summarize |
 | **Batch Benchmarks**| `make bench-control` | Headless fio benchmark on vanilla control kernel |

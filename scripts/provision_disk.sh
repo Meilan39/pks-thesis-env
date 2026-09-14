@@ -122,15 +122,18 @@ sudo chroot "$MOUNT_POINT" /bin/bash -c "
 "
 
 log_step "Populating guest assets and test harnesses"
-sudo mkdir -p "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark"
+sudo mkdir -p "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests"
 if [ -d "$GUEST_ASSETS_DIR/exploit" ]; then
     sudo cp -a "$GUEST_ASSETS_DIR/exploit/." "$MOUNT_POINT/exploit/"
 fi
 if [ -d "$GUEST_ASSETS_DIR/benchmark" ]; then
     sudo cp -a "$GUEST_ASSETS_DIR/benchmark/." "$MOUNT_POINT/benchmark/"
 fi
-sudo chown -R root:root "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark"
-sudo chmod -R 755 "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark"
+if [ -d "$GUEST_ASSETS_DIR/unit-tests" ]; then
+    sudo cp -a "$GUEST_ASSETS_DIR/unit-tests/." "$MOUNT_POINT/unit-tests/"
+fi
+sudo chown -R root:root "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests"
+sudo chmod -R 755 "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests"
 
 # Install autorun systemd unit and script
 log_step "Installing headless autorun service"

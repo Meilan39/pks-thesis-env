@@ -72,6 +72,18 @@ if [ -d "$GUEST_ASSETS_DIR/benchmark" ]; then
     fi
 fi
 
+if [ -d "$GUEST_ASSETS_DIR/unit-tests" ]; then
+    log_step "Synchronizing /unit-tests into guest rootfs"
+    sudo rm -rf "$MOUNT_POINT/unit-tests"
+    sudo mkdir -p "$MOUNT_POINT/unit-tests"
+    sudo cp -a "$GUEST_ASSETS_DIR/unit-tests/." "$MOUNT_POINT/unit-tests/"
+    sudo chown -R root:root "$MOUNT_POINT/unit-tests"
+    sudo chmod -R 755 "$MOUNT_POINT/unit-tests"
+    if [ -f "$MOUNT_POINT/unit-tests/run_pks_unit.sh" ]; then
+        sudo chmod +x "$MOUNT_POINT/unit-tests/run_pks_unit.sh"
+    fi
+fi
+
 # Synchronize headless autorun components
 if [ -d "$GUEST_ASSETS_DIR/autorun" ]; then
     log_step "Updating headless autorun service"

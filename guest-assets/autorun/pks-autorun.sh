@@ -82,6 +82,30 @@ case "$AUTO_MODE" in
         poweroff -f
         ;;
 
+    unit|pks_unit)
+        echo "--> [PKS AUTORUN] Executing in-kernel PKS unit test suite..."
+        if [ -x /unit-tests/run_pks_unit.sh ]; then
+            /unit-tests/run_pks_unit.sh
+        else
+            echo "ERROR: /unit-tests/run_pks_unit.sh not found or not executable"
+        fi
+
+        # Persist results to disk partition
+        if mountpoint -q /mnt/protected; then
+            mkdir -p /mnt/protected/unit_results
+            cp -a /tmp/unit_results/* /mnt/protected/unit_results/ 2>/dev/null || true
+        fi
+
+        sync
+        echo ""
+        echo "================================================================"
+        echo " [PKS AUTORUN] PKS unit testing complete. Powering off."
+        echo "================================================================"
+        sync
+        sleep 1
+        poweroff -f
+        ;;
+
     *)
         echo "WARN: Unknown pks_auto mode '$AUTO_MODE'. Continuing normal boot."
         ;;

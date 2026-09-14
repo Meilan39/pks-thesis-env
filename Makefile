@@ -19,7 +19,7 @@ export MEM_SEC MEM_PERF_MITIGATED MEM_PERF_CONTROL BATCH_TIMEOUT_SEC
 .PHONY: all help check-deps \
         build-sec build-perf build-control build-all \
         provision-disk update-disk \
-        test-sec-off test-sec-on test-sec \
+        test-pks-unit test-sec-off test-sec-on test-sec \
         bench-control bench-mitigated bench-all \
         fetch-results analyze-bench \
         run-sec-off run-sec-on run-perf run-control \
@@ -44,6 +44,7 @@ help:
 	@echo "    make update-disk         Incrementally sync guest-assets into disk image"
 	@echo ""
 	@echo "  Automated Security Validation (Headless Batch):"
+	@echo "    make test-pks-unit       Run built-in in-kernel PKS unit tests (debugfs)"
 	@echo "    make test-sec-off        Run exploit suite with pcache_pks=off (vulnerable)"
 	@echo "    make test-sec-on         Run exploit suite with pcache_pks=on (mitigated)"
 	@echo "    make test-sec            Execute both off/on tests and summarize results"
@@ -109,6 +110,17 @@ update-disk:
 # ==============================================================================
 # Automated Security Testing (Batch Mode)
 # ==============================================================================
+test-pks-unit:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch unit
+	@if [ -f "$(RESULTS_DIR)/pks_unit.log" ]; then \
+		echo ""; \
+		echo "======================================================================"; \
+		echo " PKS In-Kernel Self-Test Log Output"; \
+		echo "======================================================================"; \
+		grep -E "(Test|Summary|pks_test|PASS|FAIL)" "$(RESULTS_DIR)/pks_unit.log" || true; \
+		echo "======================================================================"; \
+	fi
+
 test-sec-off:
 	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch
 
