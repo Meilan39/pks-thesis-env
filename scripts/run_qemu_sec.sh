@@ -11,9 +11,12 @@ set -euo pipefail
 # If not, it falls back to TCG with -cpu max,pks=on and prints a warning.
 # ----------------------------------------------------------------------
 
-# User-configurable variables
-DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}"
-DISK_IMG="${DISK_IMG:-$HOME/src/env/images/disk.img}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+WORKSPACE_KERNEL="$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
+
+DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-${WORKSPACE_KERNEL:-$HOME/src/linux-pks-thesis}}"
+DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 MEM="${MEM:-4G}"
 SMP="${SMP:-4}"
 CONSOLE="${CONSOLE:-ttyS0}"

@@ -9,9 +9,13 @@ set -euo pipefail
 # Uses KVM if available; otherwise falls back to TCG (not recommended).
 # ----------------------------------------------------------------------
 
-# User-configurable variables
-CONTROL_KERNEL_DIR="${CONTROL_KERNEL_DIR:-$HOME/src/linux-pks-thesis-control}"
-DISK_IMG="${DISK_IMG:-$HOME/src/env/images/disk.img}"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+WORKSPACE_CONTROL="$(cd "$SCRIPT_DIR/../../linux-control" 2>/dev/null && pwd || true)"
+WORKSPACE_CONTROL_ALT="$(cd "$SCRIPT_DIR/../../linux-pks-thesis-control" 2>/dev/null && pwd || true)"
+
+CONTROL_KERNEL_DIR="${CONTROL_KERNEL_DIR:-${WORKSPACE_CONTROL:-${WORKSPACE_CONTROL_ALT:-$HOME/src/linux-pks-thesis-control}}}"
+DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 SMP="${SMP:-4}"
 CONSOLE="${CONSOLE:-ttyS0}"
 QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
