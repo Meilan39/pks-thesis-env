@@ -84,6 +84,33 @@ if [ -d "$GUEST_ASSETS_DIR/unit-tests" ]; then
     fi
 fi
 
+if [ -d "$GUEST_ASSETS_DIR/fsx" ]; then
+    log_step "Synchronizing /fsx into guest rootfs"
+    sudo rm -rf "$MOUNT_POINT/fsx"
+    sudo mkdir -p "$MOUNT_POINT/fsx"
+    sudo cp -a "$GUEST_ASSETS_DIR/fsx/." "$MOUNT_POINT/fsx/"
+    sudo chown -R root:root "$MOUNT_POINT/fsx"
+    sudo chmod -R 755 "$MOUNT_POINT/fsx"
+    if [ -f "$MOUNT_POINT/fsx/run_fsx.sh" ]; then
+        sudo chmod +x "$MOUNT_POINT/fsx/run_fsx.sh"
+    fi
+    if [ -f "$MOUNT_POINT/fsx/fsx.c" ]; then
+        log_step "Recompiling fsx harness inside chroot"
+        sudo chroot "$MOUNT_POINT" /bin/bash -c "
+            cd /fsx && make clean && make
+        " 2>/dev/null || log_warn "fsx compilation inside chroot skipped"
+    fi
+fi
+
+if [ -d "$GUEST_ASSETS_DIR/pjdfstest" ]; then
+    log_step "Synchronizing /pjdfstest into guest rootfs"
+    sudo rm -rf "$MOUNT_POINT/pjdfstest"
+    sudo mkdir -p "$MOUNT_POINT/pjdfstest"
+    sudo cp -a "$GUEST_ASSETS_DIR/pjdfstest/." "$MOUNT_POINT/pjdfstest/"
+    sudo chown -R root:root "$MOUNT_POINT/pjdfstest"
+    sudo chmod -R 755 "$MOUNT_POINT/pjdfstest"
+fi
+
 # Synchronize headless autorun components
 if [ -d "$GUEST_ASSETS_DIR/autorun" ]; then
     log_step "Updating headless autorun service"

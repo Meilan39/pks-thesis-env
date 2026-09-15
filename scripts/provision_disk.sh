@@ -122,7 +122,7 @@ sudo chroot "$MOUNT_POINT" /bin/bash -c "
 "
 
 log_step "Populating guest assets and test harnesses"
-sudo mkdir -p "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests"
+sudo mkdir -p "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests" "$MOUNT_POINT/fsx" "$MOUNT_POINT/pjdfstest"
 if [ -d "$GUEST_ASSETS_DIR/exploit" ]; then
     sudo cp -a "$GUEST_ASSETS_DIR/exploit/." "$MOUNT_POINT/exploit/"
 fi
@@ -132,8 +132,14 @@ fi
 if [ -d "$GUEST_ASSETS_DIR/unit-tests" ]; then
     sudo cp -a "$GUEST_ASSETS_DIR/unit-tests/." "$MOUNT_POINT/unit-tests/"
 fi
-sudo chown -R root:root "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests"
-sudo chmod -R 755 "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests"
+if [ -d "$GUEST_ASSETS_DIR/fsx" ]; then
+    sudo cp -a "$GUEST_ASSETS_DIR/fsx/." "$MOUNT_POINT/fsx/"
+fi
+if [ -d "$GUEST_ASSETS_DIR/pjdfstest" ]; then
+    sudo cp -a "$GUEST_ASSETS_DIR/pjdfstest/." "$MOUNT_POINT/pjdfstest/"
+fi
+sudo chown -R root:root "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests" "$MOUNT_POINT/fsx" "$MOUNT_POINT/pjdfstest"
+sudo chmod -R 755 "$MOUNT_POINT/exploit" "$MOUNT_POINT/benchmark" "$MOUNT_POINT/unit-tests" "$MOUNT_POINT/fsx" "$MOUNT_POINT/pjdfstest"
 
 # Install autorun systemd unit and script
 log_step "Installing headless autorun service"
@@ -153,6 +159,13 @@ if [ -f "$MOUNT_POINT/exploit/dirty-frag/exp.c" ]; then
     sudo chroot "$MOUNT_POINT" /bin/bash -c "
         cd /exploit/dirty-frag && gcc -O0 -Wall -o exp exp.c -lutil
     " 2>/dev/null || log_warn "dirty-frag compilation inside chroot skipped or failed"
+fi
+
+if [ -f "$MOUNT_POINT/fsx/fsx.c" ]; then
+    log_step "Compiling fsx harness inside chroot"
+    sudo chroot "$MOUNT_POINT" /bin/bash -c "
+        cd /fsx && make clean && make
+    " 2>/dev/null || log_warn "fsx compilation inside chroot skipped or failed"
 fi
 
 # Clean up chroot binds before exit

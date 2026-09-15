@@ -17,6 +17,11 @@ pks-thesis-env/
 │   │   └── pks-autorun.service
 │   ├── unit-tests/         # In-kernel built-in PKS self-tests (debugfs)
 │   │   └── run_pks_unit.sh
+│   ├── fsx/                # File System Exerciser (stress tests read/write/truncate/mmap)
+│   │   ├── fsx.c
+│   │   ├── Makefile
+│   │   └── run_fsx.sh
+│   ├── pjdfstest/          # POSIX filesystem compliance test suite
 │   ├── exploit/
 │   │   ├── copy-fail/      # Copy Fail (CVE-2026-31431) exploit
 │   │   ├── dirty-frag/     # Dirty Frag (CVE-2026-43284, CVE-2026-43500) exploit
@@ -57,6 +62,9 @@ Run `make help` to inspect all available targets:
 | | `make test-sec-off` | Automated headless run with `pcache_pks=off` |
 | | `make test-sec-on` | Automated headless run with `pcache_pks=on` |
 | | `make test-sec` | Run both off/on tests sequentially & summarize |
+| | `make test-fsx-off` | Run fsx exerciser with `pcache_pks=off` (vanilla ext4 baseline) |
+| | `make test-fsx-on` | Run fsx exerciser with `pcache_pks=on` (protected mount validation) |
+| | `make test-fsx` | Run both off/on fsx tests and summarize results |
 | **Batch Benchmarks**| `make bench-control` | Headless fio benchmark on vanilla control kernel |
 | | `make bench-mitigated`| Headless fio benchmark on mitigated kernel |
 | | `make bench-all` | Run control + mitigated runs and analyze |

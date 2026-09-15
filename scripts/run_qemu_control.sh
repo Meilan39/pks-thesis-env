@@ -26,7 +26,7 @@ RUN_MODE="${1:---interactive}"
 
 KERNEL="$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage"
 [ -f "$KERNEL" ] || die "Control kernel not found at $KERNEL. Run 'make build-control' first."
-[ -f "$DISK_IMG" ] || die "Disk image not found at $DISK_IMG. Run 'make provision-image' first."
+[ -f "$DISK_IMG" ] || die "Disk image not found at $DISK_IMG. Run 'make provision-disk' first."
 require_cmds "$QEMU_BIN"
 
 # CPU virtualization mode

@@ -20,6 +20,7 @@ export MEM_SEC MEM_PERF_MITIGATED MEM_PERF_CONTROL BATCH_TIMEOUT_SEC
         build-sec build-perf build-control build-all \
         provision-disk update-disk \
         test-pks-unit test-sec-off test-sec-on test-sec \
+        test-fsx-off test-fsx-on test-fsx \
         bench-control bench-mitigated bench-all \
         fetch-results analyze-bench \
         run-sec-off run-sec-on run-perf run-control \
@@ -48,6 +49,9 @@ help:
 	@echo "    make test-sec-off        Run exploit suite with pcache_pks=off (vulnerable)"
 	@echo "    make test-sec-on         Run exploit suite with pcache_pks=on (mitigated)"
 	@echo "    make test-sec            Execute both off/on tests and summarize results"
+	@echo "    make test-fsx-off        Run fsx filesystem exerciser with pcache_pks=off"
+	@echo "    make test-fsx-on         Run fsx filesystem exerciser with pcache_pks=on"
+	@echo "    make test-fsx            Execute both off/on fsx tests and summarize results"
 	@echo ""
 	@echo "  Automated Micro-benchmarks (Headless Batch):"
 	@echo "    make bench-control       Run fio write/read suite on control kernel"
@@ -143,6 +147,34 @@ test-sec: test-sec-off test-sec-on
 	@if [ -f "$(RESULTS_DIR)/sec_on.log" ]; then \
 		echo "On state results:"; \
 		grep -E "(RESULT:|pre-run|post-run|Security event|Oops)" "$(RESULTS_DIR)/sec_on.log" || true; \
+	fi
+	@echo "======================================================================"
+
+# ==============================================================================
+# Automated Filesystem Exerciser Testing (fsx - Batch Mode)
+# ==============================================================================
+test-fsx-off:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch fsx
+
+test-fsx-on:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch fsx
+
+test-fsx: test-fsx-off test-fsx-on
+	@echo ""
+	@echo "======================================================================"
+	@echo " File System Exerciser (fsx) Validation Summary"
+	@echo "======================================================================"
+	@echo "  pcache_pks=off Log: $(RESULTS_DIR)/fsx_off.log"
+	@echo "  pcache_pks=on  Log: $(RESULTS_DIR)/fsx_on.log"
+	@echo "----------------------------------------------------------------------"
+	@if [ -f "$(RESULTS_DIR)/fsx_off.log" ]; then \
+		echo "Off state fsx results:"; \
+		grep -E "(Test|Summary|PASS|FAIL|SUCCESS)" "$(RESULTS_DIR)/fsx_off.log" || true; \
+	fi
+	@echo "----------------------------------------------------------------------"
+	@if [ -f "$(RESULTS_DIR)/fsx_on.log" ]; then \
+		echo "On state fsx results:"; \
+		grep -E "(Test|Summary|PASS|FAIL|SUCCESS)" "$(RESULTS_DIR)/fsx_on.log" || true; \
 	fi
 	@echo "======================================================================"
 

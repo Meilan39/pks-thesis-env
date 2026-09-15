@@ -106,6 +106,32 @@ case "$AUTO_MODE" in
         poweroff -f
         ;;
 
+    fsx|selftest|selftests)
+        echo "--> [PKS AUTORUN] Executing fsx filesystem exerciser suite..."
+        if [ -x /fsx/run_fsx.sh ]; then
+            /fsx/run_fsx.sh
+        elif [ -x /guest-assets/fsx/run_fsx.sh ]; then
+            /guest-assets/fsx/run_fsx.sh
+        else
+            echo "ERROR: run_fsx.sh not found or not executable"
+        fi
+
+        # Persist results to disk partition
+        if mountpoint -q /mnt/protected; then
+            mkdir -p /mnt/protected/fsx_results
+            cp -a /tmp/fsx_results/* /mnt/protected/fsx_results/ 2>/dev/null || true
+        fi
+
+        sync
+        echo ""
+        echo "================================================================"
+        echo " [PKS AUTORUN] fsx filesystem exerciser complete. Powering off."
+        echo "================================================================"
+        sync
+        sleep 1
+        poweroff -f
+        ;;
+
     *)
         echo "WARN: Unknown pks_auto mode '$AUTO_MODE'. Continuing normal boot."
         ;;

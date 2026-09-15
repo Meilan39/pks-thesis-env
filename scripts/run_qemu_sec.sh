@@ -29,7 +29,7 @@ RUN_MODE="${2:---interactive}"
 
 KERNEL="$DEV_KERNEL_DIR/build_sec/arch/x86/boot/bzImage"
 [ -f "$KERNEL" ] || die "Security kernel not found at $KERNEL. Run 'make build-sec' first."
-[ -f "$DISK_IMG" ] || die "Disk image not found at $DISK_IMG. Run 'make provision-image' first."
+[ -f "$DISK_IMG" ] || die "Disk image not found at $DISK_IMG. Run 'make provision-disk' first."
 require_cmds "$QEMU_BIN"
 
 # Determine CPU virtualization mode
@@ -55,6 +55,8 @@ if [ "$RUN_MODE" = "--batch" ]; then
     mkdir -p "$RESULTS_DIR"
     if [ "$AUTO_MODE" = "unit" ]; then
         LOG_FILE="$RESULTS_DIR/pks_unit.log"
+    elif [ "$AUTO_MODE" = "fsx" ]; then
+        LOG_FILE="$RESULTS_DIR/fsx_${PKS_STATE}.log"
     else
         LOG_FILE="$RESULTS_DIR/sec_${PKS_STATE}.log"
     fi
