@@ -58,14 +58,13 @@ Run `make help` to inspect all available targets:
 | | `make build-all` | Compile all three kernel configurations |
 | **Disk Image** | `make provision-disk` | Bootstrap fresh 8GB Debian raw disk image |
 | | `make update-disk` | Synchronize guest assets & autorun into image |
-| **Batch Security** | `make test-pks-unit` | Automated in-kernel PKS unit tests (`/sys/kernel/debug/x86/run_pks`) |
-| | `make test-sec-off` | Automated headless run with `pcache_pks=off` |
-| | `make test-sec-on` | Automated headless run with `pcache_pks=on` |
-| | `make test-sec` | Run both off/on tests sequentially & summarize |
-| | `make test-fsx-off` | Run fsx exerciser with `pcache_pks=off` (vanilla ext4 baseline) |
+| **Security Validation** | `make test-sec-off` | Automated headless exploit run with `pcache_pks=off` (vulnerable) |
+| | `make test-sec-on` | Automated headless exploit run with `pcache_pks=on` (mitigated) |
+| | `make test-sec` | Run both off/on exploit tests sequentially & summarize |
+| **Fail-Open & Integrity** | `make test-fsx-off` | Run fsx exerciser with `pcache_pks=off` (vanilla ext4 baseline) |
 | | `make test-fsx-on` | Run fsx exerciser with `pcache_pks=on` (protected mount validation) |
 | | `make test-fsx` | Run both off/on fsx tests and summarize results |
-| **Batch Benchmarks**| `make bench-control` | Headless fio benchmark on vanilla control kernel |
+| **Micro-benchmarks** | `make bench-control` | Headless fio benchmark on vanilla control kernel |
 | | `make bench-mitigated`| Headless fio benchmark on mitigated kernel |
 | | `make bench-all` | Run control + mitigated runs and analyze |
 | **Analysis** | `make fetch-results` | Extract JSONs and logs from VM disk to host |
@@ -74,8 +73,9 @@ Run `make help` to inspect all available targets:
 | | `make run-sec-on` | Interactive console with `pcache_pks=on` |
 | | `make run-perf` | Interactive console for mitigated kernel |
 | | `make run-control` | Interactive console for control kernel |
-| **Housekeeping** | `make check-deps` | Verify host prerequisites and tools |
-| | `make clean-results` | Clear host results directory |
+| **Diagnostics & Sanity** | `make check-deps` | Verify host prerequisites and tools |
+| | `make test-pks-unit` | Run low-level in-kernel PKS self-test (`/sys/kernel/debug/x86/run_pks`) |
+| **Housekeeping** | `make clean-results` | Clear host results directory |
 | | `make clean-all` | Clear results and disk image container |
 
 ---
@@ -108,7 +108,15 @@ Executing `make test-sec` automatically runs both test phases in batch mode:
 4. Executes the tests against PKS-protected storage, detects supervisor `#PF` events, logs results, and powers off.
 5. Displays an A/B delta summary verifying that exploits succeeded in the off state and were neutralized in the on state.
 
-### 2. Automated Micro-benchmarking (`make bench-all`)
+### 2. Fail-Open & Filesystem Integrity (`make test-fsx`)
+
+Executing `make test-fsx` tests POSIX compatibility and fail-open stability:
+1. Boots the kernel with `pcache_pks=off` and runs 5,000 random operations across rootfs to verify baseline ext4 stability.
+2. Boots the kernel with `pcache_pks=on` and runs 10,000 operations on `/mnt/protected` with `-W` to test in-scope buffered I/O, truncations, and hole zeroing.
+3. Validates boundary rejection by running `fsx -b` on `/mnt/protected` to verify Commit 06 blocks `MAP_SHARED, PROT_WRITE` with `-EOPNOTSUPP`.
+4. Summarizes whether edge cases or crashes occurred in either mode.
+
+### 3. Automated Micro-benchmarking (`make bench-all`)
 
 Executing `make bench-all`:
 1. Boots the control kernel in batch mode (`pks_auto=bench`), executes the synchronous buffered write scaling and 4KB random read suites, and powers off.
@@ -117,7 +125,7 @@ Executing `make bench-all`:
 4. Extracts mitigated benchmark JSONs into `results/extracted/bench/mitigated/`.
 5. Invokes `analyze_bench.py` to print a Markdown table with mean throughput (MB/s), IOPS, latency, and throughput overhead percentage.
 
-### 3. Interactive Debugging
+### 4. Interactive Debugging
 
 To manually explore the guest environment or run custom experiments:
 ```bash

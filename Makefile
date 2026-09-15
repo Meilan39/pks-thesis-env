@@ -16,10 +16,10 @@ export DEBIAN_SUITE DEBIAN_ARCH DEBIAN_MIRROR SCRIPTS_DIR GUEST_ASSETS_DIR
 export IMAGES_DIR RESULTS_DIR QEMU_BIN SMP CONSOLE TASKSET_CPUS
 export MEM_SEC MEM_PERF_MITIGATED MEM_PERF_CONTROL BATCH_TIMEOUT_SEC
 
-.PHONY: all help check-deps \
+.PHONY: all help check-deps test-pks-unit \
         build-sec build-perf build-control build-all \
         provision-disk update-disk \
-        test-pks-unit test-sec-off test-sec-on test-sec \
+        test-sec-off test-sec-on test-sec \
         test-fsx-off test-fsx-on test-fsx \
         bench-control bench-mitigated bench-all \
         fetch-results analyze-bench \
@@ -44,11 +44,12 @@ help:
 	@echo "    make provision-disk      Bootstrap and partition fresh 8GB Debian disk"
 	@echo "    make update-disk         Incrementally sync guest-assets into disk image"
 	@echo ""
-	@echo "  Automated Security Validation (Headless Batch):"
-	@echo "    make test-pks-unit       Run built-in in-kernel PKS unit tests (debugfs)"
+	@echo "  Automated Security Validation (Exploit Neutralization):"
 	@echo "    make test-sec-off        Run exploit suite with pcache_pks=off (vulnerable)"
 	@echo "    make test-sec-on         Run exploit suite with pcache_pks=on (mitigated)"
 	@echo "    make test-sec            Execute both off/on tests and summarize results"
+	@echo ""
+	@echo "  Fail-Open & Functional Integrity (fsx Exerciser):"
 	@echo "    make test-fsx-off        Run fsx filesystem exerciser with pcache_pks=off"
 	@echo "    make test-fsx-on         Run fsx filesystem exerciser with pcache_pks=on"
 	@echo "    make test-fsx            Execute both off/on fsx tests and summarize results"
@@ -68,25 +69,14 @@ help:
 	@echo "    make run-perf            Interactive serial console (mitigated kernel)"
 	@echo "    make run-control         Interactive serial console (control kernel)"
 	@echo ""
-	@echo "  Environment & Cleanup:"
+	@echo "  Diagnostics & Sanity Checks:"
 	@echo "    make check-deps          Verify host tools and dependencies"
+	@echo "    make test-pks-unit       Run low-level in-kernel PKS self-test (debugfs)"
+	@echo ""
+	@echo "  Environment & Cleanup:"
 	@echo "    make clean-results       Remove host-side logs and extracted results"
 	@echo "    make clean-all           Remove results and disk image"
 	@echo "======================================================================"
-
-# ==============================================================================
-# Pre-flight Dependency Check
-# ==============================================================================
-check-deps:
-	@$(SCRIPTS_DIR)/common.sh
-	@echo "Checking host dependencies..."
-	@for cmd in $(QEMU_BIN) gcc make sfdisk losetup mkfs.ext4 debootstrap sudo python3; do \
-		if command -v $$cmd >/dev/null 2>&1; then \
-			printf "  [OK]   %-16s found\n" "$$cmd"; \
-		else \
-			printf "  [MISS] %-16s NOT FOUND\n" "$$cmd"; \
-		fi; \
-	done
 
 # ==============================================================================
 # Kernel Build Targets
@@ -112,19 +102,8 @@ update-disk:
 	@$(SCRIPTS_DIR)/update_disk.sh $(DISK_IMG)
 
 # ==============================================================================
-# Automated Security Testing (Batch Mode)
+# Automated Security Validation (Exploit Neutralization)
 # ==============================================================================
-test-pks-unit:
-	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch unit
-	@if [ -f "$(RESULTS_DIR)/pks_unit.log" ]; then \
-		echo ""; \
-		echo "======================================================================"; \
-		echo " PKS In-Kernel Self-Test Log Output"; \
-		echo "======================================================================"; \
-		grep -E "(Test|Summary|pks_test|PASS|FAIL)" "$(RESULTS_DIR)/pks_unit.log" || true; \
-		echo "======================================================================"; \
-	fi
-
 test-sec-off:
 	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch
 
@@ -151,7 +130,7 @@ test-sec: test-sec-off test-sec-on
 	@echo "======================================================================"
 
 # ==============================================================================
-# Automated Filesystem Exerciser Testing (fsx - Batch Mode)
+# Fail-Open & Functional Integrity Testing (fsx Exerciser)
 # ==============================================================================
 test-fsx-off:
 	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch fsx
@@ -220,6 +199,31 @@ run-perf:
 
 run-control:
 	@$(SCRIPTS_DIR)/run_qemu_control.sh --interactive
+
+# ==============================================================================
+# Diagnostics & Sanity Checks (Optional Pre-flight / Low-level Verification)
+# ==============================================================================
+check-deps:
+	@$(SCRIPTS_DIR)/common.sh
+	@echo "Checking host dependencies..."
+	@for cmd in $(QEMU_BIN) gcc make sfdisk losetup mkfs.ext4 debootstrap sudo python3; do \
+		if command -v $$cmd >/dev/null 2>&1; then \
+			printf "  [OK]   %-16s found\n" "$$cmd"; \
+		else \
+			printf "  [MISS] %-16s NOT FOUND\n" "$$cmd"; \
+		fi; \
+	done
+
+test-pks-unit:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch unit
+	@if [ -f "$(RESULTS_DIR)/pks_unit.log" ]; then \
+		echo ""; \
+		echo "======================================================================"; \
+		echo " PKS In-Kernel Self-Test Log Output"; \
+		echo "======================================================================"; \
+		grep -E "(Test|Summary|pks_test|PASS|FAIL)" "$(RESULTS_DIR)/pks_unit.log" || true; \
+		echo "======================================================================"; \
+	fi
 
 # ==============================================================================
 # Cleanup
