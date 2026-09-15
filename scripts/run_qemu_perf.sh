@@ -54,7 +54,7 @@ LOG_FILE=""
 if [ "$RUN_MODE" = "--batch" ]; then
     mkdir -p "$RESULTS_DIR"
     LOG_FILE="$RESULTS_DIR/perf_mitigated.log"
-    EXTRA_CMDLINE="pks_auto=bench panic=1"
+    EXTRA_CMDLINE="pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
 fi
 
 log_header "Launching Mitigated Performance Benchmark VM"

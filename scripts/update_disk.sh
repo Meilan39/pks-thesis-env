@@ -23,6 +23,8 @@ log_kv "Assets Dir"  "$GUEST_ASSETS_DIR"
 
 log_step "Attaching loop device with partition scanning"
 LOOP=$(sudo losetup --find --show --partscan "$DISK_IMG")
+sudo partprobe "$LOOP" 2>/dev/null || sudo partx -u "$LOOP" 2>/dev/null || true
+sleep 1
 ROOT_PART="${LOOP}p1"
 
 if [ ! -b "$ROOT_PART" ]; then

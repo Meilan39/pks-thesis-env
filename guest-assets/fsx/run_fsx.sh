@@ -26,13 +26,33 @@ if [ ! -x "$FSX_BIN" ]; then
     exit 1
 fi
 
-# Ensure /mnt/protected is mounted
-if ! mountpoint -q "$PROTECTED_MOUNT"; then
-    echo "[INFO] Mounting $PROTECTED_MOUNT..."
-    mkdir -p "$PROTECTED_MOUNT"
-    if [ -b /dev/vda2 ]; then
-        mount /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || mount -t ext4 /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || true
+# Ensure /mnt/protected is mounted with proper options
+CMDLINE="$(cat /proc/cmdline 2>/dev/null || true)"
+mkdir -p "$PROTECTED_MOUNT"
+
+if echo "$CMDLINE" | grep -q "pcache_pks=on"; then
+    if mountpoint -q "$PROTECTED_MOUNT"; then
+        if ! grep "$PROTECTED_MOUNT" /proc/mounts | grep -q "pks_pagecache"; then
+            echo "[INFO] Re-mounting $PROTECTED_MOUNT with 'pks_pagecache'..."
+            umount "$PROTECTED_MOUNT" 2>/dev/null || true
+            mount -o pks_pagecache /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || true
+        fi
+    else
+        echo "[INFO] Mounting $PROTECTED_MOUNT with 'pks_pagecache'..."
+        mount -o pks_pagecache /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || true
     fi
+
+    if grep "$PROTECTED_MOUNT" /proc/mounts | grep -q "pks_pagecache"; then
+        echo "[OK]   Protected mount active: $PROTECTED_MOUNT with 'pks_pagecache'"
+    else
+        echo "[ERR]  Failed to mount $PROTECTED_MOUNT with 'pks_pagecache'!"
+    fi
+else
+    if ! mountpoint -q "$PROTECTED_MOUNT"; then
+        echo "[INFO] Mounting $PROTECTED_MOUNT (standard ext4)..."
+        mount /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || true
+    fi
+    echo "[INFO] Mount active: $PROTECTED_MOUNT (standard ext4, pcache_pks=off)"
 fi
 
 TOTAL_PASS=0
@@ -80,14 +100,26 @@ printf " 2    | Protected mount in-scope (10K ops, 64MB)   | %-8s\n" "$res2"
 # ------------------------------------------------------------------------------
 TEST3_LOG="$RESULTS_DIR/fsx_mapwrite_reject.log"
 if mountpoint -q "$PROTECTED_MOUNT"; then
-    # -b verifies that MAP_SHARED writable mmap fails with -EOPNOTSUPP
-    "$FSX_BIN" -b -N 1 "$PROTECTED_MOUNT/fsx_reject.bin" >"$TEST3_LOG" 2>&1
-    rc=$?
-    if [ $rc -eq 0 ]; then
-        res3="[PASS]"
-        TOTAL_PASS=$((TOTAL_PASS + 1))
+    if grep "$PROTECTED_MOUNT" /proc/mounts | grep -q "pks_pagecache"; then
+        # On protected mount: verify MAP_SHARED writable mmap fails with -EOPNOTSUPP
+        "$FSX_BIN" -b "$PROTECTED_MOUNT/fsx_reject.bin" >"$TEST3_LOG" 2>&1
+        rc=$?
+        if [ $rc -eq 0 ]; then
+            res3="[PASS]"
+            TOTAL_PASS=$((TOTAL_PASS + 1))
+        else
+            res3="[FAIL]"
+        fi
     else
-        res3="[FAIL]"
+        # On unprotected mount (pcache_pks=off): verify MAP_SHARED writable mmap is permitted (rc=3)
+        "$FSX_BIN" -b "$PROTECTED_MOUNT/fsx_reject.bin" >"$TEST3_LOG" 2>&1
+        rc=$?
+        if [ $rc -eq 3 ]; then
+            res3="[PASS]"
+            TOTAL_PASS=$((TOTAL_PASS + 1))
+        else
+            res3="[FAIL]"
+        fi
     fi
 else
     res3="[SKIP]"

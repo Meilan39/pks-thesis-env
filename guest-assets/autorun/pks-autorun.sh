@@ -27,10 +27,23 @@ echo "================================================================"
 echo " [PKS AUTORUN] Triggered with mode: $AUTO_MODE"
 echo "================================================================"
 
-# Ensure /mnt/protected is mounted if partition exists
-if [ -b /dev/vda2 ] && ! mountpoint -q /mnt/protected; then
+# Ensure /mnt/protected is mounted with proper options if partition exists
+if [ -b /dev/vda2 ]; then
     mkdir -p /mnt/protected
-    mount /dev/vda2 /mnt/protected 2>/dev/null || mount -t ext4 /dev/vda2 /mnt/protected 2>/dev/null || true
+    if echo "$CMDLINE" | grep -q "pcache_pks=on"; then
+        if mountpoint -q /mnt/protected; then
+            if ! grep "/mnt/protected" /proc/mounts | grep -q "pks_pagecache"; then
+                umount /mnt/protected 2>/dev/null || true
+                mount -o pks_pagecache /dev/vda2 /mnt/protected 2>/dev/null || true
+            fi
+        else
+            mount -o pks_pagecache /dev/vda2 /mnt/protected 2>/dev/null || true
+        fi
+    else
+        if ! mountpoint -q /mnt/protected; then
+            mount /dev/vda2 /mnt/protected 2>/dev/null || mount -t ext4 /dev/vda2 /mnt/protected 2>/dev/null || true
+        fi
+    fi
 fi
 
 case "$AUTO_MODE" in

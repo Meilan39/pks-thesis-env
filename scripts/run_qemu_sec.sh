@@ -39,12 +39,12 @@ if [ -e /dev/kvm ] && grep -qw pks /proc/cpuinfo; then
     CPU_MODE="KVM / host (Hardware PKS verified)"
     CPU_ARGS=(-enable-kvm -cpu host)
 elif [ -e /dev/kvm ]; then
-    CPU_MODE="KVM / host (Host lacks PKS, falling back to TCG)"
-    CPU_ARGS=(-cpu max,pks=on)
+    CPU_MODE="TCG / max,vendor=GenuineIntel,pks=on (Host lacks PKS, falling back to TCG)"
+    CPU_ARGS=(-cpu max,vendor=GenuineIntel,pks=on)
     log_warn "Host CPU lacks supervisor PKS; falling back to TCG emulation."
 else
-    CPU_MODE="TCG / max,pks=on"
-    CPU_ARGS=(-cpu max,pks=on)
+    CPU_MODE="TCG / max,vendor=GenuineIntel,pks=on"
+    CPU_ARGS=(-cpu max,vendor=GenuineIntel,pks=on)
     log_warn "KVM not available; using TCG emulation (functional only, not publication-grade)."
 fi
 
@@ -60,7 +60,7 @@ if [ "$RUN_MODE" = "--batch" ]; then
     else
         LOG_FILE="$RESULTS_DIR/sec_${PKS_STATE}.log"
     fi
-    EXTRA_CMDLINE="pks_auto=$AUTO_MODE panic=1"
+    EXTRA_CMDLINE="pks_auto=$AUTO_MODE panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
 fi
 
 log_header "Launching Security Validation Boot"

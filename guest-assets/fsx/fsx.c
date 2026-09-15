@@ -235,23 +235,6 @@ static int do_mapread(void) {
 }
 
 static int do_mapwrite(void) {
-    if (expect_mapwrite_fail) {
-        /* Negative test: verify Commit 06 reject policy */
-        void *addr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, target_fd, 0);
-        if (addr != MAP_FAILED) {
-            munmap(addr, page_size);
-            fprintf(stderr, "[ERR] Commit 06 violation: MAP_SHARED writable mmap succeeded on protected file!\n");
-            exit(3);
-        }
-        if (errno == EOPNOTSUPP || errno == EINVAL || errno == EACCES) {
-            if (verbose)
-                printf("  [OK] Expected Commit 06 rejection verified (errno=%d: %s)\n", errno, strerror(errno));
-            return 1;
-        }
-        fprintf(stderr, "Unexpected errno for MAP_SHARED mmap: %d (%s)\n", errno, strerror(errno));
-        exit(3);
-    }
-
     if (!allow_mapwrite)
         return 0;
 
@@ -373,6 +356,38 @@ int main(int argc, char **argv) {
     if (target_fd < 0) {
         perror("open failed");
         return 1;
+    }
+
+    if (expect_mapwrite_fail) {
+        /*
+         * Negative test mode (-b): verify that MAP_SHARED writable mmap
+         * is rejected with -EOPNOTSUPP under Commit 06 policy.
+         */
+        void *addr = mmap(NULL, page_size, PROT_READ | PROT_WRITE, MAP_SHARED, target_fd, 0);
+        if (addr != MAP_FAILED) {
+            munmap(addr, page_size);
+            fprintf(stderr, "[ERR] Commit 06 violation: MAP_SHARED writable mmap succeeded!\n");
+            close(target_fd);
+            unlink(target_fname);
+            free(oracle_buf);
+            free(io_buf);
+            return 3;
+        }
+        if (errno == EOPNOTSUPP) {
+            printf("[OK] Expected Commit 06 rejection verified (errno=EOPNOTSUPP: %s)\n", strerror(errno));
+            close(target_fd);
+            unlink(target_fname);
+            free(oracle_buf);
+            free(io_buf);
+            return 0;
+        }
+        fprintf(stderr, "[ERR] Unexpected errno for MAP_SHARED mmap: %d (%s), expected EOPNOTSUPP\n",
+                errno, strerror(errno));
+        close(target_fd);
+        unlink(target_fname);
+        free(oracle_buf);
+        free(io_buf);
+        return 3;
     }
 
     unsigned long completed = 0;

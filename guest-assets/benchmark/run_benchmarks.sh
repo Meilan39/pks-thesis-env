@@ -13,11 +13,24 @@ RUNS="${RUNS:-5}"
 mkdir -p "$RESULTS_DIR"
 
 # 1. Mount verification
-if ! mountpoint -q "$PROTECTED_MOUNT"; then
-    echo "[INFO] Mounting $PROTECTED_MOUNT..."
-    mkdir -p "$PROTECTED_MOUNT"
-    if [ -b /dev/vda2 ]; then
-        mount /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || mount -t ext4 /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || true
+cmdline="$(cat /proc/cmdline 2>/dev/null || true)"
+mkdir -p "$PROTECTED_MOUNT"
+
+if echo "$cmdline" | grep -q "pcache_pks=on"; then
+    if mountpoint -q "$PROTECTED_MOUNT"; then
+        if ! grep "$PROTECTED_MOUNT" /proc/mounts | grep -q "pks_pagecache"; then
+            echo "[INFO] Re-mounting $PROTECTED_MOUNT with 'pks_pagecache'..."
+            umount "$PROTECTED_MOUNT" 2>/dev/null || true
+            mount -o pks_pagecache /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || true
+        fi
+    else
+        echo "[INFO] Mounting $PROTECTED_MOUNT with 'pks_pagecache'..."
+        mount -o pks_pagecache /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || true
+    fi
+else
+    if ! mountpoint -q "$PROTECTED_MOUNT"; then
+        echo "[INFO] Mounting $PROTECTED_MOUNT (standard ext4)..."
+        mount /dev/vda2 "$PROTECTED_MOUNT" 2>/dev/null || true
     fi
 fi
 
