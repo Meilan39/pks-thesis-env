@@ -86,7 +86,8 @@ All parameters are centralized in `config.mk` and can be overridden via environm
 
 ```makefile
 # Override kernel source tree path
-make build-sec DEV_KERNEL_DIR=/path/to/linux-5.18-rc3
+make build-sec DEV_KERNEL_DIR=/path/to/linux-pks-thesis
+make build-control CONTROL_KERNEL_DIR=/path/to/linux-pks-thesis-control
 
 # Override CPU cores and RAM allocation
 make test-sec-on SMP=8 MEM_SEC=8G

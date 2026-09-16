@@ -7,10 +7,25 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-WORKSPACE_CONTROL="$(cd "$SCRIPT_DIR/../../linux-control" 2>/dev/null && pwd || true)"
-WORKSPACE_CONTROL_ALT="$(cd "$SCRIPT_DIR/../../linux-pks-thesis-control" 2>/dev/null && pwd || true)"
-KERNEL_DIR="${1:-${CONTROL_KERNEL_DIR:-${WORKSPACE_CONTROL:-${WORKSPACE_CONTROL_ALT:-$HOME/src/linux-control}}}}"
-OUTPUT_DIR="$KERNEL_DIR/build_perf"
+CANDIDATES=(
+    "${1:-}"
+    "${CONTROL_KERNEL_DIR:-}"
+    "$(cd "$SCRIPT_DIR/../../linux-pks-thesis-control" 2>/dev/null && pwd || true)"
+    "$(cd "$SCRIPT_DIR/../../linux-control" 2>/dev/null && pwd || true)"
+    "$HOME/src/linux-pks-thesis-control"
+    "$HOME/src/linux-control"
+)
+
+KERNEL_DIR=""
+for cand in "${CANDIDATES[@]}"; do
+    if [ -n "$cand" ] && [ -d "$cand" ]; then
+        KERNEL_DIR="$cand"
+        break
+    fi
+done
+
+KERNEL_DIR="${KERNEL_DIR:-${1:-${CONTROL_KERNEL_DIR:-$HOME/src/linux-pks-thesis-control}}}"
+OUTPUT_DIR="${OUTPUT_DIR:-$KERNEL_DIR/build_perf}"
 
 [ -d "$KERNEL_DIR" ] || die "Control kernel source directory not found: $KERNEL_DIR"
 require_cmds make gcc bc flex bison

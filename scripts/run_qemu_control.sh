@@ -10,10 +10,23 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-WORKSPACE_CONTROL="$(cd "$SCRIPT_DIR/../../linux-control" 2>/dev/null && pwd || true)"
-WORKSPACE_CONTROL_ALT="$(cd "$SCRIPT_DIR/../../linux-pks-thesis-control" 2>/dev/null && pwd || true)"
+CANDIDATES=(
+    "${CONTROL_KERNEL_DIR:-}"
+    "$(cd "$SCRIPT_DIR/../../linux-pks-thesis-control" 2>/dev/null && pwd || true)"
+    "$(cd "$SCRIPT_DIR/../../linux-control" 2>/dev/null && pwd || true)"
+    "$HOME/src/linux-pks-thesis-control"
+    "$HOME/src/linux-control"
+)
 
-CONTROL_KERNEL_DIR="${CONTROL_KERNEL_DIR:-${WORKSPACE_CONTROL:-${WORKSPACE_CONTROL_ALT:-$HOME/src/linux-pks-thesis-control}}}"
+DETECTED_CONTROL=""
+for cand in "${CANDIDATES[@]}"; do
+    if [ -n "$cand" ] && [ -d "$cand" ]; then
+        DETECTED_CONTROL="$cand"
+        break
+    fi
+done
+
+CONTROL_KERNEL_DIR="${DETECTED_CONTROL:-${CONTROL_KERNEL_DIR:-$HOME/src/linux-pks-thesis-control}}"
 DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 SMP="${SMP:-4}"
 CONSOLE="${CONSOLE:-ttyS0}"
@@ -24,7 +37,13 @@ RESULTS_DIR="${RESULTS_DIR:-$ENV_DIR/results}"
 
 RUN_MODE="${1:---interactive}"
 
-KERNEL="$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage"
+if [ -f "$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage" ]; then
+    KERNEL="$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage"
+elif [ -f "$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage" ]; then
+    KERNEL="$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage"
+else
+    KERNEL="$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage"
+fi
 [ -f "$KERNEL" ] || die "Control kernel not found at $KERNEL. Run 'make build-control' first."
 [ -f "$DISK_IMG" ] || die "Disk image not found at $DISK_IMG. Run 'make provision-disk' first."
 require_cmds "$QEMU_BIN"

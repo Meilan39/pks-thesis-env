@@ -7,8 +7,17 @@
 
 # Kernel source trees
 WORKSPACE_DIR      := $(abspath $(CURDIR)/..)
-DEV_KERNEL_DIR     ?= $(if $(wildcard $(WORKSPACE_DIR)/linux-5.18-rc3),$(WORKSPACE_DIR)/linux-5.18-rc3,$(HOME)/src/linux-pks-thesis)
-CONTROL_KERNEL_DIR ?= $(if $(wildcard $(WORKSPACE_DIR)/linux-control),$(WORKSPACE_DIR)/linux-control,$(HOME)/src/linux-control)
+DEV_KERNEL_DIR     ?= $(strip \
+    $(if $(wildcard $(WORKSPACE_DIR)/linux-pks-thesis),$(WORKSPACE_DIR)/linux-pks-thesis,\
+    $(if $(wildcard $(WORKSPACE_DIR)/linux-5.18-rc3),$(WORKSPACE_DIR)/linux-5.18-rc3,\
+    $(if $(wildcard $(HOME)/src/linux-pks-thesis),$(HOME)/src/linux-pks-thesis,\
+    $(HOME)/src/linux-pks-thesis))))
+
+CONTROL_KERNEL_DIR ?= $(strip \
+    $(if $(wildcard $(WORKSPACE_DIR)/linux-pks-thesis-control),$(WORKSPACE_DIR)/linux-pks-thesis-control,\
+    $(if $(wildcard $(WORKSPACE_DIR)/linux-control),$(WORKSPACE_DIR)/linux-control,\
+    $(if $(wildcard $(HOME)/src/linux-pks-thesis-control),$(HOME)/src/linux-pks-thesis-control,\
+    $(HOME)/src/linux-pks-thesis-control))))
 
 # Storage configuration
 DISK_IMG           ?= $(CURDIR)/images/disk.img

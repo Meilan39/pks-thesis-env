@@ -10,9 +10,22 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-WORKSPACE_KERNEL="$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
+CANDIDATES=(
+    "${DEV_KERNEL_DIR:-}"
+    "$(cd "$SCRIPT_DIR/../../linux-pks-thesis" 2>/dev/null && pwd || true)"
+    "$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
+    "$HOME/src/linux-pks-thesis"
+)
 
-DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-${WORKSPACE_KERNEL:-$HOME/src/linux-pks-thesis}}"
+DETECTED_DEV=""
+for cand in "${CANDIDATES[@]}"; do
+    if [ -n "$cand" ] && [ -d "$cand" ]; then
+        DETECTED_DEV="$cand"
+        break
+    fi
+done
+
+DEV_KERNEL_DIR="${DETECTED_DEV:-${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}}"
 DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 MEM="${MEM_SEC:-4G}"
 SMP="${SMP:-4}"

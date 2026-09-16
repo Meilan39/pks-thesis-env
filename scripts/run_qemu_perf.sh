@@ -10,9 +10,22 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-WORKSPACE_KERNEL="$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
+CANDIDATES=(
+    "${DEV_KERNEL_DIR:-}"
+    "$(cd "$SCRIPT_DIR/../../linux-pks-thesis" 2>/dev/null && pwd || true)"
+    "$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
+    "$HOME/src/linux-pks-thesis"
+)
 
-DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-${WORKSPACE_KERNEL:-$HOME/src/linux-pks-thesis}}"
+DETECTED_DEV=""
+for cand in "${CANDIDATES[@]}"; do
+    if [ -n "$cand" ] && [ -d "$cand" ]; then
+        DETECTED_DEV="$cand"
+        break
+    fi
+done
+
+DEV_KERNEL_DIR="${DETECTED_DEV:-${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}}"
 DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 SMP="${SMP:-4}"
 CONSOLE="${CONSOLE:-ttyS0}"
@@ -35,12 +48,12 @@ if [ -e /dev/kvm ] && grep -qw pks /proc/cpuinfo; then
     CPU_MODE="KVM / host (Hardware PKS verified)"
     CPU_ARGS=(-enable-kvm -cpu host)
 elif [ -e /dev/kvm ]; then
-    CPU_MODE="KVM / host (Host lacks PKS, falling back to TCG)"
-    CPU_ARGS=(-cpu max,pks=on)
+    CPU_MODE="TCG / max,vendor=GenuineIntel,pks=on (Host lacks PKS, falling back to TCG)"
+    CPU_ARGS=(-cpu max,vendor=GenuineIntel,pks=on)
     log_warn "Host CPU lacks supervisor PKS; benchmark latencies under TCG will not be representative."
 else
-    CPU_MODE="TCG / max,pks=on"
-    CPU_ARGS=(-cpu max,pks=on)
+    CPU_MODE="TCG / max,vendor=GenuineIntel,pks=on"
+    CPU_ARGS=(-cpu max,vendor=GenuineIntel,pks=on)
     log_warn "KVM not available; using TCG. Micro-benchmark results will not be representative."
 fi
 
