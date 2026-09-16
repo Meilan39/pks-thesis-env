@@ -48,9 +48,9 @@ fi
 
 case "$AUTO_MODE" in
     sec|sec_on|sec_off)
-        echo "--> [PKS AUTORUN] Executing exploit test suite..."
+        echo "--> [PKS AUTORUN] Executing exploit test suite (all)..."
         if [ -x /exploit/run_tests.sh ]; then
-            /exploit/run_tests.sh
+            /exploit/run_tests.sh all
         else
             echo "ERROR: /exploit/run_tests.sh not found or not executable"
         fi
@@ -65,6 +65,52 @@ case "$AUTO_MODE" in
         echo ""
         echo "================================================================"
         echo " [PKS AUTORUN] Security validation complete. Powering off."
+        echo "================================================================"
+        sync
+        sleep 1
+        poweroff -f
+        ;;
+
+    sec_copyfail|sec_copy_fail)
+        echo "--> [PKS AUTORUN] Executing Copy Fail exploit test..."
+        if [ -x /exploit/run_tests.sh ]; then
+            /exploit/run_tests.sh copy-fail
+        else
+            echo "ERROR: /exploit/run_tests.sh not found or not executable"
+        fi
+
+        if mountpoint -q /mnt/protected; then
+            mkdir -p /mnt/protected/exploit_results
+            cp -a /tmp/exploit_results/* /mnt/protected/exploit_results/ 2>/dev/null || true
+        fi
+
+        sync
+        echo ""
+        echo "================================================================"
+        echo " [PKS AUTORUN] Copy Fail test complete. Powering off."
+        echo "================================================================"
+        sync
+        sleep 1
+        poweroff -f
+        ;;
+
+    sec_dirtyfrag|sec_dirty_frag)
+        echo "--> [PKS AUTORUN] Executing Dirty Frag exploit test..."
+        if [ -x /exploit/run_tests.sh ]; then
+            /exploit/run_tests.sh dirty-frag
+        else
+            echo "ERROR: /exploit/run_tests.sh not found or not executable"
+        fi
+
+        if mountpoint -q /mnt/protected; then
+            mkdir -p /mnt/protected/exploit_results
+            cp -a /tmp/exploit_results/* /mnt/protected/exploit_results/ 2>/dev/null || true
+        fi
+
+        sync
+        echo ""
+        echo "================================================================"
+        echo " [PKS AUTORUN] Dirty Frag test complete. Powering off."
         echo "================================================================"
         sync
         sleep 1

@@ -48,6 +48,9 @@ help:
 	@echo "    make test-sec-off        Run exploit suite with pcache_pks=off (vulnerable)"
 	@echo "    make test-sec-on         Run exploit suite with pcache_pks=on (mitigated)"
 	@echo "    make test-sec            Execute both off/on tests and summarize results"
+	@echo "    make analyze-sec         Parse sec_off.log / sec_on.log and display report"
+	@echo "    make test-sec-copyfail   Run Copy Fail exploit independently (A/B test)"
+	@echo "    make test-sec-dirtyfrag  Run Dirty Frag exploit independently (A/B test)"
 	@echo ""
 	@echo "  Fail-Open & Functional Integrity (fsx Exerciser):"
 	@echo "    make test-fsx-off        Run fsx filesystem exerciser with pcache_pks=off"
@@ -110,24 +113,29 @@ test-sec-off:
 test-sec-on:
 	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch
 
+test-sec-copyfail-off:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch sec_copyfail
+
+test-sec-copyfail-on:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch sec_copyfail
+
+test-sec-copyfail: test-sec-copyfail-off test-sec-copyfail-on
+	@python3 $(SCRIPTS_DIR)/analyze_sec.py --off-log $(RESULTS_DIR)/sec_copyfail_off.log --on-log $(RESULTS_DIR)/sec_copyfail_on.log
+
+test-sec-dirtyfrag-off:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch sec_dirtyfrag
+
+test-sec-dirtyfrag-on:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch sec_dirtyfrag
+
+test-sec-dirtyfrag: test-sec-dirtyfrag-off test-sec-dirtyfrag-on
+	@python3 $(SCRIPTS_DIR)/analyze_sec.py --off-log $(RESULTS_DIR)/sec_dirtyfrag_off.log --on-log $(RESULTS_DIR)/sec_dirtyfrag_on.log
+
 test-sec: test-sec-off test-sec-on
-	@echo ""
-	@echo "======================================================================"
-	@echo " Security Validation Summary (A/B Test)"
-	@echo "======================================================================"
-	@echo "  pcache_pks=off Log: $(RESULTS_DIR)/sec_off.log"
-	@echo "  pcache_pks=on  Log: $(RESULTS_DIR)/sec_on.log"
-	@echo "----------------------------------------------------------------------"
-	@if [ -f "$(RESULTS_DIR)/sec_off.log" ]; then \
-		echo "Off state results:"; \
-		grep -E "(RESULT:|pre-run|post-run)" "$(RESULTS_DIR)/sec_off.log" || true; \
-	fi
-	@echo "----------------------------------------------------------------------"
-	@if [ -f "$(RESULTS_DIR)/sec_on.log" ]; then \
-		echo "On state results:"; \
-		grep -E "(RESULT:|pre-run|post-run|Security event|Oops)" "$(RESULTS_DIR)/sec_on.log" || true; \
-	fi
-	@echo "======================================================================"
+	@python3 $(SCRIPTS_DIR)/analyze_sec.py --off-log $(RESULTS_DIR)/sec_off.log --on-log $(RESULTS_DIR)/sec_on.log
+
+analyze-sec:
+	@python3 $(SCRIPTS_DIR)/analyze_sec.py --off-log $(RESULTS_DIR)/sec_off.log --on-log $(RESULTS_DIR)/sec_on.log
 
 # ==============================================================================
 # Fail-Open & Functional Integrity Testing (fsx Exerciser)

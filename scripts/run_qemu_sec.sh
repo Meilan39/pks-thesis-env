@@ -57,8 +57,10 @@ if [ "$RUN_MODE" = "--batch" ]; then
         LOG_FILE="$RESULTS_DIR/pks_unit.log"
     elif [ "$AUTO_MODE" = "fsx" ]; then
         LOG_FILE="$RESULTS_DIR/fsx_${PKS_STATE}.log"
-    else
+    elif [ "$AUTO_MODE" = "sec" ]; then
         LOG_FILE="$RESULTS_DIR/sec_${PKS_STATE}.log"
+    else
+        LOG_FILE="$RESULTS_DIR/${AUTO_MODE}_${PKS_STATE}.log"
     fi
     EXTRA_CMDLINE="pks_auto=$AUTO_MODE panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
 fi
