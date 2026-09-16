@@ -1,0 +1,8 @@
+[   25.398810] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   25.400717] pks_test:pks_write_file:635: Begin...
+[   25.400790] pks_test:pks_write_file:665: Arming Context switch test
+[   25.400869] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000008feb8e0f
+[   25.400905] pks_test:set_ctx_data:371: Setting context data; 000000009a9e97d0
+[   25.401908] pks_test:pks_write_file:694: Clearing crash test arm
+[   25.401951] pks_test:debug_result:107: Test complete [2]: PASS
+[   25.402074] pks_test:debug_session:95: Freeing session ctx 000000009a9e97d0; unlock 0; crash 0; last test PASS

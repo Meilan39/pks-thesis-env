@@ -1,0 +1,7 @@
+[   26.082509] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   26.085028] pks_test:pks_write_file:635: Begin...
+[   26.085099] pks_test:pks_write_file:669: Checking Context switch test
+[   26.085224] No Context switch configured
+[   26.086335] pks_test:pks_write_file:694: Clearing crash test arm
+[   26.086335] pks_test:debug_result:107: Test complete [3]: FAIL
+[   26.086335] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
