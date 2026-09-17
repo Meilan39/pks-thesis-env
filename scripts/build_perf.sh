@@ -7,23 +7,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
-CANDIDATES=(
-    "${1:-}"
-    "${DEV_KERNEL_DIR:-}"
-    "$(cd "$SCRIPT_DIR/../../linux-pks-thesis" 2>/dev/null && pwd || true)"
-    "$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
-    "$HOME/src/linux-pks-thesis"
-)
-
-KERNEL_DIR=""
-for cand in "${CANDIDATES[@]}"; do
-    if [ -n "$cand" ] && [ -d "$cand" ]; then
-        KERNEL_DIR="$cand"
-        break
-    fi
-done
-
-KERNEL_DIR="${KERNEL_DIR:-${1:-${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}}}"
+KERNEL_DIR="${1:-${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}}"
 OUTPUT_DIR="${OUTPUT_DIR:-$KERNEL_DIR/build_perf}"
 
 [ -d "$KERNEL_DIR" ] || die "Kernel source directory not found: $KERNEL_DIR"

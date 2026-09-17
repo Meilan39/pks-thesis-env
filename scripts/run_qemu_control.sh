@@ -10,23 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-CANDIDATES=(
-    "${CONTROL_KERNEL_DIR:-}"
-    "$(cd "$SCRIPT_DIR/../../linux-pks-thesis-control" 2>/dev/null && pwd || true)"
-    "$(cd "$SCRIPT_DIR/../../linux-control" 2>/dev/null && pwd || true)"
-    "$HOME/src/linux-pks-thesis-control"
-    "$HOME/src/linux-control"
-)
-
-DETECTED_CONTROL=""
-for cand in "${CANDIDATES[@]}"; do
-    if [ -n "$cand" ] && [ -d "$cand" ]; then
-        DETECTED_CONTROL="$cand"
-        break
-    fi
-done
-
-CONTROL_KERNEL_DIR="${DETECTED_CONTROL:-${CONTROL_KERNEL_DIR:-$HOME/src/linux-pks-thesis-control}}"
+CONTROL_KERNEL_DIR="${CONTROL_KERNEL_DIR:-$HOME/src/linux-pks-thesis-control}"
 DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 SMP="${SMP:-4}"
 CONSOLE="${CONSOLE:-ttyS0}"
@@ -70,6 +54,7 @@ LOG_FILE=""
 if [ "$RUN_MODE" = "--batch" ]; then
     mkdir -p "$RESULTS_DIR"
     LOG_FILE="$RESULTS_DIR/perf_control.log"
+    RAW_LOG_FILE="$RESULTS_DIR/raw_perf_control.log"
     EXTRA_CMDLINE="pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
 fi
 
@@ -81,7 +66,8 @@ log_kv "Total RAM"   "$MEM (Equalized to mitigated usable RAM)"
 log_kv "CPU Mode"    "$CPU_MODE"
 log_kv "CPU Pinning" "${TASKSET_CPUS:-none}"
 if [ -n "$LOG_FILE" ]; then
-    log_kv "Serial Log"  "$LOG_FILE"
+    log_kv "Clean Log"   "$LOG_FILE"
+    log_kv "Raw Serial"  "$RAW_LOG_FILE"
 fi
 
 QEMU_CMD=(
@@ -99,9 +85,20 @@ QEMU_CMD=(
 )
 
 if [ "$RUN_MODE" = "--batch" ]; then
-    log_step "Running automated batch benchmark (logging to $LOG_FILE)..."
-    "${QEMU_CMD[@]}" 2>&1 | tee "$LOG_FILE"
-    log_ok "Control baseline benchmark run finished"
+    log_step "Executing control VM (raw output to $RAW_LOG_FILE)..."
+    "${QEMU_CMD[@]}" > "$RAW_LOG_FILE" 2>&1 || true
+    
+    # Filter out early boot noise, keeping autorun banner onward + any panic traces
+    awk '
+        /\[PKS AUTORUN\]|=== \[/ { capturing = 1 }
+        capturing { print; next }
+        /Kernel panic|Oops|Call Trace:|Security event|BUG:|CR4:|MSR IA32_PKRS|do_trap/ { print }
+    ' "$RAW_LOG_FILE" > "$LOG_FILE"
+    
+    if [ ! -s "$LOG_FILE" ]; then
+        cp "$RAW_LOG_FILE" "$LOG_FILE"
+    fi
+    log_ok "Control baseline run finished. Report: $LOG_FILE"
 else
     "${QEMU_CMD[@]}"
 fi

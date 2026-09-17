@@ -16,13 +16,13 @@ export DEBIAN_SUITE DEBIAN_ARCH DEBIAN_MIRROR SCRIPTS_DIR GUEST_ASSETS_DIR
 export IMAGES_DIR RESULTS_DIR QEMU_BIN SMP CONSOLE TASKSET_CPUS
 export MEM_SEC MEM_PERF_MITIGATED MEM_PERF_CONTROL BATCH_TIMEOUT_SEC
 
-.PHONY: all help check-deps test-pks-unit \
+.PHONY: all help build test test-sec bench \
+        check-deps test-pks-unit \
         build-sec build-perf build-control build-all \
         provision-disk update-disk \
-        test-sec-off test-sec-on test-sec \
+        test-sec-off test-sec-on \
         test-fsx-off test-fsx-on test-fsx \
-        bench-control bench-mitigated bench-all \
-        fetch-results analyze-bench \
+        fetch-results analyze-sec \
         run-sec-off run-sec-on run-perf run-control \
         clean-results clean-all
 
@@ -34,37 +34,34 @@ help:
 	@echo " PKS Thesis Evaluation Environment - Available Commands"
 	@echo "======================================================================"
 	@echo ""
-	@echo "  Kernel Compilation:"
+	@echo "  Primary Reproduction Commands:"
+	@echo "    make build               Build all kernels and prepare disk image (tmux supported)"
+	@echo "    make test                Run compliance & functional integrity suite (single QEMU boot)"
+	@echo "    make test-sec            Execute end-to-end exploit validation (vulnerable vs mitigated)"
+	@echo "    make bench               Micro-benchmark suite (under redesign)"
+	@echo ""
+	@echo "  Granular Kernel Compilation:"
 	@echo "    make build-sec           Compile security kernel (pcache_pks diagnostics)"
 	@echo "    make build-perf          Compile mitigated performance kernel (pcache_pks)"
 	@echo "    make build-control       Compile baseline upstream control kernel"
-	@echo "    make build-all           Compile all three kernel configurations"
+	@echo "    make build-all           Synchronously compile all three kernel configurations"
 	@echo ""
 	@echo "  Disk Image Lifecycle:"
 	@echo "    make provision-disk      Bootstrap and partition fresh 8GB Debian disk"
 	@echo "    make update-disk         Incrementally sync guest-assets into disk image"
 	@echo ""
-	@echo "  Automated Security Validation (Exploit Neutralization):"
+	@echo "  Granular Security Validation:"
 	@echo "    make test-sec-off        Run exploit suite with pcache_pks=off (vulnerable)"
 	@echo "    make test-sec-on         Run exploit suite with pcache_pks=on (mitigated)"
-	@echo "    make test-sec            Execute both off/on tests and summarize results"
-	@echo "    make analyze-sec         Parse sec_off.log / sec_on.log and display report"
 	@echo "    make test-sec-copyfail   Run Copy Fail exploit independently (A/B test)"
 	@echo "    make test-sec-dirtyfrag  Run Dirty Frag exploit independently (A/B test)"
+	@echo "    make analyze-sec         Parse sec_off.log / sec_on.log and display report"
 	@echo ""
-	@echo "  Fail-Open & Functional Integrity (fsx Exerciser):"
+	@echo "  Granular Compliance & Functional Integrity:"
 	@echo "    make test-fsx-off        Run fsx filesystem exerciser with pcache_pks=off"
 	@echo "    make test-fsx-on         Run fsx filesystem exerciser with pcache_pks=on"
 	@echo "    make test-fsx            Execute both off/on fsx tests and summarize results"
-	@echo ""
-	@echo "  Automated Micro-benchmarks (Headless Batch):"
-	@echo "    make bench-control       Run fio write/read suite on control kernel"
-	@echo "    make bench-mitigated     Run fio write/read suite on mitigated kernel"
-	@echo "    make bench-all           Run control + mitigated benchmarks and analyze"
-	@echo ""
-	@echo "  Artifact Extraction & Analysis:"
-	@echo "    make fetch-results       Extract JSONs & logs from disk image to host"
-	@echo "    make analyze-bench       Parse extracted fio JSONs and print overhead"
+	@echo "    make test-pks-unit       Run low-level in-kernel PKS self-test (debugfs)"
 	@echo ""
 	@echo "  Interactive Debugging Shells:"
 	@echo "    make run-sec-off         Interactive serial console (pcache_pks=off)"
@@ -72,17 +69,33 @@ help:
 	@echo "    make run-perf            Interactive serial console (mitigated kernel)"
 	@echo "    make run-control         Interactive serial console (control kernel)"
 	@echo ""
-	@echo "  Diagnostics & Sanity Checks:"
-	@echo "    make check-deps          Verify host tools and dependencies"
-	@echo "    make test-pks-unit       Run low-level in-kernel PKS self-test (debugfs)"
-	@echo ""
 	@echo "  Environment & Cleanup:"
+	@echo "    make check-deps          Verify host tools and dependencies"
+	@echo "    make fetch-results       Extract JSONs & logs from disk image to host"
 	@echo "    make clean-results       Remove host-side logs and extracted results"
 	@echo "    make clean-all           Remove results and disk image"
 	@echo "======================================================================"
 
 # ==============================================================================
-# Kernel Build Targets
+# Primary Reproduction Targets
+# ==============================================================================
+build:
+	@$(SCRIPTS_DIR)/build_all.sh
+
+test:
+	@$(SCRIPTS_DIR)/run_compliance.sh
+
+bench:
+	@echo "======================================================================"
+	@echo " Benchmark Suite Under Redesign"
+	@echo "======================================================================"
+	@echo "  The micro-benchmark suite is currently undergoing reconstruction."
+	@echo "  For functional validation, run:  make test"
+	@echo "  For security validation, run:    make test-sec"
+	@echo "======================================================================"
+
+# ==============================================================================
+# Kernel Build Targets (Granular)
 # ==============================================================================
 build-sec:
 	@$(SCRIPTS_DIR)/build_sec.sh $(DEV_KERNEL_DIR)
@@ -93,7 +106,8 @@ build-perf:
 build-control:
 	@$(SCRIPTS_DIR)/build_control.sh $(CONTROL_KERNEL_DIR)
 
-build-all: build-sec build-perf build-control
+build-all:
+	@$(SCRIPTS_DIR)/build_all.sh --direct
 
 # ==============================================================================
 # Disk Lifecycle Targets
@@ -166,32 +180,10 @@ test-fsx: test-fsx-off test-fsx-on
 	@echo "======================================================================"
 
 # ==============================================================================
-# Automated Benchmarking (Batch Mode)
-# ==============================================================================
-bench-control:
-	@mkdir -p $(RESULTS_DIR)/extracted/bench/control
-	@$(SCRIPTS_DIR)/run_qemu_control.sh --batch
-	@$(SCRIPTS_DIR)/fetch_results.sh $(RESULTS_DIR)/extracted_control
-	@cp -a $(RESULTS_DIR)/extracted_control/bench/*.json $(RESULTS_DIR)/extracted/bench/control/ 2>/dev/null || true
-
-bench-mitigated:
-	@mkdir -p $(RESULTS_DIR)/extracted/bench/mitigated
-	@$(SCRIPTS_DIR)/run_qemu_perf.sh --batch
-	@$(SCRIPTS_DIR)/fetch_results.sh $(RESULTS_DIR)/extracted_mitigated
-	@cp -a $(RESULTS_DIR)/extracted_mitigated/bench/*.json $(RESULTS_DIR)/extracted/bench/mitigated/ 2>/dev/null || true
-
-bench-all: bench-control bench-mitigated analyze-bench
-
-# ==============================================================================
-# Results Harvesting and Parsing
+# Results Harvesting
 # ==============================================================================
 fetch-results:
 	@$(SCRIPTS_DIR)/fetch_results.sh $(RESULTS_DIR)/extracted
-
-analyze-bench:
-	@$(SCRIPTS_DIR)/analyze_bench.py \
-		--control-dir $(RESULTS_DIR)/extracted/bench/control \
-		--mitigated-dir $(RESULTS_DIR)/extracted/bench/mitigated
 
 # ==============================================================================
 # Interactive QEMU Shells (Manual / Debugging Mode)

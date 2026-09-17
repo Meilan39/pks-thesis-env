@@ -10,22 +10,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 ENV_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
-CANDIDATES=(
-    "${DEV_KERNEL_DIR:-}"
-    "$(cd "$SCRIPT_DIR/../../linux-pks-thesis" 2>/dev/null && pwd || true)"
-    "$(cd "$SCRIPT_DIR/../../linux-5.18-rc3" 2>/dev/null && pwd || true)"
-    "$HOME/src/linux-pks-thesis"
-)
-
-DETECTED_DEV=""
-for cand in "${CANDIDATES[@]}"; do
-    if [ -n "$cand" ] && [ -d "$cand" ]; then
-        DETECTED_DEV="$cand"
-        break
-    fi
-done
-
-DEV_KERNEL_DIR="${DETECTED_DEV:-${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}}"
+DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}"
 DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 MEM="${MEM_SEC:-4G}"
 SMP="${SMP:-4}"
@@ -63,6 +48,7 @@ fi
 
 EXTRA_CMDLINE=""
 LOG_FILE=""
+RAW_LOG_FILE=""
 if [ "$RUN_MODE" = "--batch" ]; then
     AUTO_MODE="${3:-sec}"
     mkdir -p "$RESULTS_DIR"
@@ -72,9 +58,12 @@ if [ "$RUN_MODE" = "--batch" ]; then
         LOG_FILE="$RESULTS_DIR/fsx_${PKS_STATE}.log"
     elif [ "$AUTO_MODE" = "sec" ]; then
         LOG_FILE="$RESULTS_DIR/sec_${PKS_STATE}.log"
+    elif [ "$AUTO_MODE" = "compliance" ] || [ "$AUTO_MODE" = "test" ]; then
+        LOG_FILE="$RESULTS_DIR/compliance.log"
     else
         LOG_FILE="$RESULTS_DIR/${AUTO_MODE}_${PKS_STATE}.log"
     fi
+    RAW_LOG_FILE="$RESULTS_DIR/raw_${AUTO_MODE}_${PKS_STATE}.log"
     EXTRA_CMDLINE="pks_auto=$AUTO_MODE panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
 fi
 
@@ -86,7 +75,8 @@ log_kv "Disk Image"  "$DISK_IMG"
 log_kv "CPU Mode"    "$CPU_MODE"
 log_kv "RAM / Cores" "$MEM / $SMP"
 if [ -n "$LOG_FILE" ]; then
-    log_kv "Serial Log"  "$LOG_FILE"
+    log_kv "Clean Log"   "$LOG_FILE"
+    log_kv "Raw Serial"  "$RAW_LOG_FILE"
 fi
 
 QEMU_CMD=(
@@ -103,9 +93,20 @@ QEMU_CMD=(
 )
 
 if [ "$RUN_MODE" = "--batch" ]; then
-    log_step "Running automated batch security validation (logging to $LOG_FILE)..."
-    "${QEMU_CMD[@]}" 2>&1 | tee "$LOG_FILE"
-    log_ok "Batch execution finished for pcache_pks=$PKS_STATE"
+    log_step "Executing security VM (mode=$AUTO_MODE, pcache_pks=$PKS_STATE, raw log: $RAW_LOG_FILE)..."
+    "${QEMU_CMD[@]}" > "$RAW_LOG_FILE" 2>&1 || true
+    
+    # Filter out early boot noise, keeping autorun banner onward + any panic traces
+    awk '
+        /\[PKS AUTORUN\]|=== \[/ { capturing = 1 }
+        capturing { print; next }
+        /Kernel panic|Oops|Call Trace:|Security event|BUG:|CR4:|MSR IA32_PKRS|do_trap/ { print }
+    ' "$RAW_LOG_FILE" > "$LOG_FILE"
+    
+    if [ ! -s "$LOG_FILE" ]; then
+        cp "$RAW_LOG_FILE" "$LOG_FILE"
+    fi
+    log_ok "Batch execution finished for pcache_pks=$PKS_STATE. Report: $LOG_FILE"
 else
     "${QEMU_CMD[@]}"
 fi

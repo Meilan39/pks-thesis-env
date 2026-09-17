@@ -27,7 +27,7 @@ pks-thesis-env/
 │   │   ├── dirty-frag/     # Dirty Frag (CVE-2026-43284, CVE-2026-43500) exploit
 │   │   └── run_tests.sh    # Security validation harness (A/B testing)
 │   └── benchmark/
-│       └── run_benchmarks.sh # Synchronous buffered fio scaling benchmark suite
+│       └── run_benchmarks.sh # Benchmark suite placeholder (pending redesign)
 ├── scripts/
 │   ├── common.sh           # Unified minimal logging utilities & pre-flight checks
 │   ├── build_sec.sh        # Compiles debug-enabled security kernel (pcache_pks)
@@ -36,10 +36,10 @@ pks-thesis-env/
 │   ├── provision_disk.sh   # Provisions dual-partition ext4 disk image (Debian)
 │   ├── update_disk.sh      # Synchronizes guest-assets into existing disk image
 │   ├── fetch_results.sh    # Extracts artifacts from disk image to host results/
-│   ├── analyze_bench.py    # Generates thesis-ready comparison tables & overhead
+│   ├── analyze_bench.py    # Benchmark analysis placeholder (pending redesign)
 │   ├── run_qemu_sec.sh     # QEMU launcher for security tests (batch / interactive)
-│   ├── run_qemu_perf.sh    # QEMU launcher for mitigated benchmarks
-│   └── run_qemu_control.sh # QEMU launcher for baseline benchmarks
+│   ├── run_qemu_perf.sh    # QEMU launcher for mitigated performance kernel
+│   └── run_qemu_control.sh # QEMU launcher for baseline control kernel
 ├── results/                # Host-side captured serial logs and extracted data
 └── Makefile                # Pipeline automation entry point
 ```
@@ -52,30 +52,32 @@ Run `make help` to inspect all available targets:
 
 | Category | Command | Description |
 | :--- | :--- | :--- |
-| **Kernel Build** | `make build-sec` | Compile security kernel (`pcache_pks` diagnostics) |
+| **Primary Workflow** | `make build` | Build all kernels and prepare disk image (tmux supported) |
+| | `make test` | Run compliance & functional integrity suite (single QEMU boot) |
+| | `make test-sec` | Execute end-to-end exploit validation (vulnerable vs mitigated) |
+| | `make bench` | Micro-benchmark suite (under redesign) |
+| **Granular Build** | `make build-sec` | Compile security kernel (`pcache_pks` diagnostics) |
 | | `make build-perf` | Compile mitigated performance kernel |
 | | `make build-control` | Compile baseline upstream control kernel |
-| | `make build-all` | Compile all three kernel configurations |
+| | `make build-all` | Synchronously compile all three kernels |
 | **Disk Image** | `make provision-disk` | Bootstrap fresh 8GB Debian raw disk image |
 | | `make update-disk` | Synchronize guest assets & autorun into image |
-| **Security Validation** | `make test-sec-off` | Automated headless exploit run with `pcache_pks=off` (vulnerable) |
+| **Granular Security** | `make test-sec-off` | Automated headless exploit run with `pcache_pks=off` (vulnerable) |
 | | `make test-sec-on` | Automated headless exploit run with `pcache_pks=on` (mitigated) |
-| | `make test-sec` | Run both off/on exploit tests sequentially & summarize |
-| **Fail-Open & Integrity** | `make test-fsx-off` | Run fsx exerciser with `pcache_pks=off` (vanilla ext4 baseline) |
+| | `make test-sec-copyfail` | Run Copy Fail exploit independently (A/B test) |
+| | `make test-sec-dirtyfrag`| Run Dirty Frag exploit independently (A/B test) |
+| | `make analyze-sec` | Parse serial logs and display verification report |
+| **Granular Compliance** | `make test-fsx-off` | Run fsx exerciser with `pcache_pks=off` (vanilla ext4 baseline) |
 | | `make test-fsx-on` | Run fsx exerciser with `pcache_pks=on` (protected mount validation) |
 | | `make test-fsx` | Run both off/on fsx tests and summarize results |
-| **Micro-benchmarks** | `make bench-control` | Headless fio benchmark on vanilla control kernel |
-| | `make bench-mitigated`| Headless fio benchmark on mitigated kernel |
-| | `make bench-all` | Run control + mitigated runs and analyze |
-| **Analysis** | `make fetch-results` | Extract JSONs and logs from VM disk to host |
-| | `make analyze-bench` | Parse fio JSONs and print overhead table |
+| | `make test-pks-unit` | Run low-level in-kernel PKS self-test (`/sys/kernel/debug/x86/run_pks`) |
 | **Interactive** | `make run-sec-off` | Interactive console with `pcache_pks=off` |
 | | `make run-sec-on` | Interactive console with `pcache_pks=on` |
 | | `make run-perf` | Interactive console for mitigated kernel |
 | | `make run-control` | Interactive console for control kernel |
-| **Diagnostics & Sanity** | `make check-deps` | Verify host prerequisites and tools |
-| | `make test-pks-unit` | Run low-level in-kernel PKS self-test (`/sys/kernel/debug/x86/run_pks`) |
-| **Housekeeping** | `make clean-results` | Clear host results directory |
+| **Housekeeping** | `make check-deps` | Verify host prerequisites and tools |
+| | `make fetch-results` | Extract JSONs and logs from VM disk to host |
+| | `make clean-results` | Clear host results directory |
 | | `make clean-all` | Clear results and disk image container |
 
 ---
@@ -90,41 +92,37 @@ make build-sec DEV_KERNEL_DIR=/path/to/linux-pks-thesis
 make build-control CONTROL_KERNEL_DIR=/path/to/linux-pks-thesis-control
 
 # Override CPU cores and RAM allocation
-make test-sec-on SMP=8 MEM_SEC=8G
+make test-sec SMP=8 MEM_SEC=8G
 
-# Pin benchmark execution to dedicated host cores
-make bench-all TASKSET_CPUS="4-7"
+# Force disk re-provisioning during build
+make build FORCE_REPROVISION=1
 ```
 
 ---
 
 ## Evaluation Workflows
 
-### 1. Automated Security Validation (`make test-sec`)
+### 1. Autonomous Build Pipeline (`make build`)
 
-Executing `make test-sec` automatically runs both test phases in batch mode:
-1. Boots the security kernel with `pcache_pks=off` and `pks_auto=sec`.
-2. The in-guest autorun service executes `/exploit/run_tests.sh`, logs results, and powers off.
-3. Boots the security kernel with `pcache_pks=on` and `pks_auto=sec`.
-4. Executes the tests against PKS-protected storage, detects supervisor `#PF` events, logs results, and powers off.
-5. Displays an A/B delta summary verifying that exploits succeeded in the off state and were neutralized in the on state.
+Executing `make build`:
+1. If `tmux` is available on the host, automatically launches or attaches to a detached background session (`pks-build`) so long compilations survive disconnects.
+2. Sequentially compiles the security kernel (`build_sec`), mitigated performance kernel (`build_perf`), and control kernel (`build_control`).
+3. If an existing `images/disk.img` is present, synchronizes assets via `update_disk.sh`. If absent, provisions a fresh Debian disk via `provision_disk.sh`.
+4. Saves all build output to `results/build.log`.
 
-### 2. Fail-Open & Filesystem Integrity (`make test-fsx`)
+### 2. Single-Boot Compliance & Functional Integrity (`make test`)
 
-Executing `make test-fsx` tests POSIX compatibility and fail-open stability:
-1. Boots the kernel with `pcache_pks=off` and runs 5,000 random operations across rootfs to verify baseline ext4 stability.
-2. Boots the kernel with `pcache_pks=on` and runs 10,000 operations on `/mnt/protected` with `-W` to test in-scope buffered I/O, truncations, and hole zeroing.
-3. Validates boundary rejection by running `fsx -b` on `/mnt/protected` to verify Commit 06 blocks `MAP_SHARED, PROT_WRITE` with `-EOPNOTSUPP`.
-4. Summarizes whether edge cases or crashes occurred in either mode.
+Executing `make test`:
+1. Boots the mitigated kernel once with `pcache_pks=on` and `pks_auto=compliance`.
+2. Sequentially executes in-kernel PKS driver self-tests, the `fsx` filesystem exerciser (5K rootfs operations, 10K protected mount operations, Commit 06 rejection test), and POSIX test suites.
+3. Suppresses QEMU boot noise during execution, logs clean test output to `results/compliance.log`, and prints a unified pass/fail summary table on the host.
 
-### 3. Automated Micro-benchmarking (`make bench-all`)
+### 3. Automated Security Validation (`make test-sec`)
 
-Executing `make bench-all`:
-1. Boots the control kernel in batch mode (`pks_auto=bench`), executes the synchronous buffered write scaling and 4KB random read suites, and powers off.
-2. Extracts control benchmark JSONs into `results/extracted/bench/control/`.
-3. Boots the mitigated kernel in batch mode (`pcache_pks=on`), runs the identical benchmark suite, and powers off.
-4. Extracts mitigated benchmark JSONs into `results/extracted/bench/mitigated/`.
-5. Invokes `analyze_bench.py` to print a Markdown table with mean throughput (MB/s), IOPS, latency, and throughput overhead percentage.
+Executing `make test-sec` runs both test phases in batch mode:
+1. Boots the security kernel with `pcache_pks=off` and `pks_auto=sec`. Executes Copy Fail and Dirty Frag, verifying that both exploits modify target file contents.
+2. Boots the security kernel with `pcache_pks=on` and `pks_auto=sec`. Executes Copy Fail (trapped by PKS, task killed with SIGSEGV) followed by Dirty Frag (trapped by PKS in softirq, immediate kernel panic).
+3. Invokes `analyze_sec.py` to parse `results/sec_off.log` and `results/sec_on.log`, displaying a side-by-side verification report.
 
 ### 4. Interactive Debugging
 
