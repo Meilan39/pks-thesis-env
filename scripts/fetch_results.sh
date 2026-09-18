@@ -83,6 +83,15 @@ fi
 
 sudo chown -R "$(id -u):$(id -g)" "$DEST_DIR" 2>/dev/null || true
 
+# Sync harvested benchmark JSONs directly to results/raw for parse_results.py
+RAW_DIR="${RESULTS_DIR:-$ENV_DIR/results}/raw"
+mkdir -p "$RAW_DIR"
+if [ -d "$DEST_DIR/bench/raw" ]; then
+    cp -a "$DEST_DIR/bench/raw/." "$RAW_DIR/" 2>/dev/null || true
+elif [ -d "$DEST_DIR/bench" ]; then
+    cp -a "$DEST_DIR/bench/." "$RAW_DIR/" 2>/dev/null || true
+fi
+
 BENCH_COUNT=$(find "$DEST_DIR/bench" -type f -name "*.json" 2>/dev/null | wc -l || echo 0)
 EXPLOIT_COUNT=$(find "$DEST_DIR/exploit" -type f 2>/dev/null | wc -l || echo 0)
 UNIT_COUNT=$(find "$DEST_DIR/unit" -type f 2>/dev/null | wc -l || echo 0)

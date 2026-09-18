@@ -20,6 +20,7 @@ TOTAL_MEM="${MEM_PERF_MITIGATED:-4096M}"
 RESULTS_DIR="${RESULTS_DIR:-$ENV_DIR/results}"
 
 RUN_MODE="${1:---interactive}"
+PKS_STATE="${2:-on}"
 
 KERNEL="$DEV_KERNEL_DIR/build_perf/arch/x86/boot/bzImage"
 [ -f "$KERNEL" ] || die "Performance kernel not found at $KERNEL. Run 'make build-perf' first."
@@ -51,8 +52,13 @@ EXTRA_CMDLINE=""
 LOG_FILE=""
 if [ "$RUN_MODE" = "--batch" ]; then
     mkdir -p "$RESULTS_DIR"
-    LOG_FILE="$RESULTS_DIR/perf_mitigated.log"
-    RAW_LOG_FILE="$RESULTS_DIR/raw_perf_mitigated.log"
+    if [ "$PKS_STATE" = "off" ]; then
+        LOG_FILE="$RESULTS_DIR/perf_mitigated_off.log"
+        RAW_LOG_FILE="$RESULTS_DIR/raw_perf_mitigated_off.log"
+    else
+        LOG_FILE="$RESULTS_DIR/perf_mitigated.log"
+        RAW_LOG_FILE="$RESULTS_DIR/raw_perf_mitigated.log"
+    fi
     EXTRA_CMDLINE="pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
 fi
 
@@ -60,7 +66,7 @@ log_header "Launching Mitigated Performance Benchmark VM"
 log_kv "Kernel"      "$KERNEL"
 log_kv "Disk Image"  "$DISK_IMG"
 log_kv "Execution"   "$RUN_MODE"
-log_kv "PKS State"   "on"
+log_kv "PKS State"   "$PKS_STATE"
 log_kv "Total RAM"   "$TOTAL_MEM (256MB pool -> 3840MB usable)"
 log_kv "CPU Mode"    "$CPU_MODE"
 log_kv "CPU Pinning" "${TASKSET_CPUS:-none}"
@@ -77,7 +83,7 @@ QEMU_CMD=(
     -smp "$SMP"
     -m "$TOTAL_MEM"
     -kernel "$KERNEL"
-    -append "root=/dev/vda1 rw console=$CONSOLE nokaslr pcache_pks=on $EXTRA_CMDLINE"
+    -append "root=/dev/vda1 rw console=$CONSOLE nokaslr pcache_pks=$PKS_STATE $EXTRA_CMDLINE"
     -drive file="$DISK_IMG",format=raw,if=virtio,cache=none,aio=native
     -nographic
     -no-reboot

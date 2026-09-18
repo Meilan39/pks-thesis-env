@@ -60,6 +60,12 @@ if [ -d "$GUEST_ASSETS_DIR/exploit" ]; then
             cd /exploit/dirty-frag && gcc -O0 -Wall -o exp exp.c -lutil
         " 2>/dev/null || log_warn "dirty-frag compilation inside chroot skipped"
     fi
+    if [ -f "$MOUNT_POINT/exploit/fragnesia/exp.c" ]; then
+        log_step "Recompiling fragnesia harness inside chroot"
+        sudo chroot "$MOUNT_POINT" /bin/bash -c "
+            cd /exploit/fragnesia && gcc -O2 -Wall -o exp exp.c
+        " 2>/dev/null || log_warn "fragnesia compilation inside chroot skipped"
+    fi
 fi
 
 if [ -d "$GUEST_ASSETS_DIR/benchmark" ]; then
@@ -69,9 +75,7 @@ if [ -d "$GUEST_ASSETS_DIR/benchmark" ]; then
     sudo cp -a "$GUEST_ASSETS_DIR/benchmark/." "$MOUNT_POINT/benchmark/"
     sudo chown -R root:root "$MOUNT_POINT/benchmark"
     sudo chmod -R 755 "$MOUNT_POINT/benchmark"
-    if [ -f "$MOUNT_POINT/benchmark/run_benchmarks.sh" ]; then
-        sudo chmod +x "$MOUNT_POINT/benchmark/run_benchmarks.sh"
-    fi
+    find "$MOUNT_POINT/benchmark" -type f -name "*.sh" -exec sudo chmod +x {} +
 fi
 
 if [ -d "$GUEST_ASSETS_DIR/unit-tests" ]; then
@@ -81,8 +85,12 @@ if [ -d "$GUEST_ASSETS_DIR/unit-tests" ]; then
     sudo cp -a "$GUEST_ASSETS_DIR/unit-tests/." "$MOUNT_POINT/unit-tests/"
     sudo chown -R root:root "$MOUNT_POINT/unit-tests"
     sudo chmod -R 755 "$MOUNT_POINT/unit-tests"
-    if [ -f "$MOUNT_POINT/unit-tests/run_pks_unit.sh" ]; then
-        sudo chmod +x "$MOUNT_POINT/unit-tests/run_pks_unit.sh"
+    find "$MOUNT_POINT/unit-tests" -type f -name "*.sh" -exec sudo chmod +x {} +
+    if [ -f "$MOUNT_POINT/unit-tests/pks_sanity_test.c" ]; then
+        log_step "Compiling pks_sanity_test inside chroot"
+        sudo chroot "$MOUNT_POINT" /bin/bash -c "
+            cd /unit-tests && gcc -O2 -Wall -o pks_sanity_test pks_sanity_test.c
+        " 2>/dev/null || log_warn "pks_sanity_test compilation inside chroot skipped"
     fi
 fi
 

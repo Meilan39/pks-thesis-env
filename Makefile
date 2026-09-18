@@ -13,14 +13,18 @@ SHELL := /bin/bash
 # Export variables for child scripts
 export DEV_KERNEL_DIR CONTROL_KERNEL_DIR DISK_IMG DISK_SIZE ROOTFS_SIZE PROT_SIZE
 export DEBIAN_SUITE DEBIAN_ARCH DEBIAN_MIRROR SCRIPTS_DIR GUEST_ASSETS_DIR
-export IMAGES_DIR RESULTS_DIR QEMU_BIN SMP CONSOLE TASKSET_CPUS
+export IMAGES_DIR RESULTS_DIR TOOLS_DIR QEMU_BIN SMP CONSOLE TASKSET_CPUS
 export MEM_SEC MEM_PERF_MITIGATED MEM_PERF_CONTROL BATCH_TIMEOUT_SEC
 
 .PHONY: all help build test test-sec bench \
+        bench-control bench-mitigated bench-off parse-results plot-bench \
         check-deps test-pks-unit \
         build-sec build-perf build-control build-all \
         provision-disk update-disk \
         test-sec-off test-sec-on \
+        test-sec-copyfail-off test-sec-copyfail-on test-sec-copyfail \
+        test-sec-dirtyfrag-off test-sec-dirtyfrag-on test-sec-dirtyfrag \
+        test-sec-fragnesia-off test-sec-fragnesia-on test-sec-fragnesia \
         test-fsx-off test-fsx-on test-fsx \
         fetch-results analyze-sec \
         run-sec-off run-sec-on run-perf run-control \
@@ -38,7 +42,12 @@ help:
 	@echo "    make build               Build all kernels and prepare disk image (tmux supported)"
 	@echo "    make test                Run compliance & functional integrity suite (single QEMU boot)"
 	@echo "    make test-sec            Execute end-to-end exploit validation (vulnerable vs mitigated)"
-	@echo "    make bench               Micro-benchmark suite (under redesign)"
+	@echo "    make bench               Execute complete A/B benchmark suite (control + mitigated + parse)"
+	@echo "    make bench-control       Run baseline control benchmark VM in batch mode"
+	@echo "    make bench-mitigated     Run mitigated benchmark VM with pcache_pks=on in batch mode"
+	@echo "    make bench-off           Run mitigated benchmark VM with pcache_pks=off (ablation) in batch mode"
+	@echo "    make parse-results       Process raw fio/sqlite JSONs into canonical benchmark_summary.csv"
+	@echo "    make plot-bench          Render thesis publication figures (PDF/PNG vector graphics)"
 	@echo ""
 	@echo "  Granular Kernel Compilation:"
 	@echo "    make build-sec           Compile security kernel (pcache_pks diagnostics)"
@@ -55,7 +64,8 @@ help:
 	@echo "    make test-sec-on         Run exploit suite with pcache_pks=on (mitigated)"
 	@echo "    make test-sec-copyfail   Run Copy Fail exploit independently (A/B test)"
 	@echo "    make test-sec-dirtyfrag  Run Dirty Frag exploit independently (A/B test)"
-	@echo "    make analyze-sec         Parse sec_off.log / sec_on.log and display report"
+	@echo "    make test-sec-fragnesia  Run Fragnesia exploit independently (A/B test)"
+	@echo "    make analyze-sec         Parse sec logs and display report"
 	@echo ""
 	@echo "  Granular Compliance & Functional Integrity:"
 	@echo "    make test-fsx-off        Run fsx filesystem exerciser with pcache_pks=off"
@@ -85,14 +95,28 @@ build:
 test:
 	@$(SCRIPTS_DIR)/run_compliance.sh
 
-bench:
+bench: bench-control bench-mitigated fetch-results parse-results
 	@echo "======================================================================"
-	@echo " Benchmark Suite Under Redesign"
+	@echo " Benchmark Suite Execution & Processing Complete"
 	@echo "======================================================================"
-	@echo "  The micro-benchmark suite is currently undergoing reconstruction."
-	@echo "  For functional validation, run:  make test"
-	@echo "  For security validation, run:    make test-sec"
+	@echo "  Summary dataset: $(RESULTS_DIR)/processed/benchmark_summary.csv"
+	@echo "  To render publication figures, run: make plot-bench"
 	@echo "======================================================================"
+
+bench-control:
+	@$(SCRIPTS_DIR)/run_qemu_control.sh --batch
+
+bench-mitigated:
+	@$(SCRIPTS_DIR)/run_qemu_perf.sh --batch on
+
+bench-off:
+	@$(SCRIPTS_DIR)/run_qemu_perf.sh --batch off
+
+parse-results:
+	@python3 $(SCRIPTS_DIR)/parse_results.py $(RESULTS_DIR)/raw $(RESULTS_DIR)/processed/benchmark_summary.csv $(RESULTS_DIR)/processed/run_metadata.json
+
+plot-bench:
+	@python3 $(TOOLS_DIR)/plotting/plot_thesis_figures.py $(RESULTS_DIR)/processed/benchmark_summary.csv $(RESULTS_DIR)/processed/figures
 
 # ==============================================================================
 # Kernel Build Targets (Granular)
@@ -145,8 +169,21 @@ test-sec-dirtyfrag-on:
 test-sec-dirtyfrag: test-sec-dirtyfrag-off test-sec-dirtyfrag-on
 	@python3 $(SCRIPTS_DIR)/analyze_sec.py --off-log $(RESULTS_DIR)/sec_dirtyfrag_off.log --on-log $(RESULTS_DIR)/sec_dirtyfrag_on.log
 
-test-sec: test-sec-off test-sec-on
-	@python3 $(SCRIPTS_DIR)/analyze_sec.py --off-log $(RESULTS_DIR)/sec_off.log --on-log $(RESULTS_DIR)/sec_on.log
+test-sec-fragnesia-off:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch sec_fragnesia
+
+test-sec-fragnesia-on:
+	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch sec_fragnesia
+
+test-sec-fragnesia: test-sec-fragnesia-off test-sec-fragnesia-on
+	@python3 $(SCRIPTS_DIR)/analyze_sec.py --off-log $(RESULTS_DIR)/sec_fragnesia_off.log --on-log $(RESULTS_DIR)/sec_fragnesia_on.log
+
+test-sec: test-sec-copyfail test-sec-dirtyfrag test-sec-fragnesia
+	@echo ""
+	@echo "======================================================================"
+	@echo " Exploit Mitigation Evaluation Complete (Copy Fail, Dirty Frag, Fragnesia)"
+	@echo "======================================================================"
+	@python3 $(SCRIPTS_DIR)/analyze_sec.py
 
 analyze-sec:
 	@python3 $(SCRIPTS_DIR)/analyze_sec.py --off-log $(RESULTS_DIR)/sec_off.log --on-log $(RESULTS_DIR)/sec_on.log

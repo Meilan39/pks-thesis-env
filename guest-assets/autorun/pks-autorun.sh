@@ -117,6 +117,29 @@ case "$AUTO_MODE" in
         poweroff -f
         ;;
 
+    sec_fragnesia)
+        echo "--> [PKS AUTORUN] Executing Fragnesia exploit test..."
+        if [ -x /exploit/run_tests.sh ]; then
+            /exploit/run_tests.sh fragnesia
+        else
+            echo "ERROR: /exploit/run_tests.sh not found or not executable"
+        fi
+
+        if mountpoint -q /mnt/protected; then
+            mkdir -p /mnt/protected/exploit_results
+            cp -a /tmp/exploit_results/* /mnt/protected/exploit_results/ 2>/dev/null || true
+        fi
+
+        sync
+        echo ""
+        echo "================================================================"
+        echo " [PKS AUTORUN] Fragnesia test complete. Powering off."
+        echo "================================================================"
+        sync
+        sleep 1
+        poweroff -f
+        ;;
+
     bench|bench_control|bench_mitigated)
         echo "--> [PKS AUTORUN] Executing fio benchmark suite..."
         if [ -x /benchmark/run_benchmarks.sh ]; then

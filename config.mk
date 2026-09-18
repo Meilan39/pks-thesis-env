@@ -26,6 +26,7 @@ SCRIPTS_DIR        ?= $(CURDIR)/scripts
 GUEST_ASSETS_DIR   ?= $(CURDIR)/guest-assets
 IMAGES_DIR         ?= $(CURDIR)/images
 RESULTS_DIR        ?= $(CURDIR)/results
+TOOLS_DIR          ?= $(CURDIR)/tools
 
 # QEMU runtime configuration
 QEMU_BIN           ?= qemu-system-x86_64

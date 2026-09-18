@@ -67,6 +67,7 @@ log_step "Disabling debug overhead for performance measurement"
 scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_DEBUG_INFO
 scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_PROVE_LOCKING
 scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_KASAN
+scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_PCACHE_PKS_DEBUG
 
 log_step "Finalizing configuration and compiling bzImage"
 make O="$OUTPUT_DIR" olddefconfig >/dev/null

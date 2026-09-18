@@ -35,11 +35,18 @@ scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_USER_NS
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_NET_NS
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_XFRM
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_XFRM_USER
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_NET_KEY
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_INET_ESP
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_INET_ESPINTCP
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_INET6_ESP
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_INET6_ESPINTCP
 
 log_step "Enabling crypto primitives"
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_AES
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_CBC
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_ECB
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_GCM
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_CTR
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_HMAC
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_SHA256
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_CRYPTO_AUTHENC
@@ -67,6 +74,7 @@ log_step "Configuring diagnostic debug options and fail-open handling"
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_DEBUG_INFO
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_DEBUG_FS
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_DYNAMIC_DEBUG
+scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_PCACHE_PKS_DEBUG
 scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_PANIC_ON_OOPS
 
 log_step "Finalizing configuration and compiling bzImage"

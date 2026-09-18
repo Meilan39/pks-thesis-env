@@ -1,0 +1,26 @@
+# ==============================================================================
+# guest-assets/benchmark/fio_sweep.job
+#
+# Standardized fio job configuration for synchronous page-cache sweeps.
+# Parameters can be overridden via command-line arguments:
+#   fio fio_sweep.job --rw=<write|read> --bs=<size> --filename=<path>
+#                     --numjobs=<N> --output-format=json --output=<out.json>
+# ==============================================================================
+
+[global]
+ioengine=sync
+direct=0
+buffered=1
+time_based=0
+group_reporting=1
+thread=1
+zero_buffers=0
+refill_buffers=1
+size=64m
+filename=/mnt/protected/fio_test_data.bin
+
+[sync_sweep]
+name=sync_sweep
+rw=write
+bs=4k
+numjobs=1

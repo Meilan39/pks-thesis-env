@@ -98,6 +98,8 @@ sudo chroot "$MOUNT_POINT" /bin/bash -c "
         wget \
         fio \
         sysbench \
+        sqlite3 \
+        libsqlite3-dev \
         libcap-dev \
         libc6-dev \
         linux-image-amd64 \
@@ -159,6 +161,20 @@ if [ -f "$MOUNT_POINT/exploit/dirty-frag/exp.c" ]; then
     sudo chroot "$MOUNT_POINT" /bin/bash -c "
         cd /exploit/dirty-frag && gcc -O0 -Wall -o exp exp.c -lutil
     " 2>/dev/null || log_warn "dirty-frag compilation inside chroot skipped or failed"
+fi
+
+if [ -f "$MOUNT_POINT/exploit/fragnesia/exp.c" ]; then
+    log_step "Compiling fragnesia harness inside chroot"
+    sudo chroot "$MOUNT_POINT" /bin/bash -c "
+        cd /exploit/fragnesia && gcc -O2 -Wall -o exp exp.c
+    " 2>/dev/null || log_warn "fragnesia compilation inside chroot skipped or failed"
+fi
+
+if [ -f "$MOUNT_POINT/unit-tests/pks_sanity_test.c" ]; then
+    log_step "Compiling pks_sanity_test inside chroot"
+    sudo chroot "$MOUNT_POINT" /bin/bash -c "
+        cd /unit-tests && gcc -O2 -Wall -o pks_sanity_test pks_sanity_test.c
+    " 2>/dev/null || log_warn "pks_sanity_test compilation inside chroot skipped or failed"
 fi
 
 if [ -f "$MOUNT_POINT/fsx/fsx.c" ]; then

@@ -1,15 +1,17 @@
 #!/usr/bin/env python3
 """
-analyze_bench.py - Benchmark analysis placeholder.
-
-The micro-benchmark suite is currently undergoing redesign.
+scripts/analyze_bench.py - Benchmark normalization and analysis entry point.
 """
+import subprocess
 import sys
+from pathlib import Path
 
 
 def main() -> int:
-    print("[INFO] Benchmark analysis is currently a no-op (pending suite redesign).")
-    return 0
+    script_dir = Path(__file__).resolve().parent
+    parse_script = script_dir / "parse_results.py"
+    cmd = [sys.executable, str(parse_script)] + sys.argv[1:]
+    return subprocess.call(cmd)
 
 
 if __name__ == "__main__":

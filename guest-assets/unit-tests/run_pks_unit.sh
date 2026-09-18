@@ -35,6 +35,19 @@ if [ -f /sys/kernel/debug/dynamic_debug/control ]; then
     echo "file pkeys.c +pflm" > /sys/kernel/debug/dynamic_debug/control 2>/dev/null || true
 fi
 
+SANITY_BIN="$SCRIPT_DIR/pks_sanity_test"
+if [ ! -x "$SANITY_BIN" ] && [ -f "$SCRIPT_DIR/pks_sanity_test.c" ]; then
+    echo "[INFO] Compiling pks_sanity_test..."
+    gcc -O2 -Wall -o "$SANITY_BIN" "$SCRIPT_DIR/pks_sanity_test.c" 2>/dev/null || true
+fi
+
+SANITY_RC=0
+if [ -x "$SANITY_BIN" ]; then
+    echo ""
+    "$SANITY_BIN" | tee "$RESULTS_DIR/pks_sanity.log"
+    SANITY_RC=${PIPESTATUS[0]}
+fi
+
 # 3. If compiled selftest binary exists, run it
 if [ -x "$TEST_PKS_BIN" ]; then
     echo "[INFO] Running upstream compiled test_pks selftest..."
@@ -50,11 +63,12 @@ if [ -x "$TEST_PKS_BIN" ]; then
         cp -a "$RESULTS_DIR"/* /mnt/protected/unit_results/ 2>/dev/null || true
     fi
 
-    if [ "$SELRUN_RC" -eq 0 ]; then
-        echo "[OK]   All PKS in-kernel unit tests passed successfully"
+    TOTAL_RC=$((SANITY_RC | SELRUN_RC))
+    if [ "$TOTAL_RC" -eq 0 ]; then
+        echo "[OK]   All PKS unit & sanity tests passed successfully"
         exit 0
     else
-        echo "[WARN] One or more PKS unit tests failed (rc=$SELRUN_RC)"
+        echo "[WARN] One or more PKS unit/sanity tests failed (rc=$TOTAL_RC)"
         exit 1
     fi
 fi
