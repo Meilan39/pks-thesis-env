@@ -6,8 +6,8 @@ Reads the normalized benchmark summary dataset (benchmark_summary.csv)
 and generates thesis deliverables:
   - Figure 1: Unified Multi-Syscall Amortization Curves (Warm Cache)
   - Figure 2: Cold vs. Warm Cache Scaling (Allocator Overhead Isolation)
-  - Figure 3: 3-Way Kernel Ablation Comparison
-  - Figure 4: Multi-Core Concurrency Scaling
+  - Figure 3: Kernel Comparison & Ablation (Throughput & Latency)
+  - Figure 4: Multi-Core Concurrency Scaling (Aggregate Throughput & Latency)
   - Figure 5: SQLite Macrobenchmark Throughput & Latency
   - Table 1:  Statistical Equivalence (TOST) Summary
 """
@@ -17,6 +17,10 @@ import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
+
+# Use non-interactive backend for headless plotting
+import matplotlib
+matplotlib.use("Agg")
 
 try:
     import matplotlib.pyplot as plt
@@ -31,16 +35,16 @@ except ImportError as e:
 
 # Plotting style configuration
 plt.rcParams.update({
-    "font.size": 11,
-    "axes.labelsize": 12,
-    "axes.titlesize": 13,
-    "xtick.labelsize": 10,
-    "ytick.labelsize": 10,
-    "legend.fontsize": 10,
-    "figure.titlesize": 14,
-    "lines.linewidth": 2.0,
-    "lines.markersize": 6,
-    "grid.alpha": 0.4,
+    "font.size": 10,
+    "axes.labelsize": 11,
+    "axes.titlesize": 12,
+    "xtick.labelsize": 9,
+    "ytick.labelsize": 9,
+    "legend.fontsize": 9,
+    "figure.titlesize": 13,
+    "lines.linewidth": 1.8,
+    "lines.markersize": 5,
+    "grid.alpha": 0.35,
     "grid.linestyle": "--",
 })
 
@@ -69,47 +73,78 @@ def calculate_overhead(df: pd.DataFrame, syscall: str, cache_state: str = "warm"
 
 def plot_figure1(df: pd.DataFrame, out_dir: Path):
     """Figure 1: Unified Multi-Syscall Amortization Curves (Warm Cache)."""
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
     
-    # 1. Buffered write overhead
+    xticks = [512, 1024, 4096, 16384, 65536, 262144, 1048576]
+    xticklabels = [format_bytes(x) for x in xticks]
+    
+    # Left: Raw System-Call Latency (log scale)
+    for syscall, color, marker, label in [
+        ("write", "#1f77b4", "o", "write()"),
+        ("read", "#2ca02c", "s", "read()"),
+        ("ftruncate", "#ff7f0e", "^", "ftruncate()"),
+    ]:
+        sub_base = df[(df["syscall"] == syscall) & (df["cache_state"] == "warm") & 
+                      (df["metric"] == "latency_ns") & (df["kernel_variant"] == "baseline_control")]
+        sub_mit = df[(df["syscall"] == syscall) & (df["cache_state"] == "warm") & 
+                     (df["metric"] == "latency_ns") & (df["kernel_variant"] == "mitigated_on")]
+        
+        if not sub_base.empty:
+            p_base = sub_base.groupby("block_size_bytes")["value"].mean().reset_index()
+            ax1.plot(p_base["block_size_bytes"], p_base["value"] / 1000.0, 
+                     linestyle=":", color=color, marker=marker, alpha=0.7, label=f"{label} [Control]")
+        if not sub_mit.empty:
+            p_mit = sub_mit.groupby("block_size_bytes")["value"].mean().reset_index()
+            ax1.plot(p_mit["block_size_bytes"], p_mit["value"] / 1000.0, 
+                     linestyle="-", color=color, marker=marker, label=f"{label} [Mitigated]")
+    
+    ax1.set_xscale("log", base=2)
+    ax1.set_yscale("log")
+    ax1.set_xlabel("Operation Size (Bytes)")
+    ax1.set_ylabel("Mean Latency (µs, log scale)")
+    ax1.set_title("(a) System-Call Latency Scaling")
+    ax1.set_xticks(xticks)
+    ax1.set_xticklabels(xticklabels)
+    ax1.grid(True)
+    ax1.legend(loc="upper left", frameon=True, fontsize=8)
+    
+    # Right: Relative Overhead (%)
     w_df = calculate_overhead(df, "write", "warm", "latency_ns")
     if w_df is not None and not w_df.empty:
-        ax.plot(w_df["block_size_bytes"], w_df["overhead_pct"], marker="o", color="#1f77b4", label="write() [Scope Enter + Exit]")
+        ax2.plot(w_df["block_size_bytes"], w_df["overhead_pct"], marker="o", color="#1f77b4", label="write() [Scope Enter + Exit]")
     
-    # 2. Buffered read overhead (should hover near 0% parity)
     r_df = calculate_overhead(df, "read", "warm", "latency_ns")
     if r_df is not None and not r_df.empty:
-        ax.plot(r_df["block_size_bytes"], r_df["overhead_pct"], marker="s", color="#2ca02c", linestyle="--", label="read() [Zero Permission Toggles]")
+        ax2.plot(r_df["block_size_bytes"], r_df["overhead_pct"], marker="s", color="#2ca02c", linestyle="--", label="read() [Zero Toggles]")
     
-    # 3. Truncate microbenchmark overhead
     t_df = calculate_overhead(df, "ftruncate", "warm", "latency_ns")
     if t_df is not None and not t_df.empty:
-        ax.plot(t_df["block_size_bytes"], t_df["overhead_pct"], marker="^", color="#ff7f0e", linestyle="-.", label="ftruncate() [Metadata Scoping]")
+        ax2.plot(t_df["block_size_bytes"], t_df["overhead_pct"], marker="^", color="#ff7f0e", linestyle="-.", label="ftruncate() [Metadata Scope]")
     
-    ax.axhline(0, color="gray", linestyle=":", linewidth=1.5, alpha=0.7)
-    ax.set_xscale("log", base=2)
-    ax.set_xlabel("Operation Size (Bytes)")
-    ax.set_ylabel("Relative Overhead (%) vs. Baseline")
-    ax.set_title("Figure 1: Unified Multi-Syscall Amortization (Warm Cache)")
-    ax.grid(True)
-    ax.legend(loc="upper right", frameon=True)
+    ax2.axhline(0, color="gray", linestyle=":", linewidth=1.5, alpha=0.8)
+    ax2.set_xscale("log", base=2)
+    ax2.set_xlabel("Operation Size (Bytes)")
+    ax2.set_ylabel("Relative Overhead (%) vs. Baseline")
+    ax2.set_title("(b) Amortization Profile (% Overhead)")
+    ax2.set_xticks(xticks)
+    ax2.set_xticklabels(xticklabels)
+    ax2.grid(True)
+    ax2.legend(loc="upper right", frameon=True)
     
-    # Ticks formatting
-    xticks = [512, 1024, 4096, 16384, 65536, 262144, 1048576]
-    ax.set_xticks(xticks)
-    ax.set_xticklabels([format_bytes(x) for x in xticks])
-    
+    fig.suptitle("Figure 1: Unified Multi-Syscall Amortization Curves (Warm Cache)", y=1.01)
     plt.tight_layout()
-    fig.savefig(out_dir / "figure1_amortization_sweep.pdf")
-    fig.savefig(out_dir / "figure1_amortization_sweep.png", dpi=300)
+    fig.savefig(out_dir / "figure1_amortization_sweep.pdf", bbox_inches="tight")
+    fig.savefig(out_dir / "figure1_amortization_sweep.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"[INFO] Generated Figure 1 -> {out_dir}/figure1_amortization_sweep.pdf")
 
 
 def plot_figure2(df: pd.DataFrame, out_dir: Path):
     """Figure 2: Cold vs. Warm Cache Scaling (Allocator Overhead Isolation)."""
-    w_sub = df[(df["syscall"] == "write") & (df["cache_state"] == "warm") & (df["metric"] == "latency_ns") & (df["kernel_variant"] == "mitigated_on")]
-    c_sub = df[(df["syscall"] == "write") & (df["cache_state"] == "cold") & (df["metric"] == "latency_ns") & (df["kernel_variant"] == "mitigated_on")]
+    w_sub = df[(df["syscall"] == "write") & (df["cache_state"] == "warm") & 
+               (df["metric"] == "latency_ns") & (df["kernel_variant"] == "mitigated_on")]
+    c_sub = df[(df["syscall"] == "write") & (df["cache_state"] == "cold") & 
+               (df["metric"] == "latency_ns") & (df["kernel_variant"] == "mitigated_on")]
     
     if w_sub.empty or c_sub.empty:
         print("[WARN] Incomplete warm/cold write latency data for Figure 2. Skipping.")
@@ -120,103 +155,151 @@ def plot_figure2(df: pd.DataFrame, out_dir: Path):
     merged["delta_alloc_us"] = merged["delta_alloc_ns"] / 1000.0
     
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    xticks = [512, 4096, 65536, 262144, 1048576]
+    xticklabels = [format_bytes(x) for x in xticks]
     
     # Left: Warm vs Cold raw latencies
     ax1.plot(merged["block_size_bytes"], merged["value_warm"] / 1000.0, marker="o", color="#1f77b4", label="Warm Cache (Overwrite)")
-    ax1.plot(merged["block_size_bytes"], merged["value_cold"] / 1000.0, marker="s", color="#d62728", label="Cold Cache (Pool Allocation)")
+    ax1.plot(merged["block_size_bytes"], merged["value_cold"] / 1000.0, marker="s", color="#d62728", label="Cold Cache (First-Touch Allocation)")
     ax1.set_xscale("log", base=2)
     ax1.set_xlabel("Operation Size (Bytes)")
     ax1.set_ylabel("Mean System-Call Latency (µs)")
-    ax1.set_title("Write Latency: Cold vs. Warm")
+    ax1.set_title("(a) Write Latency: Cold vs. Warm")
     ax1.grid(True)
     ax1.legend()
-    xticks = [512, 4096, 65536, 1048576]
     ax1.set_xticks(xticks)
-    ax1.set_xticklabels([format_bytes(x) for x in xticks])
+    ax1.set_xticklabels(xticklabels)
     
     # Right: Isolated Allocation Overhead (Delta)
     ax2.plot(merged["block_size_bytes"], merged["delta_alloc_us"], marker="^", color="#9467bd", label="Allocation Delta (Cold - Warm)")
+    ax2.axhline(0, color="gray", linestyle=":", linewidth=1.5, alpha=0.7)
     ax2.set_xscale("log", base=2)
     ax2.set_xlabel("Operation Size (Bytes)")
     ax2.set_ylabel("Isolated Allocation Latency (µs)")
-    ax2.set_title("Isolated Static Pool Allocation Cost")
+    ax2.set_title("(b) Static Pool Allocation Cost")
     ax2.grid(True)
     ax2.legend()
     ax2.set_xticks(xticks)
-    ax2.set_xticklabels([format_bytes(x) for x in xticks])
+    ax2.set_xticklabels(xticklabels)
     
+    fig.suptitle("Figure 2: Cold vs. Warm Cache Scaling (Allocator Overhead Isolation)", y=1.01)
     plt.tight_layout()
-    fig.savefig(out_dir / "figure2_cold_vs_warm.pdf")
-    fig.savefig(out_dir / "figure2_cold_vs_warm.png", dpi=300)
+    fig.savefig(out_dir / "figure2_cold_vs_warm.pdf", bbox_inches="tight")
+    fig.savefig(out_dir / "figure2_cold_vs_warm.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"[INFO] Generated Figure 2 -> {out_dir}/figure2_cold_vs_warm.pdf")
 
 
 def plot_figure3(df: pd.DataFrame, out_dir: Path):
-    """Figure 3: 3-Way Kernel Ablation Comparison."""
-    sub = df[(df["syscall"] == "write") & (df["cache_state"] == "warm") & (df["metric"] == "throughput_mbs")]
-    if sub.empty:
+    """Figure 3: Kernel Ablation Comparison (Throughput & Latency)."""
+    sub_tp = df[(df["syscall"] == "write") & (df["cache_state"] == "warm") & (df["metric"] == "throughput_mbs")]
+    sub_lat = df[(df["syscall"] == "write") & (df["cache_state"] == "warm") & (df["metric"] == "latency_ns")]
+    
+    if sub_tp.empty:
         print("[WARN] Throughput metrics missing for Figure 3. Skipping.")
         return
     
-    pivot = sub.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
-    fig, ax = plt.subplots(figsize=(8, 5))
+    p_tp = sub_tp.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
+    p_lat = sub_lat.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean").reset_index() if not sub_lat.empty else pd.DataFrame()
+    
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+    xticks = [512, 2048, 8192, 32768, 131072, 524288, 1048576]
+    xticklabels = [format_bytes(x) for x in xticks]
     
     colors = {"baseline_control": "#7f7f7f", "mitigated_off": "#1f77b4", "mitigated_on": "#d62728"}
     labels = {
         "baseline_control": "Baseline Control (Vanilla 5.18)",
         "mitigated_off": "Mitigated Off (Ablation Control)",
-        "mitigated_on": "Mitigated On (Active PKS Protection)"
+        "mitigated_on": "Mitigated On (Active PKS)"
     }
     
+    # Left: Throughput
     for col in ["baseline_control", "mitigated_off", "mitigated_on"]:
-        if col in pivot.columns:
-            ax.plot(pivot["block_size_bytes"], pivot[col], marker="o", color=colors.get(col, "#000"), label=labels.get(col, col))
+        if col in p_tp.columns:
+            ax1.plot(p_tp["block_size_bytes"], p_tp[col], marker="o", color=colors.get(col, "#000"), label=labels.get(col, col))
     
-    ax.set_xscale("log", base=2)
-    ax.set_xlabel("Block Size (Bytes)")
-    ax.set_ylabel("Sequential Write Throughput (MB/s)")
-    ax.set_title("Figure 3: 3-Way Kernel Ablation Comparison")
-    ax.grid(True)
-    ax.legend()
+    ax1.set_xscale("log", base=2)
+    ax1.set_xlabel("Block Size (Bytes)")
+    ax1.set_ylabel("Sequential Write Throughput (MB/s)")
+    ax1.set_title("(a) Write Throughput")
+    ax1.set_xticks(xticks)
+    ax1.set_xticklabels(xticklabels)
+    ax1.grid(True)
+    ax1.legend()
     
-    xticks = [512, 2048, 8192, 32768, 131072, 524288, 1048576]
-    ax.set_xticks(xticks)
-    ax.set_xticklabels([format_bytes(x) for x in xticks])
+    # Right: Latency
+    if not p_lat.empty:
+        for col in ["baseline_control", "mitigated_off", "mitigated_on"]:
+            if col in p_lat.columns:
+                ax2.plot(p_lat["block_size_bytes"], p_lat[col] / 1000.0, marker="s", color=colors.get(col, "#000"), label=labels.get(col, col))
+        ax2.set_xscale("log", base=2)
+        ax2.set_yscale("log")
+        ax2.set_xlabel("Block Size (Bytes)")
+        ax2.set_ylabel("Mean Latency (µs, log scale)")
+        ax2.set_title("(b) Write Latency")
+        ax2.set_xticks(xticks)
+        ax2.set_xticklabels(xticklabels)
+        ax2.grid(True)
+        ax2.legend()
     
+    fig.suptitle("Figure 3: Kernel Performance Comparison & Ablation", y=1.01)
     plt.tight_layout()
-    fig.savefig(out_dir / "figure3_kernel_ablation.pdf")
-    fig.savefig(out_dir / "figure3_kernel_ablation.png", dpi=300)
+    fig.savefig(out_dir / "figure3_kernel_ablation.pdf", bbox_inches="tight")
+    fig.savefig(out_dir / "figure3_kernel_ablation.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"[INFO] Generated Figure 3 -> {out_dir}/figure3_kernel_ablation.pdf")
 
 
 def plot_figure4(df: pd.DataFrame, out_dir: Path):
-    """Figure 4: Multi-Core Concurrency Scaling."""
-    sub = df[(df["workload"] == "concurrency") & (df["metric"] == "throughput_mbs")]
-    if sub.empty:
+    """Figure 4: Multi-Core Concurrency Scaling (Aggregate Throughput & Scaling)."""
+    sub_tp = df[(df["workload"] == "concurrency") & (df["metric"] == "throughput_mbs")]
+    sub_lat = df[(df["workload"] == "concurrency") & (df["metric"] == "latency_ns")]
+    
+    if sub_tp.empty:
         print("[WARN] Concurrency metrics missing for Figure 4. Skipping.")
         return
     
-    pivot = sub.pivot_table(index="num_jobs", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
-    if "baseline_control" not in pivot.columns or "mitigated_on" not in pivot.columns:
-        print("[WARN] Incomplete variants for Concurrency Figure 4. Skipping.")
-        return
+    p_tp = sub_tp.pivot_table(index="num_jobs", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
+    p_lat = sub_lat.pivot_table(index="num_jobs", columns="kernel_variant", values="value", aggfunc="mean").reset_index() if not sub_lat.empty else pd.DataFrame()
     
-    pivot["overhead_pct"] = ((pivot["baseline_control"] - pivot["mitigated_on"]) / pivot["baseline_control"]) * 100.0
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    jobs = sorted(p_tp["num_jobs"].unique())
     
-    fig, ax = plt.subplots(figsize=(7, 4.5))
-    ax.plot(pivot["num_jobs"], pivot["overhead_pct"], marker="s", color="#2ca02c", linewidth=2.2)
+    colors = {"baseline_control": "#7f7f7f", "mitigated_off": "#1f77b4", "mitigated_on": "#d62728"}
+    labels = {
+        "baseline_control": "Baseline Control",
+        "mitigated_off": "Mitigated Off",
+        "mitigated_on": "Mitigated On"
+    }
     
-    ax.set_xlabel("Concurrent Worker Threads (numjobs)")
-    ax.set_ylabel("Throughput Reduction vs Baseline (%)")
-    ax.set_title("Figure 4: Multi-Core Concurrency Scaling Overhead")
-    ax.set_xticks([1, 2, 4])
-    ax.grid(True)
+    # Left: Aggregate Throughput
+    for col in ["baseline_control", "mitigated_off", "mitigated_on"]:
+        if col in p_tp.columns:
+            ax1.plot(p_tp["num_jobs"], p_tp[col], marker="o", linewidth=2.2, color=colors.get(col, "#000"), label=labels.get(col, col))
     
+    ax1.set_xlabel("Concurrent Worker Threads (numjobs)")
+    ax1.set_ylabel("Aggregate Throughput (MB/s)")
+    ax1.set_title("(a) Multi-Threaded Write Throughput")
+    ax1.set_xticks(jobs)
+    ax1.grid(True)
+    ax1.legend()
+    
+    # Right: Per-Thread Average Latency
+    if not p_lat.empty:
+        for col in ["baseline_control", "mitigated_off", "mitigated_on"]:
+            if col in p_lat.columns:
+                ax2.plot(p_lat["num_jobs"], p_lat[col] / 1000.0, marker="s", linewidth=2.2, color=colors.get(col, "#000"), label=labels.get(col, col))
+        ax2.set_xlabel("Concurrent Worker Threads (numjobs)")
+        ax2.set_ylabel("Average Request Latency (µs)")
+        ax2.set_title("(b) Per-Thread Request Latency")
+        ax2.set_xticks(jobs)
+        ax2.grid(True)
+        ax2.legend()
+    
+    fig.suptitle("Figure 4: Multi-Core Concurrency Scaling", y=1.01)
     plt.tight_layout()
-    fig.savefig(out_dir / "figure4_concurrency_scaling.pdf")
-    fig.savefig(out_dir / "figure4_concurrency_scaling.png", dpi=300)
+    fig.savefig(out_dir / "figure4_concurrency_scaling.pdf", bbox_inches="tight")
+    fig.savefig(out_dir / "figure4_concurrency_scaling.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"[INFO] Generated Figure 4 -> {out_dir}/figure4_concurrency_scaling.pdf")
 
@@ -224,32 +307,36 @@ def plot_figure4(df: pd.DataFrame, out_dir: Path):
 def plot_figure5(df: pd.DataFrame, out_dir: Path):
     """Figure 5: SQLite Macrobenchmark Throughput & Latency."""
     sub = df[(df["workload"] == "sqlite_macro") & (df["metric"] == "tps")]
-    if sub.empty:
-        print("[WARN] SQLite macrobenchmark metrics missing for Figure 5. Skipping.")
-        return
     
-    pivot = sub.pivot_table(index="cache_state", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
     fig, ax = plt.subplots(figsize=(7, 4.5))
-    
-    x = np.arange(len(pivot))
-    width = 0.35
-    
-    if "baseline_control" in pivot.columns:
-        ax.bar(x - width/2, pivot["baseline_control"], width, label="Baseline Control", color="#7f7f7f")
-    if "mitigated_on" in pivot.columns:
-        ax.bar(x + width/2, pivot["mitigated_on"], width, label="Mitigated On", color="#1f77b4")
-    
-    ax.set_ylabel("Transactions Per Second (TPS)")
-    ax.set_title("Figure 5: SQLite Macrobenchmark (Rollback Journal)")
-    ax.set_xticks(x)
-    labels = ["Durability (synchronous=FULL)", "Memory-Scoped (synchronous=OFF)"] if len(x) == 2 else pivot["cache_state"]
-    ax.set_xticklabels(labels)
-    ax.legend()
-    ax.grid(axis="y")
+    if sub.empty:
+        # Render a clean, informative placeholder chart
+        ax.text(0.5, 0.5, "SQLite Macrobenchmark Not Executed\n(sqlite3 was not installed on guest disk)\n\nRun 'make update-disk' to compile sqlite3,\nthen re-run 'make bench'.",
+                ha="center", va="center", fontsize=11, color="#666666",
+                bbox=dict(boxstyle="round,pad=1.0", facecolor="#f8f9fa", edgecolor="#ced4da", linewidth=1.5))
+        ax.set_axis_off()
+        ax.set_title("Figure 5: SQLite Macrobenchmark (Pending Execution)")
+    else:
+        pivot = sub.pivot_table(index="cache_state", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
+        x = np.arange(len(pivot))
+        width = 0.35
+        
+        if "baseline_control" in pivot.columns:
+            ax.bar(x - width/2, pivot["baseline_control"], width, label="Baseline Control", color="#7f7f7f")
+        if "mitigated_on" in pivot.columns:
+            ax.bar(x + width/2, pivot["mitigated_on"], width, label="Mitigated On", color="#d62728")
+        
+        ax.set_ylabel("Transactions Per Second (TPS)")
+        ax.set_title("Figure 5: SQLite Macrobenchmark (Rollback Journal Mode)")
+        ax.set_xticks(x)
+        labels = ["synchronous=FULL", "synchronous=OFF"] if len(x) == 2 else pivot["cache_state"]
+        ax.set_xticklabels(labels)
+        ax.legend()
+        ax.grid(axis="y")
     
     plt.tight_layout()
-    fig.savefig(out_dir / "figure5_sqlite_macro.pdf")
-    fig.savefig(out_dir / "figure5_sqlite_macro.png", dpi=300)
+    fig.savefig(out_dir / "figure5_sqlite_macro.pdf", bbox_inches="tight")
+    fig.savefig(out_dir / "figure5_sqlite_macro.png", dpi=300, bbox_inches="tight")
     plt.close(fig)
     print(f"[INFO] Generated Figure 5 -> {out_dir}/figure5_sqlite_macro.pdf")
 
@@ -282,6 +369,7 @@ def generate_table1_tost(df: pd.DataFrame, out_dir: Path):
         f.write("|:---|:---|:---|:---|:---|:---|\n")
         for r in rows:
             f.write(f"| {r[0]} | {r[1]} | {r[2]} | {r[3]} | {r[4]} | **{r[5]}** |\n")
+        f.write("\n*Note: Valid statistical equivalence requires identical virtualization environments (KVM vs KVM or TCG vs TCG).*\n")
     
     # Write LaTeX version
     with open(tex_path, "w", encoding="utf-8") as f:

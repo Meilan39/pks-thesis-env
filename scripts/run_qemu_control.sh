@@ -33,11 +33,22 @@ fi
 require_cmds "$QEMU_BIN"
 
 # CPU virtualization mode
+QEMU_ACCEL="${QEMU_ACCEL:-auto}"
 CPU_ARGS=()
 CPU_MODE=""
-if [ -e /dev/kvm ]; then
-    CPU_MODE="KVM / host"
+if [ "$QEMU_ACCEL" = "kvm" ]; then
+    CPU_MODE="KVM / host (Forced KVM)"
     CPU_ARGS=(-enable-kvm -cpu host)
+elif [ "$QEMU_ACCEL" = "tcg" ]; then
+    CPU_MODE="TCG / max (Forced TCG)"
+    CPU_ARGS=(-cpu max)
+elif [ -e /dev/kvm ] && grep -qw pks /proc/cpuinfo; then
+    CPU_MODE="KVM / host (Hardware PKS verified)"
+    CPU_ARGS=(-enable-kvm -cpu host)
+elif [ -e /dev/kvm ]; then
+    CPU_MODE="TCG / max (Host lacks PKS, matching perf VM TCG mode)"
+    CPU_ARGS=(-cpu max)
+    log_warn "Host CPU lacks supervisor PKS. Running control in TCG mode to match perf VM execution environment."
 else
     CPU_MODE="TCG / max"
     CPU_ARGS=(-cpu max)

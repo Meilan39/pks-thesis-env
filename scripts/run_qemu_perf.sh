@@ -28,9 +28,16 @@ KERNEL="$DEV_KERNEL_DIR/build_perf/arch/x86/boot/bzImage"
 require_cmds "$QEMU_BIN"
 
 # CPU virtualization mode
+QEMU_ACCEL="${QEMU_ACCEL:-auto}"
 CPU_ARGS=()
 CPU_MODE=""
-if [ -e /dev/kvm ] && grep -qw pks /proc/cpuinfo; then
+if [ "$QEMU_ACCEL" = "kvm" ]; then
+    CPU_MODE="KVM / host (Forced KVM)"
+    CPU_ARGS=(-enable-kvm -cpu host)
+elif [ "$QEMU_ACCEL" = "tcg" ]; then
+    CPU_MODE="TCG / max,vendor=GenuineIntel,pks=on (Forced TCG)"
+    CPU_ARGS=(-cpu max,vendor=GenuineIntel,pks=on)
+elif [ -e /dev/kvm ] && grep -qw pks /proc/cpuinfo; then
     CPU_MODE="KVM / host (Hardware PKS verified)"
     CPU_ARGS=(-enable-kvm -cpu host)
 elif [ -e /dev/kvm ]; then

@@ -17,6 +17,11 @@ SYNC_MODE="${2:-FULL}" # FULL or OFF
 OUTPUT_JSON="${3:-/mnt/protected/bench_results/raw/sqlite_${SYNC_MODE}.json}"
 TX_COUNT="${4:-5000}"
 
+if ! command -v sqlite3 >/dev/null 2>&1; then
+    echo "[WARN] sqlite3 command not found. Skipping SQLite benchmark."
+    exit 0
+fi
+
 DB_FILE="${TARGET_DIR}/sqlite_bench_${SYNC_MODE}.db"
 
 mkdir -p "$(dirname "${OUTPUT_JSON}")"

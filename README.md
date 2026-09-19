@@ -79,9 +79,7 @@ Run `make help` to inspect all available targets:
 | | `make build-all` | Synchronously compile all three kernel configurations |
 | **Disk Image** | `make provision-disk` | Bootstrap fresh 8GB Debian raw disk image |
 | | `make update-disk` | Synchronize guest assets and recompile harnesses in chroot |
-| **Granular Security** | `make test-sec-off` | Automated exploit run with `pcache_pks=off` (vulnerable baseline) |
-| | `make test-sec-on` | Automated exploit run with `pcache_pks=on` (mitigated) |
-| | `make test-sec-copyfail` | Run Copy Fail exploit independently with dedicated off and on boots |
+| **Granular Security** | `make test-sec-copyfail` | Run Copy Fail exploit independently with dedicated off and on boots |
 | | `make test-sec-dirtyfrag`| Run Dirty Frag exploit independently with dedicated off and on boots |
 | | `make test-sec-fragnesia`| Run Fragnesia exploit independently with dedicated off and on boots |
 | | `make analyze-sec` | Parse exploit serial logs and display 3-way neutralization report |
@@ -114,6 +112,9 @@ make build-control CONTROL_KERNEL_DIR=/path/to/linux-pks-thesis-control
 
 # Override CPU cores and RAM allocation
 make test-sec SMP=8 MEM_SEC=8G
+
+# Force matching virtualization accelerator (auto, kvm, or tcg)
+make bench QEMU_ACCEL=tcg
 
 # Force disk re-provisioning during build
 make build FORCE_REPROVISION=1

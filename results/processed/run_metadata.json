@@ -1,1 +1,16 @@
-{}
+{
+  "baseline_control": {
+    "kernel_variant": "baseline_control",
+    "kernel_release": "5.18.0-rc3",
+    "timestamp": "Fri Sep 18 20:14:39 UTC 2026",
+    "cmdline": "root=/dev/vda1 rw console=ttyS0 nokaslr pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target",
+    "virtualization": "TCG"
+  },
+  "mitigated_on": {
+    "kernel_variant": "mitigated_on",
+    "kernel_release": "5.18.0-rc3-00050-g89f022bca6b2",
+    "timestamp": "Fri Sep 18 20:21:48 UTC 2026",
+    "cmdline": "root=/dev/vda1 rw console=ttyS0 nokaslr pcache_pks=on pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target",
+    "virtualization": "TCG"
+  }
+}

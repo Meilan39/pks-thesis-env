@@ -61,24 +61,54 @@ if [ -b "$PROT_PART" ]; then
     fi
 fi
 
-# 2. Check rootfs /tmp if files were left in root partition
+# 2. Check rootfs /tmp if files were left in root partition (without clobbering protected partition data)
 if [ -b "$ROOT_PART" ]; then
     log_step "Inspecting rootfs partition ($ROOT_PART)"
     if sudo mount -o ro "$ROOT_PART" "$MOUNT_POINT" 2>/dev/null; then
         if [ -d "$MOUNT_POINT/tmp/bench_results" ]; then
-            sudo cp -a "$MOUNT_POINT/tmp/bench_results/." "$DEST_DIR/bench/" 2>/dev/null || true
+            sudo cp -a -n "$MOUNT_POINT/tmp/bench_results/." "$DEST_DIR/bench/" 2>/dev/null || true
         fi
         if [ -d "$MOUNT_POINT/tmp/exploit_results" ]; then
-            sudo cp -a "$MOUNT_POINT/tmp/exploit_results/." "$DEST_DIR/exploit/" 2>/dev/null || true
+            sudo cp -a -n "$MOUNT_POINT/tmp/exploit_results/." "$DEST_DIR/exploit/" 2>/dev/null || true
         fi
         if [ -d "$MOUNT_POINT/tmp/unit_results" ]; then
-            sudo cp -a "$MOUNT_POINT/tmp/unit_results/." "$DEST_DIR/unit/" 2>/dev/null || true
+            sudo cp -a -n "$MOUNT_POINT/tmp/unit_results/." "$DEST_DIR/unit/" 2>/dev/null || true
         fi
         if [ -d "$MOUNT_POINT/tmp/fsx_results" ]; then
-            sudo cp -a "$MOUNT_POINT/tmp/fsx_results/." "$DEST_DIR/fsx/" 2>/dev/null || true
+            sudo cp -a -n "$MOUNT_POINT/tmp/fsx_results/." "$DEST_DIR/fsx/" 2>/dev/null || true
         fi
         sudo umount "$MOUNT_POINT"
     fi
+fi
+
+# 3. Synchronize host-side serial logs and synthesize comprehensive exploit validation reports
+HOST_RESULTS_DIR="${RESULTS_DIR:-$ENV_DIR/results}"
+log_step "Consolidating security validation artifacts"
+for test_pair in "copy-fail:copyfail" "dirty-frag:dirtyfrag" "fragnesia:fragnesia"; do
+    tname="${test_pair%%:*}"
+    tsuffix="${test_pair##*:}"
+
+    for mode in off on; do
+        slog="$HOST_RESULTS_DIR/sec_${tsuffix}_${mode}.log"
+        if [ -f "$slog" ]; then
+            cp -f "$slog" "$DEST_DIR/exploit/sec_${tsuffix}_${mode}.log" 2>/dev/null || true
+            if [ ! -f "$DEST_DIR/exploit/${tname}_${mode}.log" ] || [ $(wc -c < "$DEST_DIR/exploit/${tname}_${mode}.log" 2>/dev/null || echo 0) -lt 200 ]; then
+                cp -f "$slog" "$DEST_DIR/exploit/${tname}_${mode}.log" 2>/dev/null || true
+            fi
+        fi
+    done
+done
+
+# If copy-fail.log only contains single-line killed notification, enrich with mitigation context
+if [ -f "$DEST_DIR/exploit/copy-fail.log" ] && [ $(wc -l < "$DEST_DIR/exploit/copy-fail.log" 2>/dev/null || echo 0) -le 3 ]; then
+    if [ -f "$DEST_DIR/exploit/copy-fail_on.log" ]; then
+        cp -f "$DEST_DIR/exploit/copy-fail_on.log" "$DEST_DIR/exploit/copy-fail.log"
+    fi
+fi
+
+# Generate formal A/B security evaluation summary table
+if [ -f "$SCRIPT_DIR/analyze_sec.py" ]; then
+    python3 "$SCRIPT_DIR/analyze_sec.py" > "$DEST_DIR/exploit/security_summary.txt" 2>&1 || true
 fi
 
 sudo chown -R "$(id -u):$(id -g)" "$DEST_DIR" 2>/dev/null || true
@@ -86,11 +116,27 @@ sudo chown -R "$(id -u):$(id -g)" "$DEST_DIR" 2>/dev/null || true
 # Sync harvested benchmark JSONs directly to results/raw for parse_results.py
 RAW_DIR="${RESULTS_DIR:-$ENV_DIR/results}/raw"
 mkdir -p "$RAW_DIR"
+
+# Clean up any stale flat JSONs in RAW_DIR if structured variant folders exist
 if [ -d "$DEST_DIR/bench/raw" ]; then
-    cp -a "$DEST_DIR/bench/raw/." "$RAW_DIR/" 2>/dev/null || true
+    for vdir in "$DEST_DIR/bench/raw"/*; do
+        if [ -d "$vdir" ]; then
+            vname="$(basename "$vdir")"
+            mkdir -p "$RAW_DIR/$vname"
+            cp -a "$vdir/." "$RAW_DIR/$vname/" 2>/dev/null || true
+        fi
+    done
 elif [ -d "$DEST_DIR/bench" ]; then
-    cp -a "$DEST_DIR/bench/." "$RAW_DIR/" 2>/dev/null || true
+    for vdir in "$DEST_DIR/bench"/*; do
+        if [ -d "$vdir" ] && [ "$(basename "$vdir")" != "raw" ]; then
+            vname="$(basename "$vdir")"
+            mkdir -p "$RAW_DIR/$vname"
+            cp -a "$vdir/." "$RAW_DIR/$vname/" 2>/dev/null || true
+        fi
+    done
 fi
+
+sudo chown -R "$(id -u):$(id -g)" "$RAW_DIR" 2>/dev/null || true
 
 BENCH_COUNT=$(find "$DEST_DIR/bench" -type f -name "*.json" 2>/dev/null | wc -l || echo 0)
 EXPLOIT_COUNT=$(find "$DEST_DIR/exploit" -type f 2>/dev/null | wc -l || echo 0)

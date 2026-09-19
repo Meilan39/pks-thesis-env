@@ -71,10 +71,12 @@ echo "=== [1/4] Executing Warm-Cache Multi-Syscall Sweep ==="
 WARM_FILE="${BENCH_DIR}/fio_warm.dat"
 TRUNC_WARM_FILE="${BENCH_DIR}/fio_trunc_warm.dat"
 
-# Pre-allocate and pre-warm working files to 64 MiB
-echo "[INFO] Pre-allocating 64 MiB warm working files..."
-dd if=/dev/urandom of="${WARM_FILE}" bs=1M count=64 status=none conv=fsync
-dd if=/dev/urandom of="${TRUNC_WARM_FILE}" bs=1M count=64 status=none conv=fsync
+# Pre-allocate and pre-warm working files (32 MiB each to fit cleanly in PKS pool)
+echo "[INFO] Pre-allocating 32 MiB warm working files..."
+sync
+echo 3 > /proc/sys/vm/drop_caches
+dd if=/dev/urandom of="${WARM_FILE}" bs=1M count=32 status=none conv=fsync
+dd if=/dev/urandom of="${TRUNC_WARM_FILE}" bs=1M count=32 status=none conv=fsync
 
 capture_meminfo "warm_before"
 
@@ -88,7 +90,7 @@ for BS in "${BLOCK_SIZES[@]}"; do
         --buffered=1 \
         --rw=write \
         --bs="${BS}" \
-        --size=64m \
+        --size=32m \
         --filename="${WARM_FILE}" \
         --numjobs=1 \
         --thread=1 \
@@ -103,7 +105,7 @@ for BS in "${BLOCK_SIZES[@]}"; do
         --buffered=1 \
         --rw=read \
         --bs="${BS}" \
-        --size=64m \
+        --size=32m \
         --filename="${WARM_FILE}" \
         --numjobs=1 \
         --thread=1 \
@@ -116,7 +118,7 @@ for BS in "${BLOCK_SIZES[@]}"; do
         --ioengine=ftruncate \
         --rw=write \
         --bs="${BS}" \
-        --size=64m \
+        --size=32m \
         --filename="${TRUNC_WARM_FILE}" \
         --numjobs=1 \
         --thread=1 \
@@ -127,6 +129,8 @@ done
 
 capture_meminfo "warm_after"
 rm -f "${WARM_FILE}" "${TRUNC_WARM_FILE}"
+sync
+echo 3 > /proc/sys/vm/drop_caches
 
 # ==============================================================================
 # Phase 2: Cold-Cache Multi-Syscall Sweep (512 B - 1 MiB)
@@ -153,7 +157,7 @@ for BS in "${BLOCK_SIZES[@]}"; do
         --buffered=1 \
         --rw=write \
         --bs="${BS}" \
-        --size=64m \
+        --size=32m \
         --filename="${COLD_FILE}" \
         --numjobs=1 \
         --thread=1 \
@@ -169,7 +173,7 @@ for BS in "${BLOCK_SIZES[@]}"; do
         --ioengine=ftruncate \
         --rw=write \
         --bs="${BS}" \
-        --size=64m \
+        --size=32m \
         --filename="${TRUNC_COLD_FILE}" \
         --numjobs=1 \
         --thread=1 \
@@ -180,6 +184,8 @@ done
 
 capture_meminfo "cold_after"
 rm -f "${COLD_FILE}" "${TRUNC_COLD_FILE}"
+sync
+echo 3 > /proc/sys/vm/drop_caches
 
 # ==============================================================================
 # Phase 3: Multi-Core Concurrency Scaling (numjobs = 1, 2, 4)
@@ -189,9 +195,13 @@ echo "=== [3/4] Executing Multi-Core Concurrency Sweep ==="
 for JOBS in 1 2 4; do
     echo "  -> Concurrency test: numjobs=${JOBS} (private files, bs=4K)"
 
-    # Pre-allocate thread-private files
+    # Recycle static pool pages before thread allocation
+    sync
+    echo 3 > /proc/sys/vm/drop_caches
+
+    # Size each private file to 16 MiB so 4 threads = 64 MiB total, safely within 256 MiB pool
     for ((j=0; j<JOBS; j++)); do
-        dd if=/dev/urandom of="${BENCH_DIR}/fio_concur_${JOBS}_${j}.dat" bs=1M count=64 status=none conv=fsync
+        dd if=/dev/urandom of="${BENCH_DIR}/fio_concur_${JOBS}_${j}.dat" bs=1M count=16 status=none conv=fsync
     done
 
     fio --name=concurrency_sweep \
@@ -200,7 +210,7 @@ for JOBS in 1 2 4; do
         --buffered=1 \
         --rw=write \
         --bs=4k \
-        --size=64m \
+        --size=16m \
         --numjobs="${JOBS}" \
         --thread=1 \
         --group_reporting=1 \
@@ -209,6 +219,8 @@ for JOBS in 1 2 4; do
         --output="${RAW_OUT_DIR}/fio_concurrency_jobs_${JOBS}.json" >/dev/null 2>&1
 
     rm -f ${BENCH_DIR}/fio_concur_${JOBS}_*.dat
+    sync
+    echo 3 > /proc/sys/vm/drop_caches
 done
 
 # ==============================================================================
@@ -217,11 +229,11 @@ done
 echo ""
 echo "=== [4/4] Executing SQLite Macrobenchmark ==="
 SQLITE_SCRIPT="/benchmark/sqlite_bench.sh"
-if [ -x "${SQLITE_SCRIPT}" ]; then
-    "${SQLITE_SCRIPT}" "${BENCH_DIR}" FULL "${RAW_OUT_DIR}/sqlite_FULL.json" 5000
-    "${SQLITE_SCRIPT}" "${BENCH_DIR}" OFF "${RAW_OUT_DIR}/sqlite_OFF.json" 5000
+if [ -x "${SQLITE_SCRIPT}" ] && command -v sqlite3 >/dev/null 2>&1; then
+    "${SQLITE_SCRIPT}" "${BENCH_DIR}" FULL "${RAW_OUT_DIR}/sqlite_FULL.json" 5000 || echo "[WARN] SQLite FULL failed"
+    "${SQLITE_SCRIPT}" "${BENCH_DIR}" OFF "${RAW_OUT_DIR}/sqlite_OFF.json" 5000 || echo "[WARN] SQLite OFF failed"
 else
-    echo "[WARN] sqlite_bench.sh not found or not executable. Skipping macrobenchmark."
+    echo "[WARN] sqlite3 or sqlite_bench.sh not available. Skipping macrobenchmark."
 fi
 
 # ==============================================================================

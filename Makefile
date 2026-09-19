@@ -60,8 +60,6 @@ help:
 	@echo "    make update-disk         Incrementally sync guest-assets into disk image"
 	@echo ""
 	@echo "  Granular Security Validation:"
-	@echo "    make test-sec-off        Run exploit suite with pcache_pks=off (vulnerable)"
-	@echo "    make test-sec-on         Run exploit suite with pcache_pks=on (mitigated)"
 	@echo "    make test-sec-copyfail   Run Copy Fail exploit independently (A/B test)"
 	@echo "    make test-sec-dirtyfrag  Run Dirty Frag exploit independently (A/B test)"
 	@echo "    make test-sec-fragnesia  Run Fragnesia exploit independently (A/B test)"
@@ -145,12 +143,6 @@ update-disk:
 # ==============================================================================
 # Automated Security Validation (Exploit Neutralization)
 # ==============================================================================
-test-sec-off:
-	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch
-
-test-sec-on:
-	@$(SCRIPTS_DIR)/run_qemu_sec.sh on --batch
-
 test-sec-copyfail-off:
 	@$(SCRIPTS_DIR)/run_qemu_sec.sh off --batch sec_copyfail
 
@@ -268,6 +260,7 @@ test-pks-unit:
 clean-results:
 	@echo "Removing results and extracted artifacts..."
 	@rm -rf $(RESULTS_DIR)/*
+	@mkdir -p $(RESULTS_DIR)/raw $(RESULTS_DIR)/processed/figures $(RESULTS_DIR)/extracted
 
 clean-all: clean-results
 	@echo "Removing disk image container..."

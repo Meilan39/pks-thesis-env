@@ -264,6 +264,30 @@ def main() -> int:
                     combined_meta[variant] = json.load(mf)
             except Exception:
                 pass
+        else:
+            # Fallback: recover provenance from host serial logs
+            meta = {"kernel_variant": variant}
+            log_tag = "control" if variant == "baseline_control" else ("mitigated" if variant == "mitigated_on" else ("mitigated_off" if variant == "mitigated_off" else variant))
+            perf_log = raw_dir.parent / f"perf_{log_tag}.log"
+            raw_log = raw_dir.parent / f"raw_perf_{log_tag}.log"
+            if perf_log.exists():
+                text = perf_log.read_text(encoding="utf-8", errors="replace")
+                m_rel = re.search(r"Kernel Release:\s+([^\n]+)", text)
+                if m_rel:
+                    meta["kernel_release"] = m_rel.group(1).strip()
+                m_date = re.search(r"Date:\s+([^\n]+)", text)
+                if m_date:
+                    meta["timestamp"] = m_date.group(1).strip()
+            if raw_log.exists():
+                text = raw_log.read_text(encoding="utf-8", errors="replace")
+                m_cmd = re.search(r"Command line:\s+([^\n]+)", text)
+                if m_cmd:
+                    meta["cmdline"] = m_cmd.group(1).strip()
+                if "TCG" in text:
+                    meta["virtualization"] = "TCG"
+                elif "KVM" in text:
+                    meta["virtualization"] = "KVM"
+            combined_meta[variant] = meta
         
         for json_file in sorted(vdir.glob("*.json")):
             if json_file.name == "run_metadata.json":

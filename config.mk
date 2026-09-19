@@ -33,6 +33,7 @@ QEMU_BIN           ?= qemu-system-x86_64
 SMP                ?= 4
 CONSOLE            ?= ttyS0
 TASKSET_CPUS       ?=
+QEMU_ACCEL         ?= auto # auto, kvm, or tcg
 
 # Memory configuration
 # Security validation: 4GB RAM

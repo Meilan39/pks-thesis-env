@@ -76,6 +76,11 @@ if [ -d "$GUEST_ASSETS_DIR/benchmark" ]; then
     sudo chown -R root:root "$MOUNT_POINT/benchmark"
     sudo chmod -R 755 "$MOUNT_POINT/benchmark"
     find "$MOUNT_POINT/benchmark" -type f -name "*.sh" -exec sudo chmod +x {} +
+    if ! sudo chroot "$MOUNT_POINT" which sqlite3 >/dev/null 2>&1; then
+        log_step "Installing sqlite3 inside guest chroot"
+        sudo chroot "$MOUNT_POINT" apt-get update >/dev/null 2>&1 || true
+        sudo chroot "$MOUNT_POINT" apt-get install -y --no-install-recommends sqlite3 >/dev/null 2>&1 || log_warn "Could not install sqlite3 inside chroot"
+    fi
 fi
 
 if [ -d "$GUEST_ASSETS_DIR/unit-tests" ]; then
