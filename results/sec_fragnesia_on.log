@@ -1,0 +1,70 @@
+[   56.923624] pks-autorun.sh[229]:  [PKS AUTORUN] Triggered with mode: sec_fragnesia
+[   56.935904] pks-autorun.sh[229]: ================================================================
+[   59.431770] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
+[   59.522425] pks-autorun.sh[229]: --> [PKS AUTORUN] Executing Fragnesia exploit test...
+[   63.177722] pks-autorun.sh[244]: [+] Protected mount active: /mnt/protected with 'pks_pagecache'
+[   63.192962] pks-autorun.sh[244]: === fragnesia ===
+[   63.203657] pks-autorun.sh[244]: Target: /mnt/protected/victim_file
+[   67.200464] run_tests.sh (244): drop_caches: 3
+[   68.113959] pks-autorun.sh[244]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
+[   79.367415] BUG: unable to handle page fault for address: ff1100017000f010
+[   79.369267] #PF: supervisor write access in kernel mode
+[   79.369413] #PF: error_code(0x0023) - protection keys violation
+[   79.372594] PGD 3201067 P4D 3202067 PUD 100223063 PMD 90000001700001e3 
+[   79.372936] Oops: 0023 [#1] PREEMPT SMP PTI
+[   79.373142] CPU: 3 PID: 68 Comm: kworker/u8:5 Not tainted 5.18.0-rc3-00050-g89f022bca6b2 #6
+[   79.375657] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+[   79.375930] Workqueue: kstrp strp_work
+[   79.379770] RIP: 0010:__crypto_xor+0x25/0x90
+[   79.379947] Code: 00 00 00 00 00 49 89 f0 41 89 c9 48 89 d6 83 f9 07 76 31 8d 49 f8 31 c0 c1 e9 03 83 c1 01 48 c1 e1 03 49 8b 14 00 48 33 14 06 <48> 89 14 07 48 83 c0 08 48 39 c1 75 eb 48 01 cf 49 01 c8 48 01 ce
+[   79.382200] RSP: 0000:ffa000000026fab8 EFLAGS: 00000202
+[   79.382350] RAX: 0000000000000000 RBX: 0000000000000010 RCX: 0000000000000010
+[   79.382507] RDX: 797bdcf589559902 RSI: ffa000000026fb79 RDI: ff1100017000f010
+[   79.383425] RBP: ffa000000026fbd0 R08: ff1100017000f010 R09: 0000000000000010
+[   79.385156] R10: 000000000000005f R11: 00000000000000b2 R12: ff11000101d029b8
+[   79.386736] R13: ff1100017000f010 R14: ffa000000026fb79 R15: 0000000000000fe0
+[   79.386912] FS:  0000000000000000(0000) GS:ff1100016bd80000(0000) knlGS:0000000000000000
+[   79.387057] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   79.387145] CR2: ff1100017000f010 CR3: 0000000101ec8000 CR4: 00000000017516e0
+[   79.387270] PKRU: 55555554
+[   79.389358] PKRS: 0x55555564
+[   79.389456] Call Trace:
+[   79.392495]  <TASK>
+[   79.392651]  crypto_ctr_crypt+0x163/0x1f0
+[   79.392919]  ? fcrypt_setkey+0x210/0x210
+[   79.393019]  gcm_dec_hash_continue+0x89/0xa0
+[   79.393088]  esp6_input+0x1d4/0x310
+[   79.395345]  xfrm_input+0x4a5/0x1310
+[   79.395426]  xfrm6_rcv_encap+0xee/0x1e0
+[   79.395497]  espintcp_rcv+0x22e/0x300
+[   79.395580]  __strp_recv+0x177/0x640
+[   79.395648]  ? strp_process+0x40/0x40
+[   79.395704]  tcp_read_sock+0x82/0x1b0
+[   79.395765]  strp_read_sock+0x61/0xa0
+[   79.395822]  strp_work+0x37/0x60
+[   79.395872]  process_one_work+0x1d3/0x3a0
+[   79.395937]  worker_thread+0x48/0x3c0
+[   79.398217]  ? rescuer_thread+0x380/0x380
+[   79.398310]  kthread+0xe3/0x110
+[   79.398375]  ? kthread_complete_and_exit+0x20/0x20
+[   79.398448]  ret_from_fork+0x22/0x30
+[   79.398699]  </TASK>
+[   79.398792] Modules linked in:
+[   79.398934] CR2: ff1100017000f010
+[   79.399287] ---[ end trace 0000000000000000 ]---
+[   79.401488] RIP: 0010:__crypto_xor+0x25/0x90
+[   79.401608] Code: 00 00 00 00 00 49 89 f0 41 89 c9 48 89 d6 83 f9 07 76 31 8d 49 f8 31 c0 c1 e9 03 83 c1 01 48 c1 e1 03 49 8b 14 00 48 33 14 06 <48> 89 14 07 48 83 c0 08 48 39 c1 75 eb 48 01 cf 49 01 c8 48 01 ce
+[   79.401829] RSP: 0000:ffa000000026fab8 EFLAGS: 00000202
+[   79.401903] RAX: 0000000000000000 RBX: 0000000000000010 RCX: 0000000000000010
+[   79.401991] RDX: 797bdcf589559902 RSI: ffa000000026fb79 RDI: ff1100017000f010
+[   79.402078] RBP: ffa000000026fbd0 R08: ff1100017000f010 R09: 0000000000000010
+[   79.402165] R10: 000000000000005f R11: 00000000000000b2 R12: ff11000101d029b8
+[   79.404461] R13: ff1100017000f010 R14: ffa000000026fb79 R15: 0000000000000fe0
+[   79.404577] FS:  0000000000000000(0000) GS:ff1100016bd80000(0000) knlGS:0000000000000000
+[   79.404679] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   79.404752] CR2: ff1100017000f010 CR3: 0000000101ec8000 CR4: 00000000017516e0
+[   79.404838] PKRU: 55555554
+[   79.404875] PKRS: 0x55555564
+[   79.405020] Kernel panic - not syncing: Fatal exception in interrupt
+[   79.408937] Kernel Offset: disabled
+[   79.409124] Rebooting in 1 seconds..

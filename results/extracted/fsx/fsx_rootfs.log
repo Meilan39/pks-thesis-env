@@ -1,0 +1,23 @@
+======================================================================
+ File System Exerciser (fsx) - PKS Integrity Validation
+   Target file:       /tmp/fsx_rootfs.bin
+   Max file size:     16777216 bytes (16.00 MB)
+   Max op size:       65536 bytes
+   Operations:        5000
+   Random seed:       1789759494
+   MAPWRITE enabled:  YES
+   Negative testing:  NO
+======================================================================
+  Progress: 2500 / 5000 operations completed...
+  Progress: 5000 / 5000 operations completed...
+==> Performing final whole-file integrity verification...
+
+======================================================================
+ [OK] SUCCESS! All 5000 operations verified with zero mismatches.
+ Operation breakdown:
+   READ        : 1011
+   WRITE       : 988
+   TRUNCATE    : 999
+   MAPREAD     : 992
+   MAPWRITE    : 1010
+======================================================================

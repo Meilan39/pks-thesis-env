@@ -1,0 +1,11 @@
+======================================================================
+ File System Exerciser (fsx) - PKS Integrity Validation
+   Target file:       /mnt/protected/fsx_reject.bin
+   Max file size:     67108864 bytes (64.00 MB)
+   Max op size:       65536 bytes
+   Operations:        10000
+   Random seed:       1789760574
+   MAPWRITE enabled:  YES
+   Negative testing:  YES (verifying -EOPNOTSUPP)
+======================================================================
+[OK] Expected Commit 06 rejection verified (errno=EOPNOTSUPP: Operation not supported)

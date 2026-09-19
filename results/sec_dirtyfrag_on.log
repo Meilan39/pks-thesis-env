@@ -1,0 +1,97 @@
+[   56.522105] pks-autorun.sh[225]:  [PKS AUTORUN] Triggered with mode: sec_dirtyfrag
+[   56.533469] pks-autorun.sh[225]: ================================================================
+[   59.081976] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
+[   59.138903] pks-autorun.sh[225]: --> [PKS AUTORUN] Executing Dirty Frag exploit test...
+[   62.702766] pks-autorun.sh[240]: [+] Protected mount active: /mnt/protected with 'pks_pagecache'
+[   62.721646] pks-autorun.sh[240]: === dirty-frag ===
+[   62.731541] pks-autorun.sh[240]: Target: /mnt/protected/victim_file
+[   66.543957] run_tests.sh (240): drop_caches: 3
+[   67.365832] pks-autorun.sh[240]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
+[   74.622191] BUG: unable to handle page fault for address: ff1100017000f000
+[   74.622492] #PF: supervisor write access in kernel mode
+[   74.624771] #PF: error_code(0x0023) - protection keys violation
+[   74.624940] PGD 3201067 P4D 3202067 PUD 100223063 PMD 90000001700001e3 
+[   74.625263] Oops: 0023 [#1] PREEMPT SMP PTI
+[   74.627588] CPU: 0 PID: 278 Comm: exp Not tainted 5.18.0-rc3-00050-g89f022bca6b2 #6
+[   74.627798] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+[   74.628035] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
+[   74.630537] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
+[   74.630887] RSP: 0018:ffa0000000003ba0 EFLAGS: 00000202
+[   74.631029] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
+[   74.633292] RDX: 0000000000000004 RSI: ffa0000000003c7c RDI: 00000000464c457f
+[   74.633421] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa0000000003bf8
+[   74.633554] R10: ff1100010483f158 R11: 0000000000000000 R12: ffa0000000003c7c
+[   74.633666] R13: ff1100010398dc00 R14: 0000000000000004 R15: ffa0000000003be8
+[   74.633816] FS:  00007f5388eca740(0000) GS:ff1100016bc00000(0000) knlGS:0000000000000000
+[   74.636091] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   74.636192] CR2: ff1100017000f000 CR3: 0000000104a24000 CR4: 00000000017516f0
+[   74.636337] PKRU: 55555554
+[   74.636402] PKRS: 0x55555564
+[   74.636499] Call Trace:
+[   74.639292]  <IRQ>
+[   74.641668]  scatterwalk_map_and_copy+0x49/0x70
+[   74.641842]  crypto_authenc_esn_decrypt+0xff/0x190
+[   74.641924]  esp_input+0x1d2/0x310
+[   74.641994]  xfrm_input+0x4a5/0x1310
+[   74.642074]  xfrm4_rcv_encap+0xb8/0x110
+[   74.642139]  ? xfrm4_transport_finish+0x210/0x210
+[   74.642207]  udp_queue_rcv_one_skb+0x23b/0x610
+[   74.642285]  udp_unicast_rcv_skb+0x70/0x80
+[   74.644491]  __udp4_lib_rcv+0x50c/0xc20
+[   74.644594]  ? ip_rcv_core+0x62/0x350
+[   74.644665]  ip_protocol_deliver_rcu+0x105/0x220
+[   74.644747]  ip_local_deliver_finish+0x6e/0x90
+[   74.644818]  __netif_receive_skb_one_core+0x82/0x90
+[   74.644900]  process_backlog+0x94/0x130
+[   74.644965]  __napi_poll+0x27/0x160
+[   74.645025]  net_rx_action+0x22a/0x280
+[   74.645091]  __do_softirq+0xf4/0x336
+[   74.645164]  do_softirq+0x91/0xc0
+[   74.647475]  </IRQ>
+[   74.647533]  <TASK>
+[   74.647570]  __local_bh_enable_ip+0x60/0x70
+[   74.647639]  ip_finish_output2+0x175/0x510
+[   74.647706]  ? dst_output+0x30/0x30
+[   74.647765]  ip_send_skb+0x76/0x80
+[   74.647822]  udp_send_skb+0x235/0x360
+[   74.647884]  udp_sendpage+0x158/0x210
+[   74.647951]  inet_sendpage+0x4a/0x80
+[   74.648012]  kernel_sendpage+0x43/0x110
+[   74.650234]  sock_sendpage+0x1b/0x20
+[   74.650294]  pipe_to_sendpage+0x5c/0xa0
+[   74.650358]  __splice_from_pipe+0xaf/0x1e0
+[   74.650419]  ? propagate_umount+0x500/0x500
+[   74.650483]  generic_splice_sendpage+0x5a/0x90
+[   74.650557]  do_splice+0x319/0x700
+[   74.650615]  __do_splice+0xd9/0x150
+[   74.650673]  __x64_sys_splice+0x8f/0x110
+[   74.650735]  do_syscall_64+0x3b/0x90
+[   74.650800]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[   74.653149] RIP: 0033:0x7f5388fd6103
+[   74.653367] Code: 64 89 02 48 c7 c0 ff ff ff ff eb b9 66 2e 0f 1f 84 00 00 00 00 00 90 80 3d e1 24 0d 00 00 49 89 ca 74 14 b8 13 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 75 c3 0f 1f 40 00 55 48 83 ec 30 44 89 4c 24
+[   74.653618] RSP: 002b:00007ffea9879cb8 EFLAGS: 00000202 ORIG_RAX: 0000000000000113
+[   74.655877] RAX: ffffffffffffffda RBX: 00007ffea9879d04 RCX: 00007f5388fd6103
+[   74.655970] RDX: 0000000000000004 RSI: 0000000000000000 RDI: 0000000000000006
+[   74.656059] RBP: 00007ffea9879d70 R08: 0000000000000028 R09: 0000000000000001
+[   74.656148] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
+[   74.656237] R13: 00007ffea9879f60 R14: 000055762d43cdd8 R15: 00007f53890e7020
+[   74.656360]  </TASK>
+[   74.656434] Modules linked in:
+[   74.658733] CR2: ff1100017000f000
+[   74.659118] ---[ end trace 0000000000000000 ]---
+[   74.659221] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
+[   74.659314] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
+[   74.661737] RSP: 0018:ffa0000000003ba0 EFLAGS: 00000202
+[   74.661817] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
+[   74.661911] RDX: 0000000000000004 RSI: ffa0000000003c7c RDI: 00000000464c457f
+[   74.662013] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa0000000003bf8
+[   74.662101] R10: ff1100010483f158 R11: 0000000000000000 R12: ffa0000000003c7c
+[   74.662189] R13: ff1100010398dc00 R14: 0000000000000004 R15: ffa0000000003be8
+[   74.664436] FS:  00007f5388eca740(0000) GS:ff1100016bc00000(0000) knlGS:0000000000000000
+[   74.664551] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   74.664630] CR2: ff1100017000f000 CR3: 0000000104a24000 CR4: 00000000017516f0
+[   74.664724] PKRU: 55555554
+[   74.664770] PKRS: 0x55555564
+[   74.664915] Kernel panic - not syncing: Fatal exception in interrupt
+[   74.665699] Kernel Offset: disabled
+[   74.665876] Rebooting in 1 seconds..
