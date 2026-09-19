@@ -124,6 +124,12 @@ if [ -d "$GUEST_ASSETS_DIR/pjdfstest" ]; then
     sudo cp -a "$GUEST_ASSETS_DIR/pjdfstest/." "$MOUNT_POINT/pjdfstest/"
     sudo chown -R root:root "$MOUNT_POINT/pjdfstest"
     sudo chmod -R 755 "$MOUNT_POINT/pjdfstest"
+    if [ -f "$MOUNT_POINT/pjdfstest/pjdfstest.c" ]; then
+        log_step "Compiling pjdfstest harness inside chroot"
+        sudo chroot "$MOUNT_POINT" /bin/bash -c "
+            cd /pjdfstest && gcc -Wall -O2 pjdfstest.c -o pjdfstest
+        " 2>/dev/null || log_warn "pjdfstest compilation inside chroot skipped"
+    fi
 fi
 
 # Synchronize headless autorun components

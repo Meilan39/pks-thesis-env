@@ -5,7 +5,7 @@
   "cmdline": "root=/dev/vda1 rw console=ttyS0 nokaslr pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target",
   "cpu_model": "QEMU TCG CPU version 2.5+",
   "cpu_count": 4,
-  "timestamp": "2026-09-19T06:21:30Z",
+  "timestamp": "2026-09-19T15:40:46Z",
   "mount_options": "/dev/vda2 on /mnt/protected type ext4 (rw,relatime)",
-  "steal_time_stat": "cpu  8868 0 18898 452338 117315 0 711 0 0 0"
+  "steal_time_stat": "cpu  6408 0 10252 100367 17877 0 222 0 0 0"
 }

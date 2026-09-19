@@ -2623,3 +2623,1953 @@ sudo: unable to resolve host ubuntu: Temporary failure in name resolution
 [1m================================================================[0m
   [2mEnd Time:       [0m Sat Sep 19 05:01:46 UTC 2026
 [1;32m[OK][0m   All kernels compiled and disk image prepared.
+
+[1m================================================================[0m
+[1m  PKS Thesis: Autonomous Build Pipeline[0m
+[1m================================================================[0m
+  [2mStart Time:     [0m Sat Sep 19 14:47:28 UTC 2026
+  [2mBuild Log:      [0m /home/vmuser/src/env/results/build.log
+[1;36m==>[0m [1m[1/4] Compiling Security Kernel (build_sec)...[0m
+
+================================================================
+  Building Security Kernel (build_sec)
+================================================================
+  Kernel Tree:     /home/vmuser/src/linux-pks-thesis
+  Output Dir:      /home/vmuser/src/linux-pks-thesis/build_sec
+  Build Jobs:      1
+==> Configuring baseline defconfig + kvm_guest
+==> Enabling storage and virtio drivers
+==> Enabling exploit prerequisite subsystems
+==> Enabling crypto primitives
+==> Enabling RxRPC fallback cipher paths
+==> Configuring PKS page-cache protection
+==> Configuring diagnostic debug options and fail-open handling
+==> Finalizing configuration and compiling bzImage
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis/build_sec'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  UPD     include/config/kernel.release
+  UPD     include/generated/utsrelease.h
+  CC      arch/x86/kernel/asm-offsets.s
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CC      init/main.o
+  CHK     include/generated/compile.h
+  CC      init/version.o
+  CC      init/do_mounts.o
+  AR      init/built-in.a
+  CC      arch/x86/entry/vdso/vma.o
+  AR      arch/x86/entry/vdso/built-in.a
+  AR      arch/x86/entry/built-in.a
+  CC      arch/x86/kernel/ldt.o
+  CC      arch/x86/kernel/setup.o
+  CC      arch/x86/kernel/espfix_64.o
+  CC      arch/x86/kernel/e820.o
+  CC      arch/x86/kernel/fpu/signal.o
+  AR      arch/x86/kernel/fpu/built-in.a
+  CC      arch/x86/kernel/cpu/umwait.o
+  AR      arch/x86/kernel/cpu/built-in.a
+  CC      arch/x86/kernel/reboot.o
+  CC      arch/x86/kernel/machine_kexec_64.o
+  CC      arch/x86/kernel/kvm.o
+  CC      arch/x86/kernel/paravirt.o
+  AR      arch/x86/kernel/built-in.a
+  CC      arch/x86/mm/init.o
+  CC      arch/x86/mm/init_64.o
+  CC      arch/x86/mm/fault.o
+  CC      arch/x86/mm/ioremap.o
+  CC      arch/x86/mm/pgtable.o
+  CC      arch/x86/mm/pat/set_memory.o
+  AR      arch/x86/mm/pat/built-in.a
+  CC      arch/x86/mm/hugetlbpage.o
+  AR      arch/x86/mm/built-in.a
+  CC      arch/x86/platform/efi/quirks.o
+  CC      arch/x86/platform/efi/efi.o
+  CC      arch/x86/platform/efi/efi_64.o
+  AR      arch/x86/platform/efi/built-in.a
+  AR      arch/x86/platform/built-in.a
+  AR      arch/x86/built-in.a
+  CC      kernel/fork.o
+  CC      kernel/cpu.o
+  CC      kernel/exit.o
+  CC      kernel/softirq.o
+  CC      kernel/sysctl.o
+  CC      kernel/ptrace.o
+  CC      kernel/sys.o
+  CC      kernel/umh.o
+  CC      kernel/workqueue.o
+  CC      kernel/reboot.o
+  CC      kernel/kmod.o
+  CC      kernel/sched/core.o
+  CC      kernel/sched/fair.o
+  CC      kernel/sched/build_policy.o
+  CC      kernel/sched/build_utility.o
+  AR      kernel/sched/built-in.a
+  CC      kernel/power/main.o
+  CC      kernel/power/console.o
+  CC      kernel/power/process.o
+  CC      kernel/power/suspend.o
+  AR      kernel/power/built-in.a
+  CC      kernel/irq/pm.o
+  AR      kernel/irq/built-in.a
+  CC      kernel/rcu/tree.o
+  AR      kernel/rcu/built-in.a
+  CC      kernel/freezer.o
+  CC      kernel/time/timer.o
+  CC      kernel/time/timekeeping_debug.o
+  AR      kernel/time/built-in.a
+  CC      kernel/futex/core.o
+  AR      kernel/futex/built-in.a
+  CC      kernel/module.o
+  CC      kernel/kexec_core.o
+  CC      kernel/compat.o
+  CC      kernel/cgroup/cgroup.o
+  CC      kernel/cgroup/cpuset.o
+  AR      kernel/cgroup/built-in.a
+  CC      kernel/trace/trace.o
+  CC      kernel/trace/blktrace.o
+  AR      kernel/trace/built-in.a
+  CC      kernel/events/core.o
+  CC      kernel/events/uprobes.o
+  AR      kernel/events/built-in.a
+  AR      kernel/built-in.a
+  CC      mm/filemap.o
+  CC      mm/oom_kill.o
+  CC      mm/fadvise.o
+  CC      mm/page-writeback.o
+  CC      mm/folio-compat.o
+  CC      mm/readahead.o
+  CC      mm/swap.o
+  CC      mm/truncate.o
+  CC      mm/vmscan.o
+  CC      mm/shmem.o
+  CC      mm/util.o
+  CC      mm/vmstat.o
+  CC      mm/backing-dev.o
+  CC      mm/mm_init.o
+  CC      mm/percpu.o
+  CC      mm/slab_common.o
+  CC      mm/compaction.o
+  CC      mm/interval_tree.o
+  CC      mm/list_lru.o
+  CC      mm/workingset.o
+  CC      mm/debug.o
+  CC      mm/gup.o
+  CC      mm/highmem.o
+  CC      mm/memory.o
+  CC      mm/mincore.o
+  CC      mm/mlock.o
+  CC      mm/mmap.o
+  CC      mm/mmu_gather.o
+  CC      mm/mprotect.o
+  CC      mm/mremap.o
+  CC      mm/page_vma_mapped.o
+  CC      mm/pagewalk.o
+  CC      mm/pgtable-generic.o
+  CC      mm/rmap.o
+  CC      mm/vmalloc.o
+  CC      mm/page_alloc.o
+  CC      mm/memblock.o
+  CC      mm/madvise.o
+  CC      mm/page_io.o
+  CC      mm/swap_state.o
+  CC      mm/swapfile.o
+  CC      mm/swap_slots.o
+  CC      mm/hugetlb.o
+  CC      mm/hugetlb_vmemmap.o
+  CC      mm/mempolicy.o
+  CC      mm/sparse.o
+  CC      mm/sparse-vmemmap.o
+  CC      mm/slub.o
+  CC      mm/migrate.o
+  CC      mm/hugetlb_cgroup.o
+  CC      mm/early_ioremap.o
+  CC      mm/secretmem.o
+  CC      mm/memfd.o
+  CC      mm/pcache_pks.o
+  AR      mm/built-in.a
+  CC      fs/open.o
+  CC      fs/read_write.o
+  CC      fs/file_table.o
+  CC      fs/stat.o
+  CC      fs/exec.o
+  CC      fs/pipe.o
+  CC      fs/namei.o
+  CC      fs/ioctl.o
+  CC      fs/inode.o
+  CC      fs/attr.o
+  CC      fs/namespace.o
+  CC      fs/libfs.o
+  CC      fs/fs-writeback.o
+  CC      fs/splice.o
+  CC      fs/sync.o
+  CC      fs/remap_range.o
+  CC      fs/buffer.o
+  CC      fs/direct-io.o
+  CC      fs/mpage.o
+  CC      fs/aio.o
+  CC      fs/io_uring.o
+  CC      fs/binfmt_misc.o
+  CC      fs/binfmt_elf.o
+  CC      fs/compat_binfmt_elf.o
+  CC      fs/coredump.o
+  CC      fs/drop_caches.o
+  CC      fs/iomap/buffered-io.o
+  CC      fs/iomap/direct-io.o
+  CC      fs/iomap/fiemap.o
+  CC      fs/iomap/seek.o
+  CC      fs/iomap/swapfile.o
+  AR      fs/iomap/built-in.a
+  CC      fs/proc/task_mmu.o
+  CC      fs/proc/base.o
+  CC      fs/proc/array.o
+  CC      fs/proc/meminfo.o
+  CC      fs/proc/vmcore.o
+  CC      fs/proc/page.o
+  AR      fs/proc/built-in.a
+  CC      fs/kernfs/mount.o
+  CC      fs/kernfs/inode.o
+  CC      fs/kernfs/file.o
+  AR      fs/kernfs/built-in.a
+  CC      fs/netfs/buffered_read.o
+  CC      fs/netfs/io.o
+  CC      fs/netfs/main.o
+  CC      fs/netfs/objects.o
+  AR      fs/netfs/built-in.a
+  CC      fs/ext4/balloc.o
+  CC      fs/ext4/bitmap.o
+  CC      fs/ext4/block_validity.o
+  CC      fs/ext4/dir.o
+  CC      fs/ext4/ext4_jbd2.o
+  CC      fs/ext4/extents.o
+  CC      fs/ext4/extents_status.o
+
+[1m================================================================[0m
+[1m  PKS Thesis: Autonomous Build Pipeline[0m
+[1m================================================================[0m
+  [2mStart Time:     [0m Sat Sep 19 14:51:08 UTC 2026
+  [2mBuild Log:      [0m /home/vmuser/src/env/results/build.log
+[1;36m==>[0m [1m[1/4] Compiling Security Kernel (build_sec)...[0m
+
+================================================================
+  Building Security Kernel (build_sec)
+================================================================
+  Kernel Tree:     /home/vmuser/src/linux-pks-thesis
+  Output Dir:      /home/vmuser/src/linux-pks-thesis/build_sec
+  Build Jobs:      1
+==> Configuring baseline defconfig + kvm_guest
+==> Enabling storage and virtio drivers
+==> Enabling exploit prerequisite subsystems
+==> Enabling crypto primitives
+==> Enabling RxRPC fallback cipher paths
+==> Configuring PKS page-cache protection
+==> Configuring diagnostic debug options and fail-open handling
+==> Finalizing configuration and compiling bzImage
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis/build_sec'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+  CC      fs/ext4/extents_status.o
+  CC      fs/ext4/file.o
+  CC      fs/ext4/fsmap.o
+  CC      fs/ext4/fsync.o
+  CC      fs/ext4/hash.o
+  CC      fs/ext4/ialloc.o
+  CC      fs/ext4/indirect.o
+  CC      fs/ext4/inline.o
+  CC      fs/ext4/inode.o
+  CC      fs/ext4/ioctl.o
+  CC      fs/ext4/mballoc.o
+  CC      fs/ext4/migrate.o
+  CC      fs/ext4/mmp.o
+  CC      fs/ext4/move_extent.o
+  CC      fs/ext4/namei.o
+  CC      fs/ext4/page-io.o
+  CC      fs/ext4/readpage.o
+  CC      fs/ext4/resize.o
+  CC      fs/ext4/super.o
+  CC      fs/ext4/symlink.o
+  CC      fs/ext4/sysfs.o
+  CC      fs/ext4/xattr.o
+  CC      fs/ext4/xattr_hurd.o
+  CC      fs/ext4/xattr_trusted.o
+  CC      fs/ext4/xattr_user.o
+  CC      fs/ext4/fast_commit.o
+  CC      fs/ext4/orphan.o
+  CC      fs/ext4/acl.o
+  CC      fs/ext4/xattr_security.o
+  AR      fs/ext4/built-in.a
+  CC      fs/jbd2/transaction.o
+  CC      fs/jbd2/commit.o
+  CC      fs/jbd2/recovery.o
+  CC      fs/jbd2/checkpoint.o
+  CC      fs/jbd2/revoke.o
+  CC      fs/jbd2/journal.o
+  AR      fs/jbd2/built-in.a
+  CC      fs/ramfs/inode.o
+  AR      fs/ramfs/built-in.a
+  CC      fs/hugetlbfs/inode.o
+  AR      fs/hugetlbfs/built-in.a
+  CC      fs/fat/cache.o
+  CC      fs/fat/dir.o
+  CC      fs/fat/fatent.o
+  CC      fs/fat/file.o
+  CC      fs/fat/inode.o
+  CC      fs/fat/misc.o
+  CC      fs/fat/nfs.o
+  CC      fs/fat/namei_vfat.o
+  CC      fs/fat/namei_msdos.o
+  AR      fs/fat/built-in.a
+  CC      fs/isofs/namei.o
+  CC      fs/isofs/inode.o
+  CC      fs/isofs/dir.o
+  CC      fs/isofs/util.o
+  CC      fs/isofs/rock.o
+  CC      fs/isofs/export.o
+  CC      fs/isofs/joliet.o
+  CC      fs/isofs/compress.o
+  AR      fs/isofs/built-in.a
+  CC      fs/nfs/client.o
+  CC      fs/nfs/dir.o
+  CC      fs/nfs/file.o
+  CC      fs/nfs/getroot.o
+  CC      fs/nfs/inode.o
+  CC      fs/nfs/super.o
+  CC      fs/nfs/io.o
+  CC      fs/nfs/direct.o
+  CC      fs/nfs/pagelist.o
+  CC      fs/nfs/read.o
+  CC      fs/nfs/symlink.o
+  CC      fs/nfs/unlink.o
+  CC      fs/nfs/write.o
+  CC      fs/nfs/namespace.o
+  CC      fs/nfs/mount_clnt.o
+  CC      fs/nfs/nfstrace.o
+  CC      fs/nfs/export.o
+  CC      fs/nfs/sysfs.o
+  CC      fs/nfs/fs_context.o
+  CC      fs/nfs/nfsroot.o
+  CC      fs/nfs/sysctl.o
+  CC      fs/nfs/nfs2super.o
+  CC      fs/nfs/proc.o
+  CC      fs/nfs/nfs2xdr.o
+  CC      fs/nfs/nfs3super.o
+  CC      fs/nfs/nfs3client.o
+  CC      fs/nfs/nfs3proc.o
+  CC      fs/nfs/nfs3xdr.o
+  CC      fs/nfs/nfs3acl.o
+  CC      fs/nfs/nfs4proc.o
+  CC      fs/nfs/nfs4xdr.o
+  CC      fs/nfs/nfs4state.o
+  CC      fs/nfs/nfs4renewd.o
+  CC      fs/nfs/nfs4super.o
+  CC      fs/nfs/nfs4file.o
+  CC      fs/nfs/delegation.o
+  CC      fs/nfs/nfs4idmap.o
+  CC      fs/nfs/callback.o
+  CC      fs/nfs/callback_xdr.o
+  CC      fs/nfs/callback_proc.o
+  CC      fs/nfs/nfs4namespace.o
+  CC      fs/nfs/nfs4getroot.o
+  CC      fs/nfs/nfs4client.o
+  CC      fs/nfs/nfs4session.o
+  CC      fs/nfs/nfs4trace.o
+  CC      fs/nfs/nfs4sysctl.o
+  AR      fs/nfs/built-in.a
+  CC      fs/lockd/clntlock.o
+  CC      fs/lockd/clntproc.o
+  AR      fs/lockd/built-in.a
+  CC      fs/autofs/inode.o
+  AR      fs/autofs/built-in.a
+  CC      fs/9p/vfs_super.o
+  CC      fs/9p/vfs_inode.o
+  CC      fs/9p/vfs_inode_dotl.o
+  CC      fs/9p/vfs_addr.o
+  CC      fs/9p/vfs_file.o
+  CC      fs/9p/vfs_dir.o
+  CC      fs/9p/vfs_dentry.o
+  CC      fs/9p/v9fs.o
+  CC      fs/9p/fid.o
+  AR      fs/9p/built-in.a
+  CC      fs/debugfs/inode.o
+  CC      fs/debugfs/file.o
+  AR      fs/debugfs/built-in.a
+  AR      fs/built-in.a
+  CC [M]  fs/efivarfs/super.o
+  LD [M]  fs/efivarfs/efivarfs.o
+  CC      ipc/shm.o
+  CC      ipc/mqueue.o
+  AR      ipc/built-in.a
+  CC      security/commoncap.o
+  CC      security/selinux/hooks.o
+  CC      security/selinux/selinuxfs.o
+  AR      security/selinux/built-in.a
+  AR      security/built-in.a
+  CC      block/bdev.o
+  CC      block/fops.o
+  CC      block/bio.o
+  CC      block/elevator.o
+  CC      block/blk-core.o
+  CC      block/blk-settings.o
+  CC      block/blk-merge.o
+  CC      block/blk-mq.o
+  CC      block/blk-mq-sched.o
+  CC      block/partitions/core.o
+  CC      block/partitions/msdos.o
+  CC      block/partitions/efi.o
+  AR      block/partitions/built-in.a
+  CC      block/blk-iolatency.o
+  CC      block/mq-deadline.o
+  CC      block/kyber-iosched.o
+  AR      block/built-in.a
+  CC      drivers/pci/pci-driver.o
+  CC      drivers/pci/quirks.o
+  CC      drivers/pci/hotplug/pci_hotplug_core.o
+  AR      drivers/pci/hotplug/built-in.a
+  AR      drivers/pci/built-in.a
+  CC      drivers/video/backlight/backlight.o
+  AR      drivers/video/backlight/built-in.a
+  CC      drivers/video/fbdev/core/fb_cmdline.o
+  AR      drivers/video/fbdev/core/built-in.a
+  AR      drivers/video/fbdev/built-in.a
+  AR      drivers/video/built-in.a
+  CC      drivers/acpi/sleep.o
+  CC      drivers/acpi/device_pm.o
+  CC      drivers/acpi/proc.o
+  CC      drivers/acpi/bus.o
+  CC      drivers/acpi/ec.o
+  CC      drivers/acpi/acpi_lpss.o
+  CC      drivers/acpi/x86/s2idle.o
+  CC      drivers/acpi/prmt.o
+  CC      drivers/acpi/acpi_video.o
+  CC      drivers/acpi/video_detect.o
+  CC      drivers/acpi/battery.o
+  AR      drivers/acpi/built-in.a
+  CC      drivers/tty/sysrq.o
+  CC      drivers/tty/vt/vt_ioctl.o
+  AR      drivers/tty/vt/built-in.a
+  AR      drivers/tty/built-in.a
+  CC      drivers/char/mem.o
+  CC      drivers/char/virtio_console.o
+  CC      drivers/char/nvram.o
+  CC      drivers/char/agp/backend.o
+  CC      drivers/char/agp/generic.o
+  CC      drivers/char/agp/intel-agp.o
+  CC      drivers/char/agp/intel-gtt.o
+  AR      drivers/char/agp/built-in.a
+  AR      drivers/char/built-in.a
+  CC      drivers/iommu/amd/iommu.o
+  AR      drivers/iommu/amd/built-in.a
+  AR      drivers/iommu/built-in.a
+  CC      drivers/gpu/drm/drm_gem_shmem_helper.o
+  CC      drivers/gpu/drm/drm_bridge_connector.o
+  CC      drivers/gpu/drm/drm_crtc_helper.o
+  CC      drivers/gpu/drm/drm_dsc.o
+  CC      drivers/gpu/drm/drm_encoder_slave.o
+  CC      drivers/gpu/drm/drm_probe_helper.o
+  CC      drivers/gpu/drm/drm_plane_helper.o
+  CC      drivers/gpu/drm/drm_atomic_helper.o
+  CC      drivers/gpu/drm/drm_kms_helper_common.o
+  CC      drivers/gpu/drm/drm_simple_kms_helper.o
+  CC      drivers/gpu/drm/drm_modeset_helper.o
+  CC      drivers/gpu/drm/drm_scdc_helper.o
+  CC      drivers/gpu/drm/drm_gem_atomic_helper.o
+  CC      drivers/gpu/drm/drm_gem_framebuffer_helper.o
+  CC      drivers/gpu/drm/drm_atomic_state_helper.o
+  CC      drivers/gpu/drm/drm_damage_helper.o
+  CC      drivers/gpu/drm/drm_self_refresh_helper.o
+  CC      drivers/gpu/drm/bridge/panel.o
+  CC      drivers/gpu/drm/drm_aperture.o
+  CC      drivers/gpu/drm/drm_file.o
+  CC      drivers/gpu/drm/drm_gem.o
+  CC      drivers/gpu/drm/drm_ioctl.o
+  CC      drivers/gpu/drm/drm_drv.o
+  CC      drivers/gpu/drm/drm_sysfs.o
+  CC      drivers/gpu/drm/drm_crtc.o
+  CC      drivers/gpu/drm/drm_modes.o
+  CC      drivers/gpu/drm/drm_edid.o
+  CC      drivers/gpu/drm/drm_modeset_lock.o
+  CC      drivers/gpu/drm/drm_atomic.o
+  CC      drivers/gpu/drm/drm_bridge.o
+  CC      drivers/gpu/drm/drm_framebuffer.o
+  CC      drivers/gpu/drm/drm_connector.o
+  CC      drivers/gpu/drm/drm_blend.o
+  CC      drivers/gpu/drm/drm_encoder.o
+  CC      drivers/gpu/drm/drm_mode_object.o
+  CC      drivers/gpu/drm/drm_property.o
+  CC      drivers/gpu/drm/drm_plane.o
+  CC      drivers/gpu/drm/drm_color_mgmt.o
+  CC      drivers/gpu/drm/drm_mode_config.o
+  CC      drivers/gpu/drm/drm_vblank.o
+  CC      drivers/gpu/drm/drm_lease.o
+  CC      drivers/gpu/drm/drm_writeback.o
+  CC      drivers/gpu/drm/drm_client.o
+  CC      drivers/gpu/drm/drm_client_modeset.o
+  CC      drivers/gpu/drm/drm_atomic_uapi.o
+  CC      drivers/gpu/drm/drm_vblank_work.o
+  CC      drivers/gpu/drm/drm_panel.o
+  CC      drivers/gpu/drm/drm_debugfs.o
+  CC      drivers/gpu/drm/drm_debugfs_crc.o
+  CC      drivers/gpu/drm/drm_mipi_dsi.o
+  CC      drivers/gpu/drm/dp/drm_dp.o
+  CC      drivers/gpu/drm/dp/drm_dp_dual_mode_helper.o
+  CC      drivers/gpu/drm/dp/drm_dp_mst_topology.o
+  AR      drivers/gpu/drm/dp/built-in.a
+  CC      drivers/gpu/drm/ttm/ttm_tt.o
+  CC      drivers/gpu/drm/ttm/ttm_bo.o
+  CC      drivers/gpu/drm/ttm/ttm_bo_util.o
+  CC      drivers/gpu/drm/ttm/ttm_bo_vm.o
+  CC      drivers/gpu/drm/ttm/ttm_execbuf_util.o
+  CC      drivers/gpu/drm/ttm/ttm_resource.o
+  CC      drivers/gpu/drm/ttm/ttm_pool.o
+  CC      drivers/gpu/drm/ttm/ttm_device.o
+  CC      drivers/gpu/drm/ttm/ttm_agp_backend.o
+  AR      drivers/gpu/drm/ttm/built-in.a
+  CC      drivers/gpu/drm/i915/i915_driver.o
+  CC      drivers/gpu/drm/i915/i915_config.o
+  CC      drivers/gpu/drm/i915/i915_getparam.o
+  CC      drivers/gpu/drm/i915/i915_ioctl.o
+  CC      drivers/gpu/drm/i915/i915_irq.o
+  CC      drivers/gpu/drm/i915/i915_mitigations.o
+  CC      drivers/gpu/drm/i915/i915_module.o
+  CC      drivers/gpu/drm/i915/i915_params.o
+  CC      drivers/gpu/drm/i915/i915_pci.o
+  CC      drivers/gpu/drm/i915/i915_suspend.o
+  CC      drivers/gpu/drm/i915/i915_switcheroo.o
+  CC      drivers/gpu/drm/i915/i915_sysfs.o
+  CC      drivers/gpu/drm/i915/i915_utils.o
+  CC      drivers/gpu/drm/i915/intel_device_info.o
+  CC      drivers/gpu/drm/i915/intel_dram.o
+  CC      drivers/gpu/drm/i915/intel_memory_region.o
+  CC      drivers/gpu/drm/i915/intel_pch.o
+  CC      drivers/gpu/drm/i915/intel_pcode.o
+  CC      drivers/gpu/drm/i915/intel_pm.o
+  CC      drivers/gpu/drm/i915/intel_region_ttm.o
+  CC      drivers/gpu/drm/i915/intel_runtime_pm.o
+  CC      drivers/gpu/drm/i915/intel_sbi.o
+  CC      drivers/gpu/drm/i915/intel_step.o
+  CC      drivers/gpu/drm/i915/intel_uncore.o
+  CC      drivers/gpu/drm/i915/vlv_sideband.o
+  CC      drivers/gpu/drm/i915/vlv_suspend.o
+  CC      drivers/gpu/drm/i915/i915_mm.o
+  CC      drivers/gpu/drm/i915/i915_ioc32.o
+  CC      drivers/gpu/drm/i915/i915_debugfs.o
+  CC      drivers/gpu/drm/i915/i915_debugfs_params.o
+  CC      drivers/gpu/drm/i915/display/intel_display_debugfs.o
+  CC      drivers/gpu/drm/i915/display/intel_pipe_crc.o
+  CC      drivers/gpu/drm/i915/i915_pmu.o
+  CC      drivers/gpu/drm/i915/gt/gen2_engine_cs.o
+  CC      drivers/gpu/drm/i915/gt/gen6_ppgtt.o
+  CC      drivers/gpu/drm/i915/gt/gen7_renderclear.o
+  CC      drivers/gpu/drm/i915/gt/gen8_engine_cs.o
+  CC      drivers/gpu/drm/i915/gt/gen8_ppgtt.o
+  CC      drivers/gpu/drm/i915/gt/intel_breadcrumbs.o
+  CC      drivers/gpu/drm/i915/gt/intel_context.o
+  CC      drivers/gpu/drm/i915/gt/intel_context_sseu.o
+  CC      drivers/gpu/drm/i915/gt/intel_engine_cs.o
+  CC      drivers/gpu/drm/i915/gt/intel_engine_heartbeat.o
+  CC      drivers/gpu/drm/i915/gt/intel_engine_pm.o
+  CC      drivers/gpu/drm/i915/gt/intel_engine_user.o
+  CC      drivers/gpu/drm/i915/gt/intel_execlists_submission.o
+  CC      drivers/gpu/drm/i915/gt/intel_ggtt.o
+  CC      drivers/gpu/drm/i915/gt/intel_ggtt_fencing.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_buffer_pool.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_clock_utils.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_debugfs.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_engines_debugfs.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_irq.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_pm.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_pm_debugfs.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_pm_irq.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_requests.o
+  CC      drivers/gpu/drm/i915/gt/intel_gtt.o
+  CC      drivers/gpu/drm/i915/gt/intel_llc.o
+  CC      drivers/gpu/drm/i915/gt/intel_lrc.o
+  CC      drivers/gpu/drm/i915/gt/intel_migrate.o
+  CC      drivers/gpu/drm/i915/gt/intel_mocs.o
+  CC      drivers/gpu/drm/i915/gt/intel_ppgtt.o
+  CC      drivers/gpu/drm/i915/gt/intel_rc6.o
+  CC      drivers/gpu/drm/i915/gt/intel_region_lmem.o
+  CC      drivers/gpu/drm/i915/gt/intel_renderstate.o
+  CC      drivers/gpu/drm/i915/gt/intel_reset.o
+  CC      drivers/gpu/drm/i915/gt/intel_ring.o
+  CC      drivers/gpu/drm/i915/gt/intel_ring_submission.o
+  CC      drivers/gpu/drm/i915/gt/intel_rps.o
+  CC      drivers/gpu/drm/i915/gt/intel_sseu.o
+  CC      drivers/gpu/drm/i915/gt/intel_sseu_debugfs.o
+  CC      drivers/gpu/drm/i915/gt/intel_timeline.o
+  CC      drivers/gpu/drm/i915/gt/intel_workarounds.o
+  CC      drivers/gpu/drm/i915/gt/shmem_utils.o
+  CC      drivers/gpu/drm/i915/gt/sysfs_engines.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_clflush.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_context.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_create.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_dmabuf.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_domain.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_execbuffer.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_internal.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_object.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_lmem.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_mman.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_pages.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_phys.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_pm.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_region.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_shmem.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_shrinker.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_stolen.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_throttle.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_tiling.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_ttm.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_ttm_move.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_ttm_pm.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_userptr.o
+  CC      drivers/gpu/drm/i915/gem/i915_gemfs.o
+  CC      drivers/gpu/drm/i915/i915_active.o
+  CC      drivers/gpu/drm/i915/i915_cmd_parser.o
+  CC      drivers/gpu/drm/i915/i915_gem_evict.o
+  CC      drivers/gpu/drm/i915/i915_gem_gtt.o
+  CC      drivers/gpu/drm/i915/i915_gem.o
+  CC      drivers/gpu/drm/i915/i915_query.o
+  CC      drivers/gpu/drm/i915/i915_request.o
+  CC      drivers/gpu/drm/i915/i915_scheduler.o
+  CC      drivers/gpu/drm/i915/i915_trace_points.o
+  CC      drivers/gpu/drm/i915/i915_ttm_buddy_manager.o
+  CC      drivers/gpu/drm/i915/i915_vma.o
+  CC      drivers/gpu/drm/i915/i915_vma_resource.o
+  CC      drivers/gpu/drm/i915/intel_wopcm.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_uc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_uc_fw.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_ads.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_ct.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_fw.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_log.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_rc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_slpc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_submission.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_huc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_huc_fw.o
+  CC      drivers/gpu/drm/i915/display/hsw_ips.o
+  CC      drivers/gpu/drm/i915/display/intel_atomic.o
+  CC      drivers/gpu/drm/i915/display/intel_atomic_plane.o
+  CC      drivers/gpu/drm/i915/display/intel_audio.o
+  CC      drivers/gpu/drm/i915/display/intel_bios.o
+  CC      drivers/gpu/drm/i915/display/intel_bw.o
+  CC      drivers/gpu/drm/i915/display/intel_cdclk.o
+  CC      drivers/gpu/drm/i915/display/intel_color.o
+  CC      drivers/gpu/drm/i915/display/intel_combo_phy.o
+  CC      drivers/gpu/drm/i915/display/intel_connector.o
+  CC      drivers/gpu/drm/i915/display/intel_crtc.o
+  CC      drivers/gpu/drm/i915/display/intel_cursor.o
+  CC      drivers/gpu/drm/i915/display/intel_display.o
+  CC      drivers/gpu/drm/i915/display/intel_display_power.o
+  CC      drivers/gpu/drm/i915/display/intel_dmc.o
+  CC      drivers/gpu/drm/i915/display/intel_dpio_phy.o
+  CC      drivers/gpu/drm/i915/display/intel_dpll.o
+  CC      drivers/gpu/drm/i915/display/intel_dpll_mgr.o
+  CC      drivers/gpu/drm/i915/display/intel_dpt.o
+  CC      drivers/gpu/drm/i915/display/intel_drrs.o
+  CC      drivers/gpu/drm/i915/display/intel_dsb.o
+  CC      drivers/gpu/drm/i915/display/intel_fb.o
+  CC      drivers/gpu/drm/i915/display/intel_fb_pin.o
+  CC      drivers/gpu/drm/i915/display/intel_fbc.o
+  CC      drivers/gpu/drm/i915/display/intel_fdi.o
+  CC      drivers/gpu/drm/i915/display/intel_fifo_underrun.o
+  CC      drivers/gpu/drm/i915/display/intel_frontbuffer.o
+  CC      drivers/gpu/drm/i915/display/intel_global_state.o
+  CC      drivers/gpu/drm/i915/display/intel_hdcp.o
+  CC      drivers/gpu/drm/i915/display/intel_hotplug.o
+  CC      drivers/gpu/drm/i915/display/intel_lpe_audio.o
+  CC      drivers/gpu/drm/i915/display/intel_overlay.o
+  CC      drivers/gpu/drm/i915/display/intel_pch_display.o
+  CC      drivers/gpu/drm/i915/display/intel_pch_refclk.o
+  CC      drivers/gpu/drm/i915/display/intel_plane_initial.o
+  CC      drivers/gpu/drm/i915/display/intel_psr.o
+  CC      drivers/gpu/drm/i915/display/intel_quirks.o
+  CC      drivers/gpu/drm/i915/display/intel_sprite.o
+  CC      drivers/gpu/drm/i915/display/intel_tc.o
+  CC      drivers/gpu/drm/i915/display/intel_vga.o
+  CC      drivers/gpu/drm/i915/display/i9xx_plane.o
+  CC      drivers/gpu/drm/i915/display/skl_scaler.o
+  CC      drivers/gpu/drm/i915/display/skl_universal_plane.o
+  CC      drivers/gpu/drm/i915/display/intel_acpi.o
+  CC      drivers/gpu/drm/i915/display/intel_opregion.o
+  CC      drivers/gpu/drm/i915/display/dvo_ch7017.o
+  CC      drivers/gpu/drm/i915/display/dvo_ch7xxx.o
+  CC      drivers/gpu/drm/i915/display/dvo_ivch.o
+  CC      drivers/gpu/drm/i915/display/dvo_ns2501.o
+  CC      drivers/gpu/drm/i915/display/dvo_sil164.o
+  CC      drivers/gpu/drm/i915/display/dvo_tfp410.o
+  CC      drivers/gpu/drm/i915/display/g4x_dp.o
+  CC      drivers/gpu/drm/i915/display/g4x_hdmi.o
+  CC      drivers/gpu/drm/i915/display/icl_dsi.o
+  CC      drivers/gpu/drm/i915/display/intel_backlight.o
+  CC      drivers/gpu/drm/i915/display/intel_crt.o
+  CC      drivers/gpu/drm/i915/display/intel_ddi.o
+  CC      drivers/gpu/drm/i915/display/intel_ddi_buf_trans.o
+  CC      drivers/gpu/drm/i915/display/intel_display_trace.o
+  CC      drivers/gpu/drm/i915/display/intel_dp.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_aux.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_aux_backlight.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_hdcp.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_link_training.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_mst.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi_dcs_backlight.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi_vbt.o
+  CC      drivers/gpu/drm/i915/display/intel_dvo.o
+  CC      drivers/gpu/drm/i915/display/intel_gmbus.o
+  CC      drivers/gpu/drm/i915/display/intel_hdmi.o
+  CC      drivers/gpu/drm/i915/display/intel_lspcon.o
+  CC      drivers/gpu/drm/i915/display/intel_lvds.o
+  CC      drivers/gpu/drm/i915/display/intel_panel.o
+  CC      drivers/gpu/drm/i915/display/intel_pps.o
+  CC      drivers/gpu/drm/i915/display/intel_qp_tables.o
+  CC      drivers/gpu/drm/i915/display/intel_sdvo.o
+  CC      drivers/gpu/drm/i915/display/intel_snps_phy.o
+  CC      drivers/gpu/drm/i915/display/intel_tv.o
+  CC      drivers/gpu/drm/i915/display/intel_vdsc.o
+  CC      drivers/gpu/drm/i915/display/intel_vrr.o
+  CC      drivers/gpu/drm/i915/display/vlv_dsi.o
+  CC      drivers/gpu/drm/i915/display/vlv_dsi_pll.o
+  CC      drivers/gpu/drm/i915/i915_perf.o
+  CC      drivers/gpu/drm/i915/i915_gpu_error.o
+  CC      drivers/gpu/drm/i915/i915_vgpu.o
+  AR      drivers/gpu/drm/i915/built-in.a
+  CC      drivers/gpu/drm/virtio/virtgpu_drv.o
+  CC      drivers/gpu/drm/virtio/virtgpu_kms.o
+  CC      drivers/gpu/drm/virtio/virtgpu_gem.o
+  CC      drivers/gpu/drm/virtio/virtgpu_vram.o
+  CC      drivers/gpu/drm/virtio/virtgpu_display.o
+  CC      drivers/gpu/drm/virtio/virtgpu_vq.o
+  CC      drivers/gpu/drm/virtio/virtgpu_fence.o
+  CC      drivers/gpu/drm/virtio/virtgpu_object.o
+  CC      drivers/gpu/drm/virtio/virtgpu_debugfs.o
+  CC      drivers/gpu/drm/virtio/virtgpu_plane.o
+  CC      drivers/gpu/drm/virtio/virtgpu_ioctl.o
+  CC      drivers/gpu/drm/virtio/virtgpu_prime.o
+  CC      drivers/gpu/drm/virtio/virtgpu_trace_points.o
+  AR      drivers/gpu/drm/virtio/built-in.a
+  AR      drivers/gpu/drm/built-in.a
+  AR      drivers/gpu/built-in.a
+  CC      drivers/connector/cn_queue.o
+  AR      drivers/connector/built-in.a
+  CC      drivers/base/syscore.o
+  CC      drivers/base/devtmpfs.o
+  CC      drivers/base/power/main.o
+  CC      drivers/base/power/wakeup.o
+  CC      drivers/base/power/trace.o
+  AR      drivers/base/power/built-in.a
+  CC      drivers/base/firmware_loader/main.o
+  CC      drivers/base/firmware_loader/builtin/main.o
+  AR      drivers/base/firmware_loader/builtin/built-in.a
+  AR      drivers/base/firmware_loader/built-in.a
+  CC      drivers/base/node.o
+  AR      drivers/base/built-in.a
+  CC      drivers/block/loop.o
+  AR      drivers/block/built-in.a
+  CC      drivers/scsi/scsicam.o
+  CC      drivers/scsi/scsi_transport_spi.o
+  AR      drivers/scsi/built-in.a
+  CC      drivers/ata/libata-core.o
+  CC      drivers/ata/libata-scsi.o
+  CC      drivers/ata/ahci.o
+  CC      drivers/ata/libahci.o
+  AR      drivers/ata/built-in.a
+  CC      drivers/net/ethernet/intel/e1000/e1000_main.o
+  CC      drivers/net/ethernet/intel/e1000/e1000_hw.o
+  CC      drivers/net/ethernet/intel/e1000/e1000_ethtool.o
+  CC      drivers/net/ethernet/intel/e1000/e1000_param.o
+  AR      drivers/net/ethernet/intel/e1000/built-in.a
+  CC      drivers/net/ethernet/intel/e1000e/netdev.o
+  AR      drivers/net/ethernet/intel/e1000e/built-in.a
+  AR      drivers/net/ethernet/intel/built-in.a
+  AR      drivers/net/ethernet/built-in.a
+  AR      drivers/net/built-in.a
+  CC      drivers/usb/common/common.o
+  AR      drivers/usb/common/built-in.a
+  CC      drivers/usb/core/usb.o
+  CC      drivers/usb/core/hub.o
+  CC      drivers/usb/core/hcd.o
+  CC      drivers/usb/core/message.o
+  CC      drivers/usb/core/phy.o
+  AR      drivers/usb/core/built-in.a
+  CC      drivers/usb/host/ehci-hcd.o
+  CC      drivers/usb/host/ohci-hcd.o
+  AR      drivers/usb/host/built-in.a
+  AR      drivers/usb/built-in.a
+  CC      drivers/input/serio/i8042.o
+  AR      drivers/input/serio/built-in.a
+  CC      drivers/input/mouse/synaptics.o
+  CC      drivers/input/mouse/psmouse-smbus.o
+  AR      drivers/input/mouse/built-in.a
+  AR      drivers/input/built-in.a
+  CC      drivers/i2c/i2c-boardinfo.o
+  CC      drivers/i2c/i2c-core-base.o
+  CC      drivers/i2c/i2c-core-smbus.o
+  CC      drivers/i2c/i2c-core-acpi.o
+  CC      drivers/i2c/i2c-smbus.o
+  CC      drivers/i2c/algos/i2c-algo-bit.o
+  AR      drivers/i2c/algos/built-in.a
+  CC      drivers/i2c/busses/i2c-i801.o
+  AR      drivers/i2c/busses/built-in.a
+  AR      drivers/i2c/built-in.a
+  CC      drivers/thermal/thermal_core.o
+  AR      drivers/thermal/built-in.a
+  CC      drivers/md/md.o
+  CC      drivers/md/md-bitmap.o
+  CC      drivers/md/dm.o
+  CC      drivers/md/dm-table.o
+  CC      drivers/md/dm-target.o
+  CC      drivers/md/dm-ioctl.o
+  CC      drivers/md/dm-io.o
+  CC      drivers/md/dm-kcopyd.o
+  CC      drivers/md/dm-sysfs.o
+  CC      drivers/md/dm-stats.o
+  CC      drivers/md/dm-rq.o
+  CC      drivers/md/dm-builtin.o
+  CC      drivers/md/dm-raid1.o
+  AR      drivers/md/built-in.a
+  CC      drivers/cpufreq/cpufreq.o
+  AR      drivers/cpufreq/built-in.a
+  CC      drivers/cpuidle/cpuidle.o
+  AR      drivers/cpuidle/built-in.a
+  CC      drivers/firmware/sysfb.o
+  CC      drivers/firmware/efi/runtime-wrappers.o
+  CC      drivers/firmware/efi/sysfb_efi.o
+  AR      drivers/firmware/efi/built-in.a
+  CC      drivers/firmware/efi/libstub/efi-stub-helper.o
+  CC      drivers/firmware/efi/libstub/gop.o
+  CC      drivers/firmware/efi/libstub/secureboot.o
+  CC      drivers/firmware/efi/libstub/tpm.o
+  CC      drivers/firmware/efi/libstub/file.o
+  CC      drivers/firmware/efi/libstub/mem.o
+  CC      drivers/firmware/efi/libstub/random.o
+  CC      drivers/firmware/efi/libstub/randomalloc.o
+  CC      drivers/firmware/efi/libstub/pci.o
+  CC      drivers/firmware/efi/libstub/alignedmem.o
+  CC      drivers/firmware/efi/libstub/relocate.o
+  CC      drivers/firmware/efi/libstub/x86-stub.o
+  STUBCPY drivers/firmware/efi/libstub/alignedmem.stub.o
+  STUBCPY drivers/firmware/efi/libstub/efi-stub-helper.stub.o
+  STUBCPY drivers/firmware/efi/libstub/file.stub.o
+  STUBCPY drivers/firmware/efi/libstub/gop.stub.o
+  STUBCPY drivers/firmware/efi/libstub/mem.stub.o
+  STUBCPY drivers/firmware/efi/libstub/pci.stub.o
+  STUBCPY drivers/firmware/efi/libstub/random.stub.o
+  STUBCPY drivers/firmware/efi/libstub/randomalloc.stub.o
+  STUBCPY drivers/firmware/efi/libstub/relocate.stub.o
+  STUBCPY drivers/firmware/efi/libstub/secureboot.stub.o
+  STUBCPY drivers/firmware/efi/libstub/tpm.stub.o
+  STUBCPY drivers/firmware/efi/libstub/x86-stub.stub.o
+  AR      drivers/firmware/efi/libstub/lib.a
+  AR      drivers/firmware/built-in.a
+  CC      drivers/platform/x86/eeepc-laptop.o
+  AR      drivers/platform/x86/built-in.a
+  AR      drivers/platform/built-in.a
+  AR      drivers/built-in.a
+  CC      sound/pci/hda/hda_intel.o
+  AR      sound/pci/hda/built-in.a
+  AR      sound/pci/built-in.a
+  AR      sound/built-in.a
+  CC      net/core/datagram.o
+  AR      net/core/built-in.a
+  CC      net/ethtool/ioctl.o
+  AR      net/ethtool/built-in.a
+  CC      net/ipv4/ipconfig.o
+  AR      net/ipv4/built-in.a
+  CC      net/sunrpc/socklib.o
+  CC      net/sunrpc/xprtsock.o
+  CC      net/sunrpc/xdr.o
+  CC      net/sunrpc/cache.o
+  CC      net/sunrpc/rpc_pipe.o
+  CC      net/sunrpc/auth_gss/auth_gss.o
+  CC      net/sunrpc/auth_gss/svcauth_gss.o
+  AR      net/sunrpc/auth_gss/built-in.a
+  AR      net/sunrpc/built-in.a
+  CC      net/rxrpc/local_event.o
+  AR      net/rxrpc/built-in.a
+  CC      net/9p/trans_virtio.o
+  AR      net/9p/built-in.a
+  AR      net/built-in.a
+  CC      arch/x86/power/cpu.o
+  AR      arch/x86/power/built-in.a
+  CC      lib/buildid.o
+  CC      lib/vsprintf.o
+  AR      lib/lib.a
+  CC      lib/iov_iter.o
+  AR      lib/built-in.a
+  GEN     .version
+  CHK     include/generated/compile.h
+  UPD     include/generated/compile.h
+  CC      init/version.o
+  AR      init/built-in.a
+  LD      vmlinux.o
+  MODPOST vmlinux.symvers
+  MODINFO modules.builtin.modinfo
+  GEN     modules.builtin
+  LD      .tmp_vmlinux.kallsyms1
+  KSYMS   .tmp_vmlinux.kallsyms1.S
+  AS      .tmp_vmlinux.kallsyms1.S
+  LD      .tmp_vmlinux.kallsyms2
+  KSYMS   .tmp_vmlinux.kallsyms2.S
+  AS      .tmp_vmlinux.kallsyms2.S
+  LD      vmlinux
+  SYSMAP  System.map
+  SORTTAB vmlinux
+  VOFFSET arch/x86/boot/compressed/../voffset.h
+  CC      arch/x86/boot/compressed/misc.o
+  OBJCOPY arch/x86/boot/compressed/vmlinux.bin
+  RELOCS  arch/x86/boot/compressed/vmlinux.relocs
+  GZIP    arch/x86/boot/compressed/vmlinux.bin.gz
+  MKPIGGY arch/x86/boot/compressed/piggy.S
+  AS      arch/x86/boot/compressed/piggy.o
+  CC      arch/x86/boot/compressed/kaslr.o
+  CC      arch/x86/boot/compressed/pgtable_64.o
+  CC      arch/x86/boot/compressed/acpi.o
+  LD      arch/x86/boot/compressed/vmlinux
+  ZOFFSET arch/x86/boot/zoffset.h
+  AS      arch/x86/boot/header.o
+  CC      arch/x86/boot/version.o
+  LD      arch/x86/boot/setup.elf
+  OBJCOPY arch/x86/boot/setup.bin
+  OBJCOPY arch/x86/boot/vmlinux.bin
+  BUILD   arch/x86/boot/bzImage
+Kernel: arch/x86/boot/bzImage is ready  (#7)
+  MODPOST modules-only.symvers
+  GEN     Module.symvers
+  CC [M]  drivers/thermal/intel/x86_pkg_temp_thermal.mod.o
+  LD [M]  drivers/thermal/intel/x86_pkg_temp_thermal.ko
+  CC [M]  fs/efivarfs/efivarfs.mod.o
+  LD [M]  fs/efivarfs/efivarfs.ko
+  CC [M]  net/ipv4/netfilter/iptable_nat.mod.o
+  LD [M]  net/ipv4/netfilter/iptable_nat.ko
+  CC [M]  net/netfilter/nf_log_syslog.mod.o
+  LD [M]  net/netfilter/nf_log_syslog.ko
+  CC [M]  net/netfilter/xt_LOG.mod.o
+  LD [M]  net/netfilter/xt_LOG.ko
+  CC [M]  net/netfilter/xt_MASQUERADE.mod.o
+  LD [M]  net/netfilter/xt_MASQUERADE.ko
+  CC [M]  net/netfilter/xt_addrtype.mod.o
+  LD [M]  net/netfilter/xt_addrtype.ko
+  CC [M]  net/netfilter/xt_mark.mod.o
+  LD [M]  net/netfilter/xt_mark.ko
+  CC [M]  net/netfilter/xt_nat.mod.o
+  LD [M]  net/netfilter/xt_nat.ko
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis/build_sec'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis'
+[OK]   Security kernel build complete: /home/vmuser/src/linux-pks-thesis/build_sec/arch/x86/boot/bzImage
+[1;36m==>[0m [1m[2/4] Compiling Mitigated Performance Kernel (build_perf)...[0m
+
+================================================================
+  Building Mitigated Performance Kernel (build_perf, dev)
+================================================================
+  Kernel Tree:     /home/vmuser/src/linux-pks-thesis
+  Output Dir:      /home/vmuser/src/linux-pks-thesis/build_perf
+  Build Jobs:      1
+==> Configuring baseline defconfig + kvm_guest
+==> Enabling storage and virtio drivers
+==> Enabling exploit prerequisite subsystems
+==> Enabling crypto primitives
+==> Enabling RxRPC fallback cipher paths
+==> Configuring PKS page-cache protection
+==> Disabling debug overhead for performance measurement
+==> Finalizing configuration and compiling bzImage
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis/build_perf'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  UPD     include/config/kernel.release
+  UPD     include/generated/utsrelease.h
+  CC      arch/x86/kernel/asm-offsets.s
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CC      init/main.o
+  CHK     include/generated/compile.h
+  CC      init/version.o
+  CC      init/do_mounts.o
+  AR      init/built-in.a
+  CC      arch/x86/entry/vdso/vma.o
+  AR      arch/x86/entry/vdso/built-in.a
+  AR      arch/x86/entry/built-in.a
+  CC      arch/x86/kernel/ldt.o
+  CC      arch/x86/kernel/setup.o
+  CC      arch/x86/kernel/espfix_64.o
+  CC      arch/x86/kernel/e820.o
+  CC      arch/x86/kernel/fpu/signal.o
+  AR      arch/x86/kernel/fpu/built-in.a
+  CC      arch/x86/kernel/cpu/umwait.o
+  AR      arch/x86/kernel/cpu/built-in.a
+  CC      arch/x86/kernel/reboot.o
+  CC      arch/x86/kernel/machine_kexec_64.o
+  CC      arch/x86/kernel/kvm.o
+  CC      arch/x86/kernel/paravirt.o
+  AR      arch/x86/kernel/built-in.a
+  CC      arch/x86/mm/init.o
+  CC      arch/x86/mm/init_64.o
+  CC      arch/x86/mm/fault.o
+  CC      arch/x86/mm/ioremap.o
+  CC      arch/x86/mm/pgtable.o
+  CC      arch/x86/mm/pat/set_memory.o
+  AR      arch/x86/mm/pat/built-in.a
+  CC      arch/x86/mm/hugetlbpage.o
+  AR      arch/x86/mm/built-in.a
+  CC      arch/x86/platform/efi/quirks.o
+  CC      arch/x86/platform/efi/efi.o
+  CC      arch/x86/platform/efi/efi_64.o
+  AR      arch/x86/platform/efi/built-in.a
+  AR      arch/x86/platform/built-in.a
+  AR      arch/x86/built-in.a
+  CC      kernel/fork.o
+  CC      kernel/cpu.o
+  CC      kernel/exit.o
+  CC      kernel/softirq.o
+  CC      kernel/sysctl.o
+  CC      kernel/ptrace.o
+  CC      kernel/sys.o
+  CC      kernel/umh.o
+  CC      kernel/workqueue.o
+  CC      kernel/reboot.o
+  CC      kernel/kmod.o
+  CC      kernel/sched/core.o
+  CC      kernel/sched/fair.o
+  CC      kernel/sched/build_policy.o
+  CC      kernel/sched/build_utility.o
+  AR      kernel/sched/built-in.a
+  CC      kernel/power/main.o
+  CC      kernel/power/console.o
+  CC      kernel/power/process.o
+  CC      kernel/power/suspend.o
+  AR      kernel/power/built-in.a
+  CC      kernel/irq/pm.o
+  AR      kernel/irq/built-in.a
+  CC      kernel/rcu/tree.o
+  AR      kernel/rcu/built-in.a
+  CC      kernel/freezer.o
+  CC      kernel/time/timer.o
+  CC      kernel/time/timekeeping_debug.o
+  AR      kernel/time/built-in.a
+  CC      kernel/futex/core.o
+  AR      kernel/futex/built-in.a
+  CC      kernel/module.o
+  CC      kernel/kexec_core.o
+  CC      kernel/compat.o
+  CC      kernel/cgroup/cgroup.o
+  CC      kernel/cgroup/cpuset.o
+  AR      kernel/cgroup/built-in.a
+  CC      kernel/trace/trace.o
+  CC      kernel/trace/blktrace.o
+  AR      kernel/trace/built-in.a
+  CC      kernel/events/core.o
+  CC      kernel/events/uprobes.o
+  AR      kernel/events/built-in.a
+  AR      kernel/built-in.a
+  CC      mm/filemap.o
+  CC      mm/oom_kill.o
+  CC      mm/fadvise.o
+  CC      mm/page-writeback.o
+  CC      mm/folio-compat.o
+  CC      mm/readahead.o
+  CC      mm/swap.o
+  CC      mm/truncate.o
+  CC      mm/vmscan.o
+  CC      mm/shmem.o
+  CC      mm/util.o
+  CC      mm/vmstat.o
+  CC      mm/backing-dev.o
+  CC      mm/mm_init.o
+  CC      mm/percpu.o
+  CC      mm/slab_common.o
+  CC      mm/compaction.o
+  CC      mm/interval_tree.o
+  CC      mm/list_lru.o
+  CC      mm/workingset.o
+  CC      mm/debug.o
+  CC      mm/gup.o
+  CC      mm/highmem.o
+  CC      mm/memory.o
+  CC      mm/mincore.o
+  CC      mm/mlock.o
+  CC      mm/mmap.o
+  CC      mm/mmu_gather.o
+  CC      mm/mprotect.o
+  CC      mm/mremap.o
+  CC      mm/page_vma_mapped.o
+  CC      mm/pagewalk.o
+  CC      mm/pgtable-generic.o
+  CC      mm/rmap.o
+  CC      mm/vmalloc.o
+  CC      mm/page_alloc.o
+  CC      mm/memblock.o
+  CC      mm/madvise.o
+  CC      mm/page_io.o
+  CC      mm/swap_state.o
+  CC      mm/swapfile.o
+  CC      mm/swap_slots.o
+  CC      mm/hugetlb.o
+  CC      mm/hugetlb_vmemmap.o
+  CC      mm/mempolicy.o
+  CC      mm/sparse.o
+  CC      mm/sparse-vmemmap.o
+  CC      mm/slub.o
+  CC      mm/migrate.o
+  CC      mm/hugetlb_cgroup.o
+  CC      mm/early_ioremap.o
+  CC      mm/secretmem.o
+  CC      mm/memfd.o
+  CC      mm/pcache_pks.o
+  AR      mm/built-in.a
+  CC      fs/open.o
+  CC      fs/read_write.o
+  CC      fs/file_table.o
+  CC      fs/stat.o
+  CC      fs/exec.o
+  CC      fs/pipe.o
+  CC      fs/namei.o
+  CC      fs/ioctl.o
+  CC      fs/inode.o
+  CC      fs/attr.o
+  CC      fs/namespace.o
+  CC      fs/libfs.o
+  CC      fs/fs-writeback.o
+  CC      fs/splice.o
+  CC      fs/sync.o
+  CC      fs/remap_range.o
+  CC      fs/buffer.o
+  CC      fs/direct-io.o
+  CC      fs/mpage.o
+  CC      fs/aio.o
+  CC      fs/io_uring.o
+  CC      fs/binfmt_misc.o
+  CC      fs/binfmt_elf.o
+  CC      fs/compat_binfmt_elf.o
+  CC      fs/coredump.o
+  CC      fs/drop_caches.o
+  CC      fs/iomap/buffered-io.o
+  CC      fs/iomap/direct-io.o
+  CC      fs/iomap/fiemap.o
+  CC      fs/iomap/seek.o
+  CC      fs/iomap/swapfile.o
+  AR      fs/iomap/built-in.a
+  CC      fs/proc/task_mmu.o
+  CC      fs/proc/base.o
+  CC      fs/proc/array.o
+  CC      fs/proc/meminfo.o
+  CC      fs/proc/vmcore.o
+  CC      fs/proc/page.o
+  AR      fs/proc/built-in.a
+  CC      fs/kernfs/mount.o
+  CC      fs/kernfs/inode.o
+  CC      fs/kernfs/file.o
+  AR      fs/kernfs/built-in.a
+  CC      fs/netfs/buffered_read.o
+  CC      fs/netfs/io.o
+  CC      fs/netfs/main.o
+  CC      fs/netfs/objects.o
+  AR      fs/netfs/built-in.a
+  CC      fs/ext4/balloc.o
+  CC      fs/ext4/bitmap.o
+  CC      fs/ext4/block_validity.o
+  CC      fs/ext4/dir.o
+  CC      fs/ext4/ext4_jbd2.o
+  CC      fs/ext4/extents.o
+  CC      fs/ext4/extents_status.o
+  CC      fs/ext4/file.o
+  CC      fs/ext4/fsmap.o
+  CC      fs/ext4/fsync.o
+  CC      fs/ext4/hash.o
+  CC      fs/ext4/ialloc.o
+  CC      fs/ext4/indirect.o
+  CC      fs/ext4/inline.o
+  CC      fs/ext4/inode.o
+  CC      fs/ext4/ioctl.o
+  CC      fs/ext4/mballoc.o
+  CC      fs/ext4/migrate.o
+  CC      fs/ext4/mmp.o
+  CC      fs/ext4/move_extent.o
+  CC      fs/ext4/namei.o
+  CC      fs/ext4/page-io.o
+  CC      fs/ext4/readpage.o
+  CC      fs/ext4/resize.o
+  CC      fs/ext4/super.o
+  CC      fs/ext4/symlink.o
+  CC      fs/ext4/sysfs.o
+  CC      fs/ext4/xattr.o
+  CC      fs/ext4/xattr_hurd.o
+  CC      fs/ext4/xattr_trusted.o
+  CC      fs/ext4/xattr_user.o
+  CC      fs/ext4/fast_commit.o
+  CC      fs/ext4/orphan.o
+  CC      fs/ext4/acl.o
+  CC      fs/ext4/xattr_security.o
+  AR      fs/ext4/built-in.a
+  CC      fs/jbd2/transaction.o
+  CC      fs/jbd2/commit.o
+  CC      fs/jbd2/recovery.o
+  CC      fs/jbd2/checkpoint.o
+  CC      fs/jbd2/revoke.o
+  CC      fs/jbd2/journal.o
+  AR      fs/jbd2/built-in.a
+  CC      fs/ramfs/inode.o
+  AR      fs/ramfs/built-in.a
+  CC      fs/hugetlbfs/inode.o
+  AR      fs/hugetlbfs/built-in.a
+  CC      fs/fat/cache.o
+  CC      fs/fat/dir.o
+  CC      fs/fat/fatent.o
+  CC      fs/fat/file.o
+  CC      fs/fat/inode.o
+  CC      fs/fat/misc.o
+  CC      fs/fat/nfs.o
+  CC      fs/fat/namei_vfat.o
+  CC      fs/fat/namei_msdos.o
+  AR      fs/fat/built-in.a
+  CC      fs/isofs/namei.o
+  CC      fs/isofs/inode.o
+  CC      fs/isofs/dir.o
+  CC      fs/isofs/util.o
+  CC      fs/isofs/rock.o
+  CC      fs/isofs/export.o
+  CC      fs/isofs/joliet.o
+  CC      fs/isofs/compress.o
+  AR      fs/isofs/built-in.a
+  CC      fs/nfs/client.o
+  CC      fs/nfs/dir.o
+  CC      fs/nfs/file.o
+  CC      fs/nfs/getroot.o
+  CC      fs/nfs/inode.o
+  CC      fs/nfs/super.o
+  CC      fs/nfs/io.o
+  CC      fs/nfs/direct.o
+  CC      fs/nfs/pagelist.o
+  CC      fs/nfs/read.o
+  CC      fs/nfs/symlink.o
+  CC      fs/nfs/unlink.o
+  CC      fs/nfs/write.o
+  CC      fs/nfs/namespace.o
+  CC      fs/nfs/mount_clnt.o
+  CC      fs/nfs/nfstrace.o
+  CC      fs/nfs/export.o
+  CC      fs/nfs/sysfs.o
+  CC      fs/nfs/fs_context.o
+  CC      fs/nfs/nfsroot.o
+  CC      fs/nfs/sysctl.o
+  CC      fs/nfs/nfs2super.o
+  CC      fs/nfs/proc.o
+  CC      fs/nfs/nfs2xdr.o
+  CC      fs/nfs/nfs3super.o
+  CC      fs/nfs/nfs3client.o
+  CC      fs/nfs/nfs3proc.o
+  CC      fs/nfs/nfs3xdr.o
+  CC      fs/nfs/nfs3acl.o
+  CC      fs/nfs/nfs4proc.o
+  CC      fs/nfs/nfs4xdr.o
+  CC      fs/nfs/nfs4state.o
+  CC      fs/nfs/nfs4renewd.o
+  CC      fs/nfs/nfs4super.o
+  CC      fs/nfs/nfs4file.o
+  CC      fs/nfs/delegation.o
+  CC      fs/nfs/nfs4idmap.o
+  CC      fs/nfs/callback.o
+  CC      fs/nfs/callback_xdr.o
+  CC      fs/nfs/callback_proc.o
+  CC      fs/nfs/nfs4namespace.o
+  CC      fs/nfs/nfs4getroot.o
+  CC      fs/nfs/nfs4client.o
+  CC      fs/nfs/nfs4session.o
+  CC      fs/nfs/nfs4trace.o
+  CC      fs/nfs/nfs4sysctl.o
+  AR      fs/nfs/built-in.a
+  CC      fs/lockd/clntlock.o
+  CC      fs/lockd/clntproc.o
+  AR      fs/lockd/built-in.a
+  CC      fs/autofs/inode.o
+  AR      fs/autofs/built-in.a
+  CC      fs/9p/vfs_super.o
+  CC      fs/9p/vfs_inode.o
+  CC      fs/9p/vfs_inode_dotl.o
+  CC      fs/9p/vfs_addr.o
+  CC      fs/9p/vfs_file.o
+  CC      fs/9p/vfs_dir.o
+  CC      fs/9p/vfs_dentry.o
+  CC      fs/9p/v9fs.o
+  CC      fs/9p/fid.o
+  AR      fs/9p/built-in.a
+  CC      fs/debugfs/inode.o
+  CC      fs/debugfs/file.o
+  AR      fs/debugfs/built-in.a
+  AR      fs/built-in.a
+  CC [M]  fs/efivarfs/super.o
+  LD [M]  fs/efivarfs/efivarfs.o
+  CC      ipc/shm.o
+  CC      ipc/mqueue.o
+  AR      ipc/built-in.a
+  CC      security/commoncap.o
+  CC      security/selinux/hooks.o
+  CC      security/selinux/selinuxfs.o
+  AR      security/selinux/built-in.a
+  AR      security/built-in.a
+  CC      block/bdev.o
+  CC      block/fops.o
+  CC      block/bio.o
+  CC      block/elevator.o
+  CC      block/blk-core.o
+  CC      block/blk-settings.o
+  CC      block/blk-merge.o
+  CC      block/blk-mq.o
+  CC      block/blk-mq-sched.o
+  CC      block/partitions/core.o
+  CC      block/partitions/msdos.o
+  CC      block/partitions/efi.o
+  AR      block/partitions/built-in.a
+  CC      block/blk-iolatency.o
+  CC      block/mq-deadline.o
+  CC      block/kyber-iosched.o
+  AR      block/built-in.a
+  CC      drivers/pci/pci-driver.o
+  CC      drivers/pci/quirks.o
+  CC      drivers/pci/hotplug/pci_hotplug_core.o
+  AR      drivers/pci/hotplug/built-in.a
+  AR      drivers/pci/built-in.a
+  CC      drivers/video/backlight/backlight.o
+  AR      drivers/video/backlight/built-in.a
+  CC      drivers/video/fbdev/core/fb_cmdline.o
+  AR      drivers/video/fbdev/core/built-in.a
+  AR      drivers/video/fbdev/built-in.a
+  AR      drivers/video/built-in.a
+  CC      drivers/acpi/sleep.o
+  CC      drivers/acpi/device_pm.o
+  CC      drivers/acpi/proc.o
+  CC      drivers/acpi/bus.o
+  CC      drivers/acpi/ec.o
+  CC      drivers/acpi/acpi_lpss.o
+  CC      drivers/acpi/x86/s2idle.o
+  CC      drivers/acpi/prmt.o
+  CC      drivers/acpi/acpi_video.o
+  CC      drivers/acpi/video_detect.o
+  CC      drivers/acpi/battery.o
+  AR      drivers/acpi/built-in.a
+  CC      drivers/tty/sysrq.o
+  CC      drivers/tty/vt/vt_ioctl.o
+  AR      drivers/tty/vt/built-in.a
+  AR      drivers/tty/built-in.a
+  CC      drivers/char/mem.o
+  CC      drivers/char/virtio_console.o
+  CC      drivers/char/nvram.o
+  CC      drivers/char/agp/backend.o
+  CC      drivers/char/agp/generic.o
+  CC      drivers/char/agp/intel-agp.o
+  CC      drivers/char/agp/intel-gtt.o
+  AR      drivers/char/agp/built-in.a
+  AR      drivers/char/built-in.a
+  CC      drivers/iommu/amd/iommu.o
+  AR      drivers/iommu/amd/built-in.a
+  AR      drivers/iommu/built-in.a
+  CC      drivers/gpu/drm/drm_gem_shmem_helper.o
+  CC      drivers/gpu/drm/drm_bridge_connector.o
+  CC      drivers/gpu/drm/drm_crtc_helper.o
+  CC      drivers/gpu/drm/drm_dsc.o
+  CC      drivers/gpu/drm/drm_encoder_slave.o
+  CC      drivers/gpu/drm/drm_probe_helper.o
+  CC      drivers/gpu/drm/drm_plane_helper.o
+  CC      drivers/gpu/drm/drm_atomic_helper.o
+  CC      drivers/gpu/drm/drm_kms_helper_common.o
+  CC      drivers/gpu/drm/drm_simple_kms_helper.o
+  CC      drivers/gpu/drm/drm_modeset_helper.o
+  CC      drivers/gpu/drm/drm_scdc_helper.o
+  CC      drivers/gpu/drm/drm_gem_atomic_helper.o
+  CC      drivers/gpu/drm/drm_gem_framebuffer_helper.o
+  CC      drivers/gpu/drm/drm_atomic_state_helper.o
+  CC      drivers/gpu/drm/drm_damage_helper.o
+  CC      drivers/gpu/drm/drm_self_refresh_helper.o
+  CC      drivers/gpu/drm/bridge/panel.o
+  CC      drivers/gpu/drm/drm_aperture.o
+  CC      drivers/gpu/drm/drm_file.o
+  CC      drivers/gpu/drm/drm_gem.o
+  CC      drivers/gpu/drm/drm_ioctl.o
+  CC      drivers/gpu/drm/drm_drv.o
+  CC      drivers/gpu/drm/drm_sysfs.o
+  CC      drivers/gpu/drm/drm_crtc.o
+  CC      drivers/gpu/drm/drm_modes.o
+  CC      drivers/gpu/drm/drm_edid.o
+  CC      drivers/gpu/drm/drm_modeset_lock.o
+  CC      drivers/gpu/drm/drm_atomic.o
+  CC      drivers/gpu/drm/drm_bridge.o
+  CC      drivers/gpu/drm/drm_framebuffer.o
+  CC      drivers/gpu/drm/drm_connector.o
+  CC      drivers/gpu/drm/drm_blend.o
+  CC      drivers/gpu/drm/drm_encoder.o
+  CC      drivers/gpu/drm/drm_mode_object.o
+  CC      drivers/gpu/drm/drm_property.o
+  CC      drivers/gpu/drm/drm_plane.o
+  CC      drivers/gpu/drm/drm_color_mgmt.o
+  CC      drivers/gpu/drm/drm_mode_config.o
+  CC      drivers/gpu/drm/drm_vblank.o
+  CC      drivers/gpu/drm/drm_lease.o
+  CC      drivers/gpu/drm/drm_writeback.o
+  CC      drivers/gpu/drm/drm_client.o
+  CC      drivers/gpu/drm/drm_client_modeset.o
+  CC      drivers/gpu/drm/drm_atomic_uapi.o
+  CC      drivers/gpu/drm/drm_vblank_work.o
+  CC      drivers/gpu/drm/drm_panel.o
+  CC      drivers/gpu/drm/drm_debugfs.o
+  CC      drivers/gpu/drm/drm_debugfs_crc.o
+  CC      drivers/gpu/drm/drm_mipi_dsi.o
+  CC      drivers/gpu/drm/dp/drm_dp.o
+  CC      drivers/gpu/drm/dp/drm_dp_dual_mode_helper.o
+  CC      drivers/gpu/drm/dp/drm_dp_mst_topology.o
+  AR      drivers/gpu/drm/dp/built-in.a
+  CC      drivers/gpu/drm/ttm/ttm_tt.o
+  CC      drivers/gpu/drm/ttm/ttm_bo.o
+  CC      drivers/gpu/drm/ttm/ttm_bo_util.o
+  CC      drivers/gpu/drm/ttm/ttm_bo_vm.o
+  CC      drivers/gpu/drm/ttm/ttm_execbuf_util.o
+  CC      drivers/gpu/drm/ttm/ttm_resource.o
+  CC      drivers/gpu/drm/ttm/ttm_pool.o
+  CC      drivers/gpu/drm/ttm/ttm_device.o
+  CC      drivers/gpu/drm/ttm/ttm_agp_backend.o
+  AR      drivers/gpu/drm/ttm/built-in.a
+  CC      drivers/gpu/drm/i915/i915_driver.o
+  CC      drivers/gpu/drm/i915/i915_config.o
+  CC      drivers/gpu/drm/i915/i915_getparam.o
+  CC      drivers/gpu/drm/i915/i915_ioctl.o
+  CC      drivers/gpu/drm/i915/i915_irq.o
+  CC      drivers/gpu/drm/i915/i915_mitigations.o
+  CC      drivers/gpu/drm/i915/i915_module.o
+  CC      drivers/gpu/drm/i915/i915_params.o
+  CC      drivers/gpu/drm/i915/i915_pci.o
+  CC      drivers/gpu/drm/i915/i915_suspend.o
+  CC      drivers/gpu/drm/i915/i915_switcheroo.o
+  CC      drivers/gpu/drm/i915/i915_sysfs.o
+  CC      drivers/gpu/drm/i915/i915_utils.o
+  CC      drivers/gpu/drm/i915/intel_device_info.o
+  CC      drivers/gpu/drm/i915/intel_dram.o
+  CC      drivers/gpu/drm/i915/intel_memory_region.o
+  CC      drivers/gpu/drm/i915/intel_pch.o
+  CC      drivers/gpu/drm/i915/intel_pcode.o
+  CC      drivers/gpu/drm/i915/intel_pm.o
+  CC      drivers/gpu/drm/i915/intel_region_ttm.o
+  CC      drivers/gpu/drm/i915/intel_runtime_pm.o
+  CC      drivers/gpu/drm/i915/intel_sbi.o
+  CC      drivers/gpu/drm/i915/intel_step.o
+  CC      drivers/gpu/drm/i915/intel_uncore.o
+  CC      drivers/gpu/drm/i915/vlv_sideband.o
+  CC      drivers/gpu/drm/i915/vlv_suspend.o
+  CC      drivers/gpu/drm/i915/i915_mm.o
+  CC      drivers/gpu/drm/i915/i915_ioc32.o
+  CC      drivers/gpu/drm/i915/i915_debugfs.o
+  CC      drivers/gpu/drm/i915/i915_debugfs_params.o
+  CC      drivers/gpu/drm/i915/display/intel_display_debugfs.o
+  CC      drivers/gpu/drm/i915/display/intel_pipe_crc.o
+  CC      drivers/gpu/drm/i915/i915_pmu.o
+  CC      drivers/gpu/drm/i915/gt/gen2_engine_cs.o
+  CC      drivers/gpu/drm/i915/gt/gen6_ppgtt.o
+  CC      drivers/gpu/drm/i915/gt/gen7_renderclear.o
+  CC      drivers/gpu/drm/i915/gt/gen8_engine_cs.o
+  CC      drivers/gpu/drm/i915/gt/gen8_ppgtt.o
+  CC      drivers/gpu/drm/i915/gt/intel_breadcrumbs.o
+  CC      drivers/gpu/drm/i915/gt/intel_context.o
+  CC      drivers/gpu/drm/i915/gt/intel_context_sseu.o
+  CC      drivers/gpu/drm/i915/gt/intel_engine_cs.o
+  CC      drivers/gpu/drm/i915/gt/intel_engine_heartbeat.o
+  CC      drivers/gpu/drm/i915/gt/intel_engine_pm.o
+  CC      drivers/gpu/drm/i915/gt/intel_engine_user.o
+  CC      drivers/gpu/drm/i915/gt/intel_execlists_submission.o
+  CC      drivers/gpu/drm/i915/gt/intel_ggtt.o
+  CC      drivers/gpu/drm/i915/gt/intel_ggtt_fencing.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_buffer_pool.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_clock_utils.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_debugfs.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_engines_debugfs.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_irq.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_pm.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_pm_debugfs.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_pm_irq.o
+  CC      drivers/gpu/drm/i915/gt/intel_gt_requests.o
+  CC      drivers/gpu/drm/i915/gt/intel_gtt.o
+  CC      drivers/gpu/drm/i915/gt/intel_llc.o
+  CC      drivers/gpu/drm/i915/gt/intel_lrc.o
+  CC      drivers/gpu/drm/i915/gt/intel_migrate.o
+  CC      drivers/gpu/drm/i915/gt/intel_mocs.o
+  CC      drivers/gpu/drm/i915/gt/intel_ppgtt.o
+  CC      drivers/gpu/drm/i915/gt/intel_rc6.o
+  CC      drivers/gpu/drm/i915/gt/intel_region_lmem.o
+  CC      drivers/gpu/drm/i915/gt/intel_renderstate.o
+  CC      drivers/gpu/drm/i915/gt/intel_reset.o
+  CC      drivers/gpu/drm/i915/gt/intel_ring.o
+  CC      drivers/gpu/drm/i915/gt/intel_ring_submission.o
+  CC      drivers/gpu/drm/i915/gt/intel_rps.o
+  CC      drivers/gpu/drm/i915/gt/intel_sseu.o
+  CC      drivers/gpu/drm/i915/gt/intel_sseu_debugfs.o
+  CC      drivers/gpu/drm/i915/gt/intel_timeline.o
+  CC      drivers/gpu/drm/i915/gt/intel_workarounds.o
+  CC      drivers/gpu/drm/i915/gt/shmem_utils.o
+  CC      drivers/gpu/drm/i915/gt/sysfs_engines.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_clflush.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_context.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_create.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_dmabuf.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_domain.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_execbuffer.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_internal.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_object.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_lmem.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_mman.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_pages.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_phys.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_pm.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_region.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_shmem.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_shrinker.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_stolen.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_throttle.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_tiling.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_ttm.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_ttm_move.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_ttm_pm.o
+  CC      drivers/gpu/drm/i915/gem/i915_gem_userptr.o
+  CC      drivers/gpu/drm/i915/gem/i915_gemfs.o
+  CC      drivers/gpu/drm/i915/i915_active.o
+  CC      drivers/gpu/drm/i915/i915_cmd_parser.o
+  CC      drivers/gpu/drm/i915/i915_gem_evict.o
+  CC      drivers/gpu/drm/i915/i915_gem_gtt.o
+  CC      drivers/gpu/drm/i915/i915_gem.o
+  CC      drivers/gpu/drm/i915/i915_query.o
+  CC      drivers/gpu/drm/i915/i915_request.o
+  CC      drivers/gpu/drm/i915/i915_scheduler.o
+  CC      drivers/gpu/drm/i915/i915_trace_points.o
+  CC      drivers/gpu/drm/i915/i915_ttm_buddy_manager.o
+  CC      drivers/gpu/drm/i915/i915_vma.o
+  CC      drivers/gpu/drm/i915/i915_vma_resource.o
+  CC      drivers/gpu/drm/i915/intel_wopcm.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_uc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_uc_fw.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_ads.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_ct.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_fw.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_log.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_rc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_slpc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_guc_submission.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_huc.o
+  CC      drivers/gpu/drm/i915/gt/uc/intel_huc_fw.o
+  CC      drivers/gpu/drm/i915/display/hsw_ips.o
+  CC      drivers/gpu/drm/i915/display/intel_atomic.o
+  CC      drivers/gpu/drm/i915/display/intel_atomic_plane.o
+  CC      drivers/gpu/drm/i915/display/intel_audio.o
+  CC      drivers/gpu/drm/i915/display/intel_bios.o
+  CC      drivers/gpu/drm/i915/display/intel_bw.o
+  CC      drivers/gpu/drm/i915/display/intel_cdclk.o
+  CC      drivers/gpu/drm/i915/display/intel_color.o
+  CC      drivers/gpu/drm/i915/display/intel_combo_phy.o
+  CC      drivers/gpu/drm/i915/display/intel_connector.o
+  CC      drivers/gpu/drm/i915/display/intel_crtc.o
+  CC      drivers/gpu/drm/i915/display/intel_cursor.o
+  CC      drivers/gpu/drm/i915/display/intel_display.o
+  CC      drivers/gpu/drm/i915/display/intel_display_power.o
+  CC      drivers/gpu/drm/i915/display/intel_dmc.o
+  CC      drivers/gpu/drm/i915/display/intel_dpio_phy.o
+  CC      drivers/gpu/drm/i915/display/intel_dpll.o
+  CC      drivers/gpu/drm/i915/display/intel_dpll_mgr.o
+  CC      drivers/gpu/drm/i915/display/intel_dpt.o
+  CC      drivers/gpu/drm/i915/display/intel_drrs.o
+  CC      drivers/gpu/drm/i915/display/intel_dsb.o
+  CC      drivers/gpu/drm/i915/display/intel_fb.o
+  CC      drivers/gpu/drm/i915/display/intel_fb_pin.o
+  CC      drivers/gpu/drm/i915/display/intel_fbc.o
+  CC      drivers/gpu/drm/i915/display/intel_fdi.o
+  CC      drivers/gpu/drm/i915/display/intel_fifo_underrun.o
+  CC      drivers/gpu/drm/i915/display/intel_frontbuffer.o
+  CC      drivers/gpu/drm/i915/display/intel_global_state.o
+  CC      drivers/gpu/drm/i915/display/intel_hdcp.o
+  CC      drivers/gpu/drm/i915/display/intel_hotplug.o
+  CC      drivers/gpu/drm/i915/display/intel_lpe_audio.o
+  CC      drivers/gpu/drm/i915/display/intel_overlay.o
+  CC      drivers/gpu/drm/i915/display/intel_pch_display.o
+  CC      drivers/gpu/drm/i915/display/intel_pch_refclk.o
+  CC      drivers/gpu/drm/i915/display/intel_plane_initial.o
+  CC      drivers/gpu/drm/i915/display/intel_psr.o
+  CC      drivers/gpu/drm/i915/display/intel_quirks.o
+  CC      drivers/gpu/drm/i915/display/intel_sprite.o
+  CC      drivers/gpu/drm/i915/display/intel_tc.o
+  CC      drivers/gpu/drm/i915/display/intel_vga.o
+  CC      drivers/gpu/drm/i915/display/i9xx_plane.o
+  CC      drivers/gpu/drm/i915/display/skl_scaler.o
+  CC      drivers/gpu/drm/i915/display/skl_universal_plane.o
+  CC      drivers/gpu/drm/i915/display/intel_acpi.o
+  CC      drivers/gpu/drm/i915/display/intel_opregion.o
+  CC      drivers/gpu/drm/i915/display/dvo_ch7017.o
+  CC      drivers/gpu/drm/i915/display/dvo_ch7xxx.o
+  CC      drivers/gpu/drm/i915/display/dvo_ivch.o
+  CC      drivers/gpu/drm/i915/display/dvo_ns2501.o
+  CC      drivers/gpu/drm/i915/display/dvo_sil164.o
+  CC      drivers/gpu/drm/i915/display/dvo_tfp410.o
+  CC      drivers/gpu/drm/i915/display/g4x_dp.o
+  CC      drivers/gpu/drm/i915/display/g4x_hdmi.o
+  CC      drivers/gpu/drm/i915/display/icl_dsi.o
+  CC      drivers/gpu/drm/i915/display/intel_backlight.o
+  CC      drivers/gpu/drm/i915/display/intel_crt.o
+  CC      drivers/gpu/drm/i915/display/intel_ddi.o
+  CC      drivers/gpu/drm/i915/display/intel_ddi_buf_trans.o
+  CC      drivers/gpu/drm/i915/display/intel_display_trace.o
+  CC      drivers/gpu/drm/i915/display/intel_dp.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_aux.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_aux_backlight.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_hdcp.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_link_training.o
+  CC      drivers/gpu/drm/i915/display/intel_dp_mst.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi_dcs_backlight.o
+  CC      drivers/gpu/drm/i915/display/intel_dsi_vbt.o
+  CC      drivers/gpu/drm/i915/display/intel_dvo.o
+  CC      drivers/gpu/drm/i915/display/intel_gmbus.o
+  CC      drivers/gpu/drm/i915/display/intel_hdmi.o
+  CC      drivers/gpu/drm/i915/display/intel_lspcon.o
+  CC      drivers/gpu/drm/i915/display/intel_lvds.o
+  CC      drivers/gpu/drm/i915/display/intel_panel.o
+  CC      drivers/gpu/drm/i915/display/intel_pps.o
+  CC      drivers/gpu/drm/i915/display/intel_qp_tables.o
+  CC      drivers/gpu/drm/i915/display/intel_sdvo.o
+  CC      drivers/gpu/drm/i915/display/intel_snps_phy.o
+  CC      drivers/gpu/drm/i915/display/intel_tv.o
+  CC      drivers/gpu/drm/i915/display/intel_vdsc.o
+  CC      drivers/gpu/drm/i915/display/intel_vrr.o
+  CC      drivers/gpu/drm/i915/display/vlv_dsi.o
+  CC      drivers/gpu/drm/i915/display/vlv_dsi_pll.o
+  CC      drivers/gpu/drm/i915/i915_perf.o
+  CC      drivers/gpu/drm/i915/i915_gpu_error.o
+  CC      drivers/gpu/drm/i915/i915_vgpu.o
+  AR      drivers/gpu/drm/i915/built-in.a
+  CC      drivers/gpu/drm/virtio/virtgpu_drv.o
+  CC      drivers/gpu/drm/virtio/virtgpu_kms.o
+  CC      drivers/gpu/drm/virtio/virtgpu_gem.o
+  CC      drivers/gpu/drm/virtio/virtgpu_vram.o
+  CC      drivers/gpu/drm/virtio/virtgpu_display.o
+  CC      drivers/gpu/drm/virtio/virtgpu_vq.o
+  CC      drivers/gpu/drm/virtio/virtgpu_fence.o
+  CC      drivers/gpu/drm/virtio/virtgpu_object.o
+  CC      drivers/gpu/drm/virtio/virtgpu_debugfs.o
+  CC      drivers/gpu/drm/virtio/virtgpu_plane.o
+  CC      drivers/gpu/drm/virtio/virtgpu_ioctl.o
+  CC      drivers/gpu/drm/virtio/virtgpu_prime.o
+  CC      drivers/gpu/drm/virtio/virtgpu_trace_points.o
+  AR      drivers/gpu/drm/virtio/built-in.a
+  AR      drivers/gpu/drm/built-in.a
+  AR      drivers/gpu/built-in.a
+  CC      drivers/connector/cn_queue.o
+  AR      drivers/connector/built-in.a
+  CC      drivers/base/syscore.o
+  CC      drivers/base/devtmpfs.o
+  CC      drivers/base/power/main.o
+  CC      drivers/base/power/wakeup.o
+  CC      drivers/base/power/trace.o
+  AR      drivers/base/power/built-in.a
+  CC      drivers/base/firmware_loader/main.o
+  CC      drivers/base/firmware_loader/builtin/main.o
+  AR      drivers/base/firmware_loader/builtin/built-in.a
+  AR      drivers/base/firmware_loader/built-in.a
+  CC      drivers/base/node.o
+  AR      drivers/base/built-in.a
+  CC      drivers/block/loop.o
+  AR      drivers/block/built-in.a
+  CC      drivers/scsi/scsicam.o
+  CC      drivers/scsi/scsi_transport_spi.o
+  AR      drivers/scsi/built-in.a
+  CC      drivers/ata/libata-core.o
+  CC      drivers/ata/libata-scsi.o
+  CC      drivers/ata/ahci.o
+  CC      drivers/ata/libahci.o
+  AR      drivers/ata/built-in.a
+  CC      drivers/net/ethernet/intel/e1000/e1000_main.o
+  CC      drivers/net/ethernet/intel/e1000/e1000_hw.o
+  CC      drivers/net/ethernet/intel/e1000/e1000_ethtool.o
+  CC      drivers/net/ethernet/intel/e1000/e1000_param.o
+  AR      drivers/net/ethernet/intel/e1000/built-in.a
+  CC      drivers/net/ethernet/intel/e1000e/netdev.o
+  AR      drivers/net/ethernet/intel/e1000e/built-in.a
+  AR      drivers/net/ethernet/intel/built-in.a
+  AR      drivers/net/ethernet/built-in.a
+  AR      drivers/net/built-in.a
+  CC      drivers/usb/common/common.o
+  AR      drivers/usb/common/built-in.a
+  CC      drivers/usb/core/usb.o
+  CC      drivers/usb/core/hub.o
+  CC      drivers/usb/core/hcd.o
+  CC      drivers/usb/core/message.o
+  CC      drivers/usb/core/phy.o
+  AR      drivers/usb/core/built-in.a
+  CC      drivers/usb/host/ehci-hcd.o
+  CC      drivers/usb/host/ohci-hcd.o
+  AR      drivers/usb/host/built-in.a
+  AR      drivers/usb/built-in.a
+  CC      drivers/input/serio/i8042.o
+  AR      drivers/input/serio/built-in.a
+  CC      drivers/input/mouse/synaptics.o
+  CC      drivers/input/mouse/psmouse-smbus.o
+  AR      drivers/input/mouse/built-in.a
+  AR      drivers/input/built-in.a
+  CC      drivers/i2c/i2c-boardinfo.o
+  CC      drivers/i2c/i2c-core-base.o
+  CC      drivers/i2c/i2c-core-smbus.o
+  CC      drivers/i2c/i2c-core-acpi.o
+  CC      drivers/i2c/i2c-smbus.o
+  CC      drivers/i2c/algos/i2c-algo-bit.o
+  AR      drivers/i2c/algos/built-in.a
+  CC      drivers/i2c/busses/i2c-i801.o
+  AR      drivers/i2c/busses/built-in.a
+  AR      drivers/i2c/built-in.a
+  CC      drivers/thermal/thermal_core.o
+  AR      drivers/thermal/built-in.a
+  CC      drivers/md/md.o
+  CC      drivers/md/md-bitmap.o
+  CC      drivers/md/dm.o
+  CC      drivers/md/dm-table.o
+  CC      drivers/md/dm-target.o
+  CC      drivers/md/dm-ioctl.o
+  CC      drivers/md/dm-io.o
+  CC      drivers/md/dm-kcopyd.o
+  CC      drivers/md/dm-sysfs.o
+  CC      drivers/md/dm-stats.o
+  CC      drivers/md/dm-rq.o
+  CC      drivers/md/dm-builtin.o
+  CC      drivers/md/dm-raid1.o
+  AR      drivers/md/built-in.a
+  CC      drivers/cpufreq/cpufreq.o
+  AR      drivers/cpufreq/built-in.a
+  CC      drivers/cpuidle/cpuidle.o
+  AR      drivers/cpuidle/built-in.a
+  CC      drivers/firmware/sysfb.o
+  CC      drivers/firmware/efi/runtime-wrappers.o
+  CC      drivers/firmware/efi/sysfb_efi.o
+  AR      drivers/firmware/efi/built-in.a
+  CC      drivers/firmware/efi/libstub/efi-stub-helper.o
+  CC      drivers/firmware/efi/libstub/gop.o
+  CC      drivers/firmware/efi/libstub/secureboot.o
+  CC      drivers/firmware/efi/libstub/tpm.o
+  CC      drivers/firmware/efi/libstub/file.o
+  CC      drivers/firmware/efi/libstub/mem.o
+  CC      drivers/firmware/efi/libstub/random.o
+  CC      drivers/firmware/efi/libstub/randomalloc.o
+  CC      drivers/firmware/efi/libstub/pci.o
+  CC      drivers/firmware/efi/libstub/alignedmem.o
+  CC      drivers/firmware/efi/libstub/relocate.o
+  CC      drivers/firmware/efi/libstub/x86-stub.o
+  STUBCPY drivers/firmware/efi/libstub/alignedmem.stub.o
+  STUBCPY drivers/firmware/efi/libstub/efi-stub-helper.stub.o
+  STUBCPY drivers/firmware/efi/libstub/file.stub.o
+  STUBCPY drivers/firmware/efi/libstub/gop.stub.o
+  STUBCPY drivers/firmware/efi/libstub/mem.stub.o
+  STUBCPY drivers/firmware/efi/libstub/pci.stub.o
+  STUBCPY drivers/firmware/efi/libstub/random.stub.o
+  STUBCPY drivers/firmware/efi/libstub/randomalloc.stub.o
+  STUBCPY drivers/firmware/efi/libstub/relocate.stub.o
+  STUBCPY drivers/firmware/efi/libstub/secureboot.stub.o
+  STUBCPY drivers/firmware/efi/libstub/tpm.stub.o
+  STUBCPY drivers/firmware/efi/libstub/x86-stub.stub.o
+  AR      drivers/firmware/efi/libstub/lib.a
+  AR      drivers/firmware/built-in.a
+  CC      drivers/platform/x86/eeepc-laptop.o
+  AR      drivers/platform/x86/built-in.a
+  AR      drivers/platform/built-in.a
+  AR      drivers/built-in.a
+  CC      sound/pci/hda/hda_intel.o
+  AR      sound/pci/hda/built-in.a
+  AR      sound/pci/built-in.a
+  AR      sound/built-in.a
+  CC      net/core/datagram.o
+  AR      net/core/built-in.a
+  CC      net/ethtool/ioctl.o
+  AR      net/ethtool/built-in.a
+  CC      net/ipv4/ipconfig.o
+  AR      net/ipv4/built-in.a
+  CC      net/sunrpc/socklib.o
+  CC      net/sunrpc/xprtsock.o
+  CC      net/sunrpc/xdr.o
+  CC      net/sunrpc/cache.o
+  CC      net/sunrpc/rpc_pipe.o
+  CC      net/sunrpc/auth_gss/auth_gss.o
+  CC      net/sunrpc/auth_gss/svcauth_gss.o
+  AR      net/sunrpc/auth_gss/built-in.a
+  AR      net/sunrpc/built-in.a
+  CC      net/rxrpc/local_event.o
+  AR      net/rxrpc/built-in.a
+  CC      net/9p/trans_virtio.o
+  AR      net/9p/built-in.a
+  AR      net/built-in.a
+  CC      arch/x86/power/cpu.o
+  AR      arch/x86/power/built-in.a
+  CC      lib/buildid.o
+  CC      lib/vsprintf.o
+  AR      lib/lib.a
+  CC      lib/iov_iter.o
+  AR      lib/built-in.a
+  GEN     .version
+  CHK     include/generated/compile.h
+  UPD     include/generated/compile.h
+  CC      init/version.o
+  AR      init/built-in.a
+  LD      vmlinux.o
+  MODPOST vmlinux.symvers
+  MODINFO modules.builtin.modinfo
+  GEN     modules.builtin
+  LD      .tmp_vmlinux.kallsyms1
+  KSYMS   .tmp_vmlinux.kallsyms1.S
+  AS      .tmp_vmlinux.kallsyms1.S
+  LD      .tmp_vmlinux.kallsyms2
+  KSYMS   .tmp_vmlinux.kallsyms2.S
+  AS      .tmp_vmlinux.kallsyms2.S
+  LD      vmlinux
+  SYSMAP  System.map
+  SORTTAB vmlinux
+  VOFFSET arch/x86/boot/compressed/../voffset.h
+  CC      arch/x86/boot/compressed/misc.o
+  OBJCOPY arch/x86/boot/compressed/vmlinux.bin
+  RELOCS  arch/x86/boot/compressed/vmlinux.relocs
+  GZIP    arch/x86/boot/compressed/vmlinux.bin.gz
+  MKPIGGY arch/x86/boot/compressed/piggy.S
+  AS      arch/x86/boot/compressed/piggy.o
+  CC      arch/x86/boot/compressed/kaslr.o
+  CC      arch/x86/boot/compressed/pgtable_64.o
+  CC      arch/x86/boot/compressed/acpi.o
+  LD      arch/x86/boot/compressed/vmlinux
+  ZOFFSET arch/x86/boot/zoffset.h
+  AS      arch/x86/boot/header.o
+  CC      arch/x86/boot/version.o
+  LD      arch/x86/boot/setup.elf
+  OBJCOPY arch/x86/boot/setup.bin
+  OBJCOPY arch/x86/boot/vmlinux.bin
+  BUILD   arch/x86/boot/bzImage
+Kernel: arch/x86/boot/bzImage is ready  (#3)
+  MODPOST modules-only.symvers
+  GEN     Module.symvers
+  CC [M]  drivers/thermal/intel/x86_pkg_temp_thermal.mod.o
+  LD [M]  drivers/thermal/intel/x86_pkg_temp_thermal.ko
+  CC [M]  fs/efivarfs/efivarfs.mod.o
+  LD [M]  fs/efivarfs/efivarfs.ko
+  CC [M]  net/ipv4/netfilter/iptable_nat.mod.o
+  LD [M]  net/ipv4/netfilter/iptable_nat.ko
+  CC [M]  net/netfilter/nf_log_syslog.mod.o
+  LD [M]  net/netfilter/nf_log_syslog.ko
+  CC [M]  net/netfilter/xt_LOG.mod.o
+  LD [M]  net/netfilter/xt_LOG.ko
+  CC [M]  net/netfilter/xt_MASQUERADE.mod.o
+  LD [M]  net/netfilter/xt_MASQUERADE.ko
+  CC [M]  net/netfilter/xt_addrtype.mod.o
+  LD [M]  net/netfilter/xt_addrtype.ko
+  CC [M]  net/netfilter/xt_mark.mod.o
+  LD [M]  net/netfilter/xt_mark.ko
+  CC [M]  net/netfilter/xt_nat.mod.o
+  LD [M]  net/netfilter/xt_nat.ko
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis/build_perf'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis'
+[OK]   Mitigated performance kernel build complete: /home/vmuser/src/linux-pks-thesis/build_perf/arch/x86/boot/bzImage
+[1;36m==>[0m [1m[3/4] Compiling Baseline Control Kernel (build_control)...[0m
+
+================================================================
+  Building Control Baseline Kernel (build_perf, control)
+================================================================
+  Kernel Tree:     /home/vmuser/src/linux-pks-thesis-control
+  Output Dir:      /home/vmuser/src/linux-pks-thesis-control/build_perf
+  Build Jobs:      1
+==> Configuring baseline defconfig + kvm_guest
+==> Enabling storage and virtio drivers
+==> Enabling exploit prerequisite subsystems
+==> Enabling crypto primitives
+==> Enabling RxRPC fallback cipher paths
+==> Disabling debug overhead for performance measurement
+==> Finalizing configuration and compiling bzImage
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_perf'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#1)
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_perf'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+[OK]   Control kernel build complete: /home/vmuser/src/linux-pks-thesis-control/build_perf/arch/x86/boot/bzImage
+[1;36m==>[0m [1m[4/4] Preparing Disk Image (/home/vmuser/src/env/images/disk.img)...[0m
+[1;34m[INFO][0m Existing disk image detected. Synchronizing guest assets via update_disk.sh...
+
+================================================================
+  Updating Guest Assets in Disk Image
+================================================================
+  Disk Image:      /home/vmuser/src/env/images/disk.img
+  Assets Dir:      /home/vmuser/src/env/guest-assets
+==> Attaching loop device with partition scanning
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Synchronizing /exploit into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Recompiling dirty-frag harness inside chroot
+==> Recompiling fragnesia harness inside chroot
+==> Synchronizing /benchmark into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Synchronizing /unit-tests into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Compiling pks_sanity_test inside chroot
+==> Synchronizing /fsx into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Recompiling fsx harness inside chroot
+rm -f fsx
+cc -O2 -Wall -Wextra -D_GNU_SOURCE -o fsx fsx.c
+==> Synchronizing /pjdfstest into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Compiling pjdfstest harness inside chroot
+[WARN] pjdfstest compilation inside chroot skipped
+==> Updating headless autorun service
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+[OK]   Disk image updated successfully
+==> Detaching mounts and loop devices
+
+[1m================================================================[0m
+[1m  Build Pipeline Completed Successfully[0m
+[1m================================================================[0m
+  [2mEnd Time:       [0m Sat Sep 19 15:07:14 UTC 2026
+[1;32m[OK][0m   All kernels compiled and disk image prepared.

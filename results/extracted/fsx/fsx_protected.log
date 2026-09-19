@@ -4,24 +4,22 @@
    Max file size:     67108864 bytes (64.00 MB)
    Max op size:       65536 bytes
    Operations:        10000
-   Random seed:       1789794651
+   Random seed:       1789830814
    MAPWRITE enabled:  NO (PKS mode)
    Negative testing:  NO
 ======================================================================
-  Progress: 0 / 10000 operations completed...
-  Progress: 0 / 10000 operations completed...
-  Progress: 2500 / 10000 operations completed...
   Progress: 2500 / 10000 operations completed...
   Progress: 5000 / 10000 operations completed...
+  Progress: 7500 / 10000 operations completed...
   Progress: 7500 / 10000 operations completed...
 ==> Performing final whole-file integrity verification...
 
 ======================================================================
- [OK] SUCCESS! All 8009 operations verified with zero mismatches.
+ [OK] SUCCESS! All 7972 operations verified with zero mismatches.
  Operation breakdown:
-   READ        : 2043
-   WRITE       : 2022
-   TRUNCATE    : 1941
-   MAPREAD     : 2003
+   READ        : 1965
+   WRITE       : 2001
+   TRUNCATE    : 2042
+   MAPREAD     : 1964
    MAPWRITE    : 0
 ======================================================================

@@ -1,18 +1,18 @@
 # Table 1: Two One-Sided Tests (TOST) Read-Path Parity
 
-| Block Size | Baseline (ns) | Mitigated (ns) | Difference (%) | Equivalence Bound | Equivalent? |
+| Block Size | Baseline Mean (ns) | Mitigated Mean (ns) | Difference (%) | Equivalence Bound | Equivalent? |
 |:---|:---|:---|:---|:---|:---|
-| 512B | 10047.3 | 312322.0 | +3008.51% | ±2.0% | **No** |
-| 1KB | 98586.2 | 437273.5 | +343.54% | ±2.0% | **No** |
-| 2KB | 17572.2 | 397382.6 | +2161.42% | ±2.0% | **No** |
-| 4KB | 302576.0 | 410980.2 | +35.83% | ±2.0% | **No** |
-| 8KB | 45418.8 | 503544.5 | +1008.67% | ±2.0% | **No** |
-| 16KB | 84503.1 | 1222331.2 | +1346.49% | ±2.0% | **No** |
-| 32KB | 148269.3 | 988055.4 | +566.39% | ±2.0% | **No** |
-| 64KB | 288725.9 | 1579568.7 | +447.08% | ±2.0% | **No** |
-| 128KB | 558591.3 | 3124305.4 | +459.32% | ±2.0% | **No** |
-| 256KB | 1209961.0 | 5072840.1 | +319.26% | ±2.0% | **No** |
-| 512KB | 2182590.8 | 8734829.8 | +300.20% | ±2.0% | **No** |
-| 1MB | 4216418.8 | 19350876.6 | +358.94% | ±2.0% | **No** |
+| 512B | 10057.6 | 299875.2 | +2881.57% | ±2.0% | **Outside Bound** |
+| 1KB | 58894.7 | 318906.5 | +441.49% | ±2.0% | **Outside Bound** |
+| 2KB | 96789.6 | 355762.0 | +267.56% | ±2.0% | **Outside Bound** |
+| 4KB | 26303.8 | 383070.5 | +1356.33% | ±2.0% | **Outside Bound** |
+| 8KB | 41398.9 | 470309.5 | +1036.04% | ±2.0% | **Outside Bound** |
+| 16KB | 77314.3 | 667987.3 | +763.99% | ±2.0% | **Outside Bound** |
+| 32KB | 149491.8 | 1024328.1 | +585.21% | ±2.0% | **Outside Bound** |
+| 64KB | 291292.4 | 1778544.1 | +510.57% | ±2.0% | **Outside Bound** |
+| 128KB | 598707.4 | 2699299.6 | +350.85% | ±2.0% | **Outside Bound** |
+| 256KB | 1099988.3 | 5094571.5 | +363.15% | ±2.0% | **Outside Bound** |
+| 512KB | 5287155.0 | 9521094.4 | +80.08% | ±2.0% | **Outside Bound** |
+| 1MB | 4301684.4 | 90018085.1 | +1992.62% | ±2.0% | **Outside Bound** |
 
-*Note: Valid statistical equivalence requires identical virtualization environments (KVM vs KVM or TCG vs TCG).*
+*Note on Methodology: The above table reflects single-run point estimates. Formal hypothesis rejection (H01/H02 with α=0.05) requires evaluating N >= 30 independent runs to compute Welch's degrees of freedom and two one-sided t-statistics against the ±2.0% equivalence margin. Under QEMU TCG software emulation, translated MSR helper overhead inflates small-block measurements.*

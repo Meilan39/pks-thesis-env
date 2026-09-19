@@ -93,7 +93,7 @@ build:
 test:
 	@$(SCRIPTS_DIR)/run_compliance.sh
 
-bench: bench-control bench-mitigated fetch-results parse-results
+bench: bench-control bench-off bench-mitigated fetch-results parse-results
 	@echo "======================================================================"
 	@echo " Benchmark Suite Execution & Processing Complete"
 	@echo "======================================================================"

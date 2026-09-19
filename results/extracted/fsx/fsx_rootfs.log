@@ -4,7 +4,7 @@
    Max file size:     16777216 bytes (16.00 MB)
    Max op size:       65536 bytes
    Operations:        5000
-   Random seed:       1789794298
+   Random seed:       1789830508
    MAPWRITE enabled:  YES
    Negative testing:  NO
 ======================================================================
@@ -12,11 +12,11 @@
 ==> Performing final whole-file integrity verification...
 
 ======================================================================
- [OK] SUCCESS! All 4986 operations verified with zero mismatches.
+ [OK] SUCCESS! All 4996 operations verified with zero mismatches.
  Operation breakdown:
-   READ        : 915
-   WRITE       : 1010
-   TRUNCATE    : 1044
-   MAPREAD     : 991
-   MAPWRITE    : 1026
+   READ        : 1038
+   WRITE       : 953
+   TRUNCATE    : 1032
+   MAPREAD     : 958
+   MAPWRITE    : 1015
 ======================================================================

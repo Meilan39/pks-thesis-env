@@ -140,7 +140,7 @@ case "$AUTO_MODE" in
         poweroff -f
         ;;
 
-    bench|bench_control|bench_mitigated)
+    bench|bench_control|bench_mitigated|bench_off)
         echo "--> [PKS AUTORUN] Executing fio benchmark suite..."
         if [ -x /benchmark/run_benchmarks.sh ]; then
             /benchmark/run_benchmarks.sh
@@ -151,7 +151,9 @@ case "$AUTO_MODE" in
         # Persist results to disk partition
         if mountpoint -q /mnt/protected; then
             mkdir -p /mnt/protected/bench_results
-            cp -a /tmp/bench_results/* /mnt/protected/bench_results/ 2>/dev/null || true
+            if [ -d /tmp/bench_results ]; then
+                cp -a /tmp/bench_results/* /mnt/protected/bench_results/ 2>/dev/null || true
+            fi
         fi
 
         sync
@@ -237,11 +239,19 @@ case "$AUTO_MODE" in
         # 3. POSIX Compliance (pjdfstest)
         echo ""
         echo "=== [3/3] POSIX Compliance Tests (pjdfstest) ==="
-        if [ -d /pjdfstest/tests ] && command -v prove >/dev/null 2>&1; then
-            cd /pjdfstest && prove -r tests/chown tests/chmod tests/truncate 2>&1 | tee /tmp/pjdfstest.log || true
-            cd /
+        if [ -d /pjdfstest/tests ] && [ -x /pjdfstest/pjdfstest ] && command -v prove >/dev/null 2>&1; then
+            if mountpoint -q /mnt/protected; then
+                mkdir -p /mnt/protected/pjdfstest_scratch
+                cd /mnt/protected/pjdfstest_scratch
+                prove -r /pjdfstest/tests/chown /pjdfstest/tests/chmod /pjdfstest/tests/truncate 2>&1 | tee /tmp/pjdfstest.log || true
+                cd /
+                rm -rf /mnt/protected/pjdfstest_scratch
+            else
+                cd /pjdfstest && prove -r tests/chown tests/chmod tests/truncate 2>&1 | tee /tmp/pjdfstest.log || true
+                cd /
+            fi
         else
-            echo "[INFO] pjdfstest omitted or prove not installed. Functional coverage validated by fsx."
+            echo "[INFO] pjdfstest omitted, uncompiled, or prove not installed. Functional coverage validated by fsx."
         fi
 
         # Persist results to protected storage

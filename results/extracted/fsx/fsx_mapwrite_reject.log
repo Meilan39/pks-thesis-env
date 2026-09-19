@@ -4,7 +4,7 @@
    Max file size:     67108864 bytes (64.00 MB)
    Max op size:       65536 bytes
    Operations:        10000
-   Random seed:       1789795392
+   Random seed:       1789831549
    MAPWRITE enabled:  YES
    Negative testing:  YES (verifying -EOPNOTSUPP)
 ======================================================================

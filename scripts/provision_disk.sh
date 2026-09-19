@@ -184,6 +184,13 @@ if [ -f "$MOUNT_POINT/fsx/fsx.c" ]; then
     " 2>/dev/null || log_warn "fsx compilation inside chroot skipped or failed"
 fi
 
+if [ -f "$MOUNT_POINT/pjdfstest/pjdfstest.c" ]; then
+    log_step "Compiling pjdfstest inside chroot"
+    sudo chroot "$MOUNT_POINT" /bin/bash -c "
+        cd /pjdfstest && gcc -Wall -O2 pjdfstest.c -o pjdfstest
+    " 2>/dev/null || log_warn "pjdfstest compilation inside chroot skipped or failed"
+fi
+
 # Clean up chroot binds before exit
 sudo umount "$MOUNT_POINT/dev"
 sudo umount "$MOUNT_POINT/proc"

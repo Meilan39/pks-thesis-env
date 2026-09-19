@@ -1,78 +1,83 @@
-[   57.429618] pks-autorun.sh[228]:  [PKS AUTORUN] Triggered with mode: sec_copyfail
-[   57.439638] pks-autorun.sh[228]: ================================================================
-[   60.128642] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
-[   60.278863] pks-autorun.sh[228]: --> [PKS AUTORUN] Executing Copy Fail exploit test...
-[   64.232965] pks-autorun.sh[243]: [+] Protected mount active: /mnt/protected with 'pks_pagecache'
-[   64.628455] pks-autorun.sh[243]: ======================================================================
-[   64.668358] pks-autorun.sh[243]: === copy-fail (pcache_pks=on) ===
-[   64.677635] pks-autorun.sh[243]: Target: /mnt/protected/victim_file
-[   68.249536] run_tests.sh (243): drop_caches: 3
-[   69.033693] pks-autorun.sh[243]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
-[   78.958385] BUG: unable to handle page fault for address: ff1100017000f000
-[   78.959047] #PF: supervisor write access in kernel mode
-[   78.959230] #PF: error_code(0x0023) - protection keys violation
-[   78.962254] PGD 3201067 P4D 3202067 PUD 100223063 PMD 90000001700001e3 
-[   78.962635] Oops: 0023 [#1] PREEMPT SMP PTI
-[   78.965354] CPU: 0 PID: 284 Comm: python3 Not tainted 5.18.0-rc3-00050-g89f022bca6b2 #6
-[   78.965606] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-[   78.965877] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
-[   78.968641] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
-[   78.971391] RSP: 0018:ffa0000000557c60 EFLAGS: 00000202
-[   78.971540] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
-[   78.971714] RDX: 0000000000000004 RSI: ffa0000000557d3c RDI: 00000000464c457f
-[   78.971870] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa0000000557cb8
-[   78.974343] R10: ff11000101927bf0 R11: 0000000000000000 R12: ffa0000000557d3c
-[   78.974500] R13: ff11000104a8dc00 R14: 0000000000000004 R15: ffa0000000557ca8
-[   78.974731] FS:  00007ff9ac179040(0000) GS:ff1100016bc00000(0000) knlGS:0000000000000000
-[   78.974903] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   78.978057] CR2: ff1100017000f000 CR3: 0000000104804000 CR4: 00000000017516f0
-[   78.978210] PKRU: 55555554
-[   78.978302] PKRS: 0x55555564
-[   78.978404] Call Trace:
-[   78.981295]  <TASK>
-[   78.981551]  scatterwalk_map_and_copy+0x49/0x70
-[   78.983968]  crypto_authenc_esn_decrypt+0xff/0x190
-[   78.984093]  aead_recvmsg+0x525/0x5f0
-[   78.984169]  __sys_recvfrom+0x161/0x180
-[   78.984252]  ? __do_splice+0xd9/0x150
-[   78.984358]  ? fpregs_assert_state_consistent+0x19/0x40
-[   78.984449]  __x64_sys_recvfrom+0x1b/0x20
-[   78.984555]  ? do_syscall_64+0x3b/0x90
-[   78.984646]  ? entry_SYSCALL_64_after_hwframe+0x44/0xae
-[   78.987019]  </TASK>
-[   78.987123] Modules linked in:
-[   78.987327] CR2: ff1100017000f000
-[   78.989875] ---[ end trace 0000000000000000 ]---
-[   78.990007] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
-[   78.990108] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
-[   78.991259] RSP: 0018:ffa0000000557c60 EFLAGS: 00000202
-[   78.991355] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
-[   78.991554] RDX: 0000000000000004 RSI: ffa0000000557d3c RDI: 00000000464c457f
-[   78.991662] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa0000000557cb8
-[   78.991773] R10: ff11000101927bf0 R11: 0000000000000000 R12: ffa0000000557d3c
-[   78.991877] R13: ff11000104a8dc00 R14: 0000000000000004 R15: ffa0000000557ca8
-[   78.991982] FS:  00007ff9ac179040(0000) GS:ff1100016bc00000(0000) knlGS:0000000000000000
-[   78.992100] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   78.995200] CR2: ff1100017000f000 CR3: 0000000104804000 CR4: 00000000017516f0
-[   78.995398] PKRU: 55555554
-[   78.995447] PKRS: 0x55555564
-[   78.995562] note: python3[284] exited with preempt_count 1
-[   80.849691] pks-autorun.sh[243]: exploit exited with code 137
-[   81.186617] pks-autorun.sh[243]: post-run MD5: bf3f1799b2782402b9bbe1d16fba90e5
-[   82.957455] pks-autorun.sh[243]: [+] Security event detected in dmesg:
-[   83.254904] pks-autorun.sh[333]: [   78.959047] #PF: supervisor write access in kernel mode
-[   83.267985] pks-autorun.sh[333]: [   78.959230] #PF: error_code(0x0023) - protection keys violation
-[   83.280452] pks-autorun.sh[333]: [   78.962635] Oops: 0023 [#1] PREEMPT SMP PTI
-[   83.292187] pks-autorun.sh[333]: [   78.978302] PKRS: 0x55555564
-[   83.301708] pks-autorun.sh[333]: [   78.995447] PKRS: 0x55555564
-[   83.320848] pks-autorun.sh[243]: RESULT: copy-fail BLOCKED by Intel PKS (page cache protected)
-[   87.981374] run_tests.sh (243): drop_caches: 3
-[   88.046707] pks-autorun.sh[243]: ---
-[   88.068686] pks-autorun.sh[243]: All tests completed.
-[   88.081671] pks-autorun.sh[243]: Logs: /tmp/exploit_results/
-[   90.067720] pks-autorun.sh[228]: ================================================================
-[   90.089893] pks-autorun.sh[228]:  [PKS AUTORUN] Copy Fail test complete. Powering off.
-[   90.104980] pks-autorun.sh[228]: ================================================================
-[   92.709745] e1000e: EEE TX LPI TIMER: 00000000
-[   92.728771] ACPI: PM: Preparing to enter system sleep state S5
-[   92.786660] reboot: Power down
+[   56.558743] pks-autorun.sh[225]:  [PKS AUTORUN] Triggered with mode: sec_copyfail
+[   56.567350] pks-autorun.sh[225]: ================================================================
+[   59.169600] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
+[   59.257669] pks-autorun.sh[225]: --> [PKS AUTORUN] Executing Copy Fail exploit test...
+[   63.215672] pks-autorun.sh[240]: [+] Protected mount active: /mnt/protected with 'pks_pagecache'
+[   65.140434] pks-autorun.sh[240]: ======================================================================
+[   65.176480] pks-autorun.sh[240]: === copy-fail (pcache_pks=on) ===
+[   65.188513] pks-autorun.sh[240]: Target: /mnt/protected/victim_file
+[   67.666030] run_tests.sh (240): drop_caches: 3
+[   68.423861] pks-autorun.sh[240]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
+[   78.833751] BUG: unable to handle page fault for address: ff1100017000f000
+[   78.834791] #PF: supervisor write access in kernel mode
+[   78.834905] #PF: error_code(0x0023) - protection keys violation
+[   78.836545] PGD 3201067 P4D 3202067 PUD 100223063 PMD 90000001700001e3 
+[   78.870792] Oops: 0023 [#1] PREEMPT SMP PTI
+[   78.873022] CPU: 2 PID: 281 Comm: python3 Not tainted 5.18.0-rc3-00050-g057575e0ecf6 #7
+[   78.873430] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+[   78.874879] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
+[   78.877260] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
+[   78.879801] RSP: 0018:ffa0000000627c60 EFLAGS: 00000202
+[   78.880037] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
+[   78.880262] RDX: 0000000000000004 RSI: ffa0000000627d3c RDI: 00000000464c457f
+[   78.880480] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa0000000627cb8
+[   78.883950] R10: ff110001048a53f0 R11: 0000000000000000 R12: ffa0000000627d3c
+[   78.884099] R13: ff11000103b2dc00 R14: 0000000000000004 R15: ffa0000000627ca8
+[   78.884257] FS:  00007f8132603040(0000) GS:ff1100016bd00000(0000) knlGS:0000000000000000
+[   78.884381] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   78.884460] CR2: ff1100017000f000 CR3: 000000010091a000 CR4: 00000000017516e0
+[   78.884936] PKRU: 55555554
+[   78.885008] PKRS: 0x55555564
+[   78.885118] Call Trace:
+[   78.887051]  <TASK>
+[   78.887320]  scatterwalk_map_and_copy+0x49/0x70
+[   78.889525]  crypto_authenc_esn_decrypt+0xff/0x190
+[   78.889653]  aead_recvmsg+0x525/0x5f0
+[   78.889735]  __sys_recvfrom+0x161/0x180
+[   78.890745]  ? 0xffffffff81000000
+[   78.890933]  ? recalibrate_cpu_khz+0x10/0x10
+[   78.891005]  ? ktime_get+0x33/0x90
+[   78.891059]  ? arch_restore_msi_irqs+0x10/0x10
+[   78.893352]  ? lapic_next_event+0x17/0x20
+[   78.893432]  ? clockevents_program_event+0x90/0xf0
+[   78.893518]  ? hrtimer_interrupt+0x12b/0x210
+[   78.893596]  __x64_sys_recvfrom+0x1b/0x20
+[   78.893707]  ? do_syscall_64+0x3b/0x90
+[   78.893785]  ? entry_SYSCALL_64_after_hwframe+0x44/0xae
+[   78.893900]  </TASK>
+[   78.893985] Modules linked in:
+[   78.896383] CR2: ff1100017000f000
+[   78.896750] ---[ end trace 0000000000000000 ]---
+[   78.897618] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
+[   78.899221] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
+[   78.899467] RSP: 0018:ffa0000000627c60 EFLAGS: 00000202
+[   78.899553] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
+[   78.899648] RDX: 0000000000000004 RSI: ffa0000000627d3c RDI: 00000000464c457f
+[   78.899741] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa0000000627cb8
+[   78.901940] R10: ff110001048a53f0 R11: 0000000000000000 R12: ffa0000000627d3c
+[   78.902042] R13: ff11000103b2dc00 R14: 0000000000000004 R15: ffa0000000627ca8
+[   78.902131] FS:  00007f8132603040(0000) GS:ff1100016bd00000(0000) knlGS:0000000000000000
+[   78.902230] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   78.902302] CR2: ff1100017000f000 CR3: 000000010091a000 CR4: 00000000017516e0
+[   78.902388] PKRU: 55555554
+[   78.902425] PKRS: 0x55555564
+[   78.902552] note: python3[281] exited with preempt_count 1
+[   80.198325] pks-autorun.sh[240]: exploit exited with code 137
+[   80.565652] pks-autorun.sh[240]: post-run MD5: bf3f1799b2782402b9bbe1d16fba90e5
+[   82.141291] pks-autorun.sh[240]: [+] Security event detected in dmesg:
+[   82.384983] pks-autorun.sh[330]: [   78.834791] #PF: supervisor write access in kernel mode
+[   82.397460] pks-autorun.sh[330]: [   78.834905] #PF: error_code(0x0023) - protection keys violation
+[   82.409166] pks-autorun.sh[330]: [   78.870792] Oops: 0023 [#1] PREEMPT SMP PTI
+[   82.417628] pks-autorun.sh[330]: [   78.885008] PKRS: 0x55555564
+[   82.423565] pks-autorun.sh[330]: [   78.902425] PKRS: 0x55555564
+[   82.436312] pks-autorun.sh[240]: RESULT: copy-fail BLOCKED by Intel PKS (page cache protected)
+[   87.129457] run_tests.sh (240): drop_caches: 3
+[   87.156958] pks-autorun.sh[240]: ---
+[   87.175527] pks-autorun.sh[240]: All tests completed.
+[   87.187830] pks-autorun.sh[240]: Logs: /tmp/exploit_results/
+[   89.055508] pks-autorun.sh[225]: ================================================================
+[   89.076549] pks-autorun.sh[225]:  [PKS AUTORUN] Copy Fail test complete. Powering off.
+[   89.086266] pks-autorun.sh[225]: ================================================================
+[   91.899791] e1000e: EEE TX LPI TIMER: 00000000
+[   91.920197] ACPI: PM: Preparing to enter system sleep state S5
+[   91.923966] reboot: Power down

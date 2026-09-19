@@ -1,6 +1,6 @@
-MemFree:         3704904 kB
-MemAvailable:    3681408 kB
-Cached:            15152 kB
+MemFree:         3704868 kB
+MemAvailable:    3681640 kB
+Cached:            15240 kB
 SwapCached:            0 kB
-Dirty:               120 kB
+Dirty:                88 kB
 Writeback:             0 kB

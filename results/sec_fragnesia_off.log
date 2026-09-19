@@ -1,24 +1,22 @@
-[   58.669938] pks-autorun.sh[227]:  [PKS AUTORUN] Triggered with mode: sec_fragnesia
-[   58.684059] pks-autorun.sh[227]: ================================================================
-[   59.813376] pks-autorun.sh[227]: --> [PKS AUTORUN] Executing Fragnesia exploit test...
-[   63.958184] pks-autorun.sh[235]: [-] Protected mount active: /mnt/protected without 'pks_pagecache' (standard ext4)
-[   63.984652] pks-autorun.sh[235]: ======================================================================
-[   63.996482] pks-autorun.sh[235]: === fragnesia (pcache_pks=off) ===
-[   64.009926] pks-autorun.sh[235]: Target: /mnt/protected/victim_file
-[   66.290618] run_tests.sh (235): drop_caches: 3
-[   67.131500] pks-autorun.sh[235]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
-[   79.492096] process 'exp' launched '/mnt/protected/victim_file' with NULL argv: empty string added
-[   87.574155] victim_file (273) used greatest stack depth: 12792 bytes left
-[   89.057674] pks-autorun.sh[235]: exploit exited with code 1
-[   89.393830] pks-autorun.sh[235]: post-run MD5: bf3f1799b2782402b9bbe1d16fba90e5
-[   90.505149] pks-autorun.sh[235]: RESULT: fragnesia BLOCKED or failed (page cache protected)
-[   94.647547] run_tests.sh (235): drop_caches: 3
-[   94.675198] pks-autorun.sh[235]: ---
-[   94.694488] pks-autorun.sh[235]: All tests completed.
-[   94.706499] pks-autorun.sh[235]: Logs: /tmp/exploit_results/
-[   96.519597] pks-autorun.sh[227]: ================================================================
-[   96.544918] pks-autorun.sh[227]:  [PKS AUTORUN] Fragnesia test complete. Powering off.
-[   96.557158] pks-autorun.sh[227]: ================================================================
-[   99.287094] e1000e: EEE TX LPI TIMER: 00000000
-[   99.304691] ACPI: PM: Preparing to enter system sleep state S5
-[   99.314133] reboot: Power down
+[   56.054728] pks-autorun.sh[229]:  [PKS AUTORUN] Triggered with mode: sec_fragnesia
+[   56.063434] pks-autorun.sh[229]: ================================================================
+[   57.204755] pks-autorun.sh[229]: --> [PKS AUTORUN] Executing Fragnesia exploit test...
+[   60.780417] pks-autorun.sh[237]: [-] Protected mount active: /mnt/protected without 'pks_pagecache' (standard ext4)
+[   60.806463] pks-autorun.sh[237]: ======================================================================
+[   60.816767] pks-autorun.sh[237]: === fragnesia (pcache_pks=off) ===
+[   60.823161] pks-autorun.sh[237]: Target: /mnt/protected/victim_file
+[   65.272026] run_tests.sh (237): drop_caches: 3
+[   66.019505] pks-autorun.sh[237]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
+[   77.951539] pks-autorun.sh[237]: target modified -> corruption detected
+[   82.380161] pks-autorun.sh[237]: post-run MD5: 8c3fb16b1d5bc3fad6646128a84d5505
+[   83.430907] pks-autorun.sh[237]: RESULT: fragnesia SUCCEEDED (page cache modified)
+[   87.958920] run_tests.sh (237): drop_caches: 3
+[   87.993998] pks-autorun.sh[237]: ---
+[   88.008184] pks-autorun.sh[237]: All tests completed.
+[   88.021781] pks-autorun.sh[237]: Logs: /tmp/exploit_results/
+[   90.111953] pks-autorun.sh[229]: ================================================================
+[   90.133822] pks-autorun.sh[229]:  [PKS AUTORUN] Fragnesia test complete. Powering off.
+[   90.143168] pks-autorun.sh[229]: ================================================================
+[   93.241216] e1000e: EEE TX LPI TIMER: 00000000
+[   93.258166] ACPI: PM: Preparing to enter system sleep state S5
+[   93.263394] reboot: Power down

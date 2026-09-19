@@ -1,23 +1,23 @@
-[   58.238222] pks-autorun.sh[225]:  [PKS AUTORUN] Triggered with mode: sec_dirtyfrag
-[   58.253733] pks-autorun.sh[225]: ================================================================
-[   59.504436] pks-autorun.sh[225]: --> [PKS AUTORUN] Executing Dirty Frag exploit test...
-[   63.695019] pks-autorun.sh[233]: [-] Protected mount active: /mnt/protected without 'pks_pagecache' (standard ext4)
-[   63.720035] pks-autorun.sh[233]: ======================================================================
-[   63.736001] pks-autorun.sh[233]: === dirty-frag (pcache_pks=off) ===
-[   63.743196] pks-autorun.sh[233]: Target: /mnt/protected/victim_file
-[   67.688772] run_tests.sh (233): drop_caches: 3
-[   68.484820] pks-autorun.sh[233]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
-[   79.051216] pks-autorun.sh[233]: target modified -> corruption detected
-[   83.590350] pks-autorun.sh[233]: post-run MD5: b05121347db4cf34bbeb573cd968ac1c
-[   84.685829] pks-autorun.sh[233]: RESULT: dirty-frag SUCCEEDED (page cache modified)
-[   85.272834] exp (271) used greatest stack depth: 12744 bytes left
-[   88.837738] run_tests.sh (233): drop_caches: 3
-[   88.865231] pks-autorun.sh[233]: ---
-[   88.888513] pks-autorun.sh[233]: All tests completed.
-[   88.900716] pks-autorun.sh[233]: Logs: /tmp/exploit_results/
-[   90.773908] pks-autorun.sh[225]: ================================================================
-[   90.789654] pks-autorun.sh[225]:  [PKS AUTORUN] Dirty Frag test complete. Powering off.
-[   90.801354] pks-autorun.sh[225]: ================================================================
-[   93.485303] e1000e: EEE TX LPI TIMER: 00000000
-[   93.509865] ACPI: PM: Preparing to enter system sleep state S5
-[   93.521987] reboot: Power down
+[   56.291339] pks-autorun.sh[227]:  [PKS AUTORUN] Triggered with mode: sec_dirtyfrag
+[   56.300311] pks-autorun.sh[227]: ================================================================
+[   57.380101] pks-autorun.sh[227]: --> [PKS AUTORUN] Executing Dirty Frag exploit test...
+[   60.973578] pks-autorun.sh[235]: [-] Protected mount active: /mnt/protected without 'pks_pagecache' (standard ext4)
+[   60.992251] pks-autorun.sh[235]: ======================================================================
+[   61.001937] pks-autorun.sh[235]: === dirty-frag (pcache_pks=off) ===
+[   61.010802] pks-autorun.sh[235]: Target: /mnt/protected/victim_file
+[   65.038077] run_tests.sh (235): drop_caches: 3
+[   65.792569] pks-autorun.sh[235]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
+[   75.809150] pks-autorun.sh[235]: target modified -> corruption detected
+[   80.142584] pks-autorun.sh[235]: post-run MD5: b05121347db4cf34bbeb573cd968ac1c
+[   81.168056] pks-autorun.sh[235]: RESULT: dirty-frag SUCCEEDED (page cache modified)
+[   81.701937] exp (273) used greatest stack depth: 12744 bytes left
+[   85.025091] run_tests.sh (235): drop_caches: 3
+[   85.058557] pks-autorun.sh[235]: ---
+[   85.074090] pks-autorun.sh[235]: All tests completed.
+[   85.084124] pks-autorun.sh[235]: Logs: /tmp/exploit_results/
+[   86.949854] pks-autorun.sh[227]: ================================================================
+[   86.973777] pks-autorun.sh[227]:  [PKS AUTORUN] Dirty Frag test complete. Powering off.
+[   86.981080] pks-autorun.sh[227]: ================================================================
+[   89.630510] e1000e: EEE TX LPI TIMER: 00000000
+[   89.650834] ACPI: PM: Preparing to enter system sleep state S5
+[   89.653960] reboot: Power down

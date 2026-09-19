@@ -52,7 +52,7 @@ def parse_sec_log(file_path: Path) -> dict:
     }
 
     # Analyze Copy Fail section
-    cf_match = re.search(r"=== copy-fail ===(.*?)(?:=== dirty-frag ===|=== fragnesia ===|All tests completed|\Z)", content, re.DOTALL)
+    cf_match = re.search(r"===\s*copy-fail(?:\s*\(.*?\))?\s*===(.*?)(?:===\s*dirty-frag|===\s*fragnesia|All tests completed|\Z)", content, re.DOTALL)
     if cf_match:
         cf_text = cf_match.group(1)
         results["copy_fail"]["tested"] = True
@@ -79,7 +79,7 @@ def parse_sec_log(file_path: Path) -> dict:
             results["copy_fail"]["containment"] = "Task Killed (Process Isolation, SIGSEGV)"
 
     # Analyze Dirty Frag section
-    df_match = re.search(r"=== dirty-frag ===(.*?)(?:=== fragnesia ===|All tests completed|\Z)", content, re.DOTALL)
+    df_match = re.search(r"===\s*dirty-frag(?:\s*\(.*?\))?\s*===(.*?)(?:===\s*fragnesia|All tests completed|\Z)", content, re.DOTALL)
     if df_match:
         df_text = df_match.group(1)
         results["dirty_frag"]["tested"] = True
@@ -105,7 +105,7 @@ def parse_sec_log(file_path: Path) -> dict:
             results["dirty_frag"]["containment"] = "Fail-Closed Panic (Hardware #PF in SoftIRQ)"
 
     # Analyze Fragnesia section
-    fn_match = re.search(r"=== fragnesia ===(.*?)(?:All tests completed|\Z)", content, re.DOTALL)
+    fn_match = re.search(r"===\s*fragnesia(?:\s*\(.*?\))?\s*===(.*?)(?:All tests completed|\Z)", content, re.DOTALL)
     if fn_match:
         fn_text = fn_match.group(1)
         results["fragnesia"]["tested"] = True

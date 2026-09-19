@@ -230,7 +230,7 @@ echo ""
 echo "=== [4/4] Executing SQLite Macrobenchmark ==="
 SQLITE_SCRIPT="/benchmark/sqlite_bench.sh"
 if [ -x "${SQLITE_SCRIPT}" ] && command -v sqlite3 >/dev/null 2>&1; then
-    "${SQLITE_SCRIPT}" "${BENCH_DIR}" FULL "${RAW_OUT_DIR}/sqlite_FULL.json" 5000 || echo "[WARN] SQLite FULL failed"
+    "${SQLITE_SCRIPT}" "${BENCH_DIR}" FULL "${RAW_OUT_DIR}/sqlite_FULL.json" 500 || echo "[WARN] SQLite FULL failed"
     "${SQLITE_SCRIPT}" "${BENCH_DIR}" OFF "${RAW_OUT_DIR}/sqlite_OFF.json" 5000 || echo "[WARN] SQLite OFF failed"
 else
     echo "[WARN] sqlite3 or sqlite_bench.sh not available. Skipping macrobenchmark."

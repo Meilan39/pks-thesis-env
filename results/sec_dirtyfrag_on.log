@@ -1,102 +1,99 @@
-[   59.128719] pks-autorun.sh[228]:  [PKS AUTORUN] Triggered with mode: sec_dirtyfrag
-[   59.138661] pks-autorun.sh[228]: ================================================================
-[   61.684317] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
-[   61.775582] pks-autorun.sh[228]: --> [PKS AUTORUN] Executing Dirty Frag exploit test...
-[   65.939619] pks-autorun.sh[243]: [+] Protected mount active: /mnt/protected with 'pks_pagecache'
-[   66.606926] pks-autorun.sh[243]: ======================================================================
-[   66.630202] pks-autorun.sh[243]: === dirty-frag (pcache_pks=on) ===
-[   66.645193] pks-autorun.sh[243]: Target: /mnt/protected/victim_file
-[   70.003566] run_tests.sh (243): drop_caches: 3
-[   70.790585] pks-autorun.sh[243]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
-[   78.604259] BUG: unable to handle page fault for address: ff1100017000f000
-[   78.605733] #PF: supervisor write access in kernel mode
-[   78.605876] #PF: error_code(0x0023) - protection keys violation
-[   78.606053] PGD 3201067 P4D 3202067 PUD 100223063 PMD 90000001700001e3 
-[   78.609670] Oops: 0023 [#1] PREEMPT SMP PTI
-[   78.609910] CPU: 3 PID: 283 Comm: exp Not tainted 5.18.0-rc3-00050-g89f022bca6b2 #6
-[   78.610136] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
-[   78.612857] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
-[   78.616092] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
-[   78.616522] RSP: 0018:ffa0000000120ba0 EFLAGS: 00000202
-[   78.618591] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
-[   78.619486] RDX: 0000000000000004 RSI: ffa0000000120c7c RDI: 00000000464c457f
-[   78.619639] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa0000000120bf8
-[   78.619782] R10: ff1100010392f558 R11: 0000000000000000 R12: ffa0000000120c7c
-[   78.619926] R13: ff110001003a0000 R14: 0000000000000004 R15: ffa0000000120be8
-[   78.621704] FS:  00007fa2df098740(0000) GS:ff1100016bd80000(0000) knlGS:0000000000000000
-[   78.621882] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   78.621996] CR2: ff1100017000f000 CR3: 0000000104cc6000 CR4: 00000000017516e0
-[   78.622138] PKRU: 55555554
-[   78.622206] PKRS: 0x55555564
-[   78.625191] Call Trace:
-[   78.627311]  <IRQ>
-[   78.627564]  scatterwalk_map_and_copy+0x49/0x70
-[   78.627726]  crypto_authenc_esn_decrypt+0xff/0x190
-[   78.627820]  esp_input+0x1d2/0x310
-[   78.627889]  ? xfrm_state_lookup+0x4c/0x60
-[   78.627963]  xfrm_input+0x4a5/0x1310
-[   78.630294]  xfrm4_rcv_encap+0xb8/0x110
-[   78.630395]  ? xfrm4_transport_finish+0x210/0x210
-[   78.630479]  udp_queue_rcv_one_skb+0x23b/0x610
-[   78.630566]  udp_unicast_rcv_skb+0x70/0x80
-[   78.630660]  __udp4_lib_rcv+0x50c/0xc20
-[   78.630739]  ip_protocol_deliver_rcu+0x105/0x220
-[   78.630826]  ip_local_deliver_finish+0x6e/0x90
-[   78.630904]  __netif_receive_skb_one_core+0x82/0x90
-[   78.633191]  process_backlog+0x94/0x130
-[   78.633268]  __napi_poll+0x27/0x160
-[   78.633331]  net_rx_action+0x22a/0x280
-[   78.633401]  __do_softirq+0xf4/0x336
-[   78.633473]  do_softirq+0x91/0xc0
-[   78.633636]  </IRQ>
-[   78.633689]  <TASK>
-[   78.633728]  __local_bh_enable_ip+0x60/0x70
-[   78.636047]  ip_finish_output2+0x175/0x510
-[   78.636135]  ? dst_output+0x30/0x30
-[   78.636200]  ip_send_skb+0x76/0x80
-[   78.636263]  udp_send_skb+0x235/0x360
-[   78.636331]  udp_sendpage+0x158/0x210
-[   78.636397]  ? pks_restore_pt_regs+0x24/0x70
-[   78.636470]  ? irqentry_exit+0xc/0x50
-[   78.636538]  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
-[   78.636635]  inet_sendpage+0x4a/0x80
-[   78.636702]  kernel_sendpage+0x43/0x110
-[   78.638952]  ? pipe_to_sendpage+0x6c/0xa0
-[   78.639029]  sock_sendpage+0x1b/0x20
-[   78.639093]  pipe_to_sendpage+0x5c/0xa0
-[   78.639162]  __splice_from_pipe+0xaf/0x1e0
-[   78.639232]  ? propagate_umount+0x500/0x500
-[   78.639305]  generic_splice_sendpage+0x5a/0x90
-[   78.639383]  do_splice+0x319/0x700
-[   78.639448]  __do_splice+0xd9/0x150
-[   78.639513]  __x64_sys_splice+0x8f/0x110
-[   78.641820]  do_syscall_64+0x3b/0x90
-[   78.641901]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[   78.642133] RIP: 0033:0x7fa2df1a4103
-[   78.642338] Code: 64 89 02 48 c7 c0 ff ff ff ff eb b9 66 2e 0f 1f 84 00 00 00 00 00 90 80 3d e1 24 0d 00 00 49 89 ca 74 14 b8 13 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 75 c3 0f 1f 40 00 55 48 83 ec 30 44 89 4c 24
-[   78.644208] RSP: 002b:00007ffd564c6318 EFLAGS: 00000202 ORIG_RAX: 0000000000000113
-[   78.644369] RAX: ffffffffffffffda RBX: 00007ffd564c6364 RCX: 00007fa2df1a4103
-[   78.644483] RDX: 0000000000000004 RSI: 0000000000000000 RDI: 0000000000000006
-[   78.644594] RBP: 00007ffd564c63d0 R08: 0000000000000028 R09: 0000000000000001
-[   78.644712] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
-[   78.647751] R13: 00007ffd564c65c0 R14: 000055dc5560bdd8 R15: 00007fa2df2b5020
-[   78.647910]  </TASK>
-[   78.647995] Modules linked in:
-[   78.648189] CR2: ff1100017000f000
-[   78.650742] ---[ end trace 0000000000000000 ]---
-[   78.650866] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
-[   78.650967] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
-[   78.651233] RSP: 0018:ffa0000000120ba0 EFLAGS: 00000202
-[   78.653546] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
-[   78.653671] RDX: 0000000000000004 RSI: ffa0000000120c7c RDI: 00000000464c457f
-[   78.653783] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa0000000120bf8
-[   78.653893] R10: ff1100010392f558 R11: 0000000000000000 R12: ffa0000000120c7c
-[   78.654001] R13: ff110001003a0000 R14: 0000000000000004 R15: ffa0000000120be8
-[   78.654111] FS:  00007fa2df098740(0000) GS:ff1100016bd80000(0000) knlGS:0000000000000000
-[   78.656434] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[   78.656535] CR2: ff1100017000f000 CR3: 0000000104cc6000 CR4: 00000000017516e0
-[   78.656651] PKRU: 55555554
-[   78.656698] PKRS: 0x55555564
-[   78.656856] Kernel panic - not syncing: Fatal exception in interrupt
-[   78.660483] Kernel Offset: disabled
-[   78.660889] Rebooting in 1 seconds..
+[   57.433066] pks-autorun.sh[229]:  [PKS AUTORUN] Triggered with mode: sec_dirtyfrag
+[   57.445456] pks-autorun.sh[229]: ================================================================
+[   60.073754] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
+[   60.164622] pks-autorun.sh[229]: --> [PKS AUTORUN] Executing Dirty Frag exploit test...
+[   64.154911] pks-autorun.sh[244]: [+] Protected mount active: /mnt/protected with 'pks_pagecache'
+[   64.169891] pks-autorun.sh[244]: ======================================================================
+[   64.178546] pks-autorun.sh[244]: === dirty-frag (pcache_pks=on) ===
+[   64.187529] pks-autorun.sh[244]: Target: /mnt/protected/victim_file
+[   66.842323] run_tests.sh (244): drop_caches: 3
+[   67.763652] pks-autorun.sh[244]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
+[   75.056045] BUG: unable to handle page fault for address: ff1100017000f000
+[   75.058456] #PF: supervisor write access in kernel mode
+[   75.058584] #PF: error_code(0x0023) - protection keys violation
+[   75.058745] PGD 3201067 P4D 3202067 PUD 100223063 PMD 90000001700001e3 
+[   75.059061] Oops: 0023 [#1] PREEMPT SMP PTI
+[   75.061407] CPU: 1 PID: 284 Comm: exp Not tainted 5.18.0-rc3-00050-g057575e0ecf6 #7
+[   75.061608] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
+[   75.061836] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
+[   75.064335] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
+[   75.064679] RSP: 0018:ffa00000000c8ba0 EFLAGS: 00000202
+[   75.066970] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
+[   75.067108] RDX: 0000000000000004 RSI: ffa00000000c8c7c RDI: 00000000464c457f
+[   75.067241] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa00000000c8bf8
+[   75.067370] R10: ff110001009e1158 R11: 0000000000000000 R12: ffa00000000c8c7c
+[   75.067503] R13: ff11000101b00000 R14: 0000000000000004 R15: ffa00000000c8be8
+[   75.069866] FS:  00007f528a0f1740(0000) GS:ff1100016bc80000(0000) knlGS:0000000000000000
+[   75.069992] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   75.070085] CR2: ff1100017000f000 CR3: 00000001039c8000 CR4: 00000000017516e0
+[   75.070234] PKRU: 55555554
+[   75.070313] PKRS: 0x55555564
+[   75.070407] Call Trace:
+[   75.073198]  <IRQ>
+[   75.076272]  scatterwalk_map_and_copy+0x49/0x70
+[   75.076416]  crypto_authenc_esn_decrypt+0xff/0x190
+[   75.076498]  esp_input+0x1d2/0x310
+[   75.076558]  ? xfrm_state_lookup+0x4c/0x60
+[   75.076629]  xfrm_input+0x4a5/0x1310
+[   75.076710]  xfrm4_rcv_encap+0xb8/0x110
+[   75.076772]  ? xfrm4_transport_finish+0x210/0x210
+[   75.076839]  udp_queue_rcv_one_skb+0x23b/0x610
+[   75.079030]  udp_unicast_rcv_skb+0x70/0x80
+[   75.079108]  __udp4_lib_rcv+0x50c/0xc20
+[   75.079185]  ? ip_rcv_core+0x75/0x350
+[   75.079248]  ip_protocol_deliver_rcu+0x105/0x220
+[   75.079317]  ip_local_deliver_finish+0x6e/0x90
+[   75.079382]  __netif_receive_skb_one_core+0x82/0x90
+[   75.079456]  process_backlog+0x94/0x130
+[   75.079515]  __napi_poll+0x27/0x160
+[   75.079573]  net_rx_action+0x22a/0x280
+[   75.079637]  __do_softirq+0xf4/0x336
+[   75.082559]  do_softirq+0x91/0xc0
+[   75.082718]  </IRQ>
+[   75.082766]  <TASK>
+[   75.082803]  __local_bh_enable_ip+0x60/0x70
+[   75.082868]  ip_finish_output2+0x175/0x510
+[   75.082935]  ? dst_output+0x30/0x30
+[   75.082992]  ip_send_skb+0x76/0x80
+[   75.083048]  udp_send_skb+0x235/0x360
+[   75.083109]  udp_sendpage+0x158/0x210
+[   75.083176]  inet_sendpage+0x4a/0x80
+[   75.085378]  kernel_sendpage+0x43/0x110
+[   75.085471]  sock_sendpage+0x1b/0x20
+[   75.085530]  pipe_to_sendpage+0x5c/0xa0
+[   75.085603]  __splice_from_pipe+0xaf/0x1e0
+[   75.085667]  ? propagate_umount+0x500/0x500
+[   75.085733]  generic_splice_sendpage+0x5a/0x90
+[   75.085805]  do_splice+0x319/0x700
+[   75.085865]  __do_splice+0xd9/0x150
+[   75.085925]  __x64_sys_splice+0x8f/0x110
+[   75.085989]  do_syscall_64+0x3b/0x90
+[   75.086057]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[   75.089135] RIP: 0033:0x7f528a1fd103
+[   75.089332] Code: 64 89 02 48 c7 c0 ff ff ff ff eb b9 66 2e 0f 1f 84 00 00 00 00 00 90 80 3d e1 24 0d 00 00 49 89 ca 74 14 b8 13 01 00 00 0f 05 <48> 3d 00 f0 ff ff 77 75 c3 0f 1f 40 00 55 48 83 ec 30 44 89 4c 24
+[   75.089553] RSP: 002b:00007ffc08c89058 EFLAGS: 00000202 ORIG_RAX: 0000000000000113
+[   75.091849] RAX: ffffffffffffffda RBX: 00007ffc08c890a4 RCX: 00007f528a1fd103
+[   75.091940] RDX: 0000000000000004 RSI: 0000000000000000 RDI: 0000000000000006
+[   75.092027] RBP: 00007ffc08c89110 R08: 0000000000000028 R09: 0000000000000001
+[   75.092113] R10: 0000000000000000 R11: 0000000000000202 R12: 0000000000000000
+[   75.092198] R13: 00007ffc08c89300 R14: 000055f93b729dd8 R15: 00007f528a30e020
+[   75.092315]  </TASK>
+[   75.092388] Modules linked in:
+[   75.094646] CR2: ff1100017000f000
+[   75.095007] ---[ end trace 0000000000000000 ]---
+[   75.095101] RIP: 0010:scatterwalk_copychunks+0x197/0x1c0
+[   75.095187] Code: 02 48 29 c6 c1 e9 03 f3 48 a5 e9 6b ff ff ff 48 83 c4 10 5b 5d 41 5c 41 5d 41 5e 41 5f c3 0f 1f 44 00 00 e9 79 ff ff ff 8b 3e <89> 38 8b 74 0e fc 89 74 08 fc e9 41 ff ff ff 0f b7 74 0e fe 66 89
+[   75.097560] RSP: 0018:ffa00000000c8ba0 EFLAGS: 00000202
+[   75.097640] RAX: ff1100017000f000 RBX: 0000000000000004 RCX: 0000000000000004
+[   75.097727] RDX: 0000000000000004 RSI: ffa00000000c8c7c RDI: 00000000464c457f
+[   75.097814] RBP: ffd4000005c003c0 R08: 0000000000000001 R09: ffa00000000c8bf8
+[   75.097899] R10: ff110001009e1158 R11: 0000000000000000 R12: ffa00000000c8c7c
+[   75.097985] R13: ff11000101b00000 R14: 0000000000000004 R15: ffa00000000c8be8
+[   75.098081] FS:  00007f528a0f1740(0000) GS:ff1100016bc80000(0000) knlGS:0000000000000000
+[   75.100343] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   75.100424] CR2: ff1100017000f000 CR3: 00000001039c8000 CR4: 00000000017516e0
+[   75.100518] PKRU: 55555554
+[   75.100558] PKRS: 0x55555564
+[   75.100712] Kernel panic - not syncing: Fatal exception in interrupt
+[   75.101604] Kernel Offset: disabled
+[   75.101783] Rebooting in 1 seconds..

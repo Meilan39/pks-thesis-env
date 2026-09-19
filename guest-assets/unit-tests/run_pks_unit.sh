@@ -36,7 +36,7 @@ if [ -f /sys/kernel/debug/dynamic_debug/control ]; then
 fi
 
 SANITY_BIN="$SCRIPT_DIR/pks_sanity_test"
-if [ ! -x "$SANITY_BIN" ] && [ -f "$SCRIPT_DIR/pks_sanity_test.c" ]; then
+if [ -f "$SCRIPT_DIR/pks_sanity_test.c" ] && { [ ! -x "$SANITY_BIN" ] || [ "$SCRIPT_DIR/pks_sanity_test.c" -nt "$SANITY_BIN" ]; }; then
     echo "[INFO] Compiling pks_sanity_test..."
     gcc -O2 -Wall -o "$SANITY_BIN" "$SCRIPT_DIR/pks_sanity_test.c" 2>/dev/null || true
 fi

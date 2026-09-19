@@ -350,26 +350,59 @@ def generate_table1_tost(df: pd.DataFrame, out_dir: Path):
     
     rows = []
     margin_pct = 2.0  # Practical equivalence bound: +/- 2%
+    is_distribution = False
     
     if not read_sub.empty:
-        piv = read_sub.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
-        if "baseline_control" in piv.columns and "mitigated_on" in piv.columns:
-            for _, row in piv.iterrows():
+        # Check sample counts per group
+        sample_counts = read_sub.groupby(["block_size_bytes", "kernel_variant"])["value"].count()
+        is_distribution = (sample_counts > 1).any()
+        
+        piv_mean = read_sub.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
+        piv_std = read_sub.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="std").reset_index() if is_distribution else None
+        
+        if "baseline_control" in piv_mean.columns and "mitigated_on" in piv_mean.columns:
+            for _, row in piv_mean.iterrows():
                 bs = row["block_size_bytes"]
-                base_val = row["baseline_control"]
-                mit_val = row["mitigated_on"]
-                diff_pct = ((mit_val - base_val) / base_val) * 100.0
-                equiv = "Yes" if abs(diff_pct) <= margin_pct else "No"
-                rows.append((format_bytes(bs), f"{base_val:.1f}", f"{mit_val:.1f}", f"{diff_pct:+.2f}%", f"±{margin_pct:.1f}%", equiv))
+                base_mean = row["baseline_control"]
+                mit_mean = row["mitigated_on"]
+                diff_pct = ((mit_mean - base_mean) / base_mean) * 100.0
+                
+                if is_distribution and piv_std is not None:
+                    # Multi-sample TOST calculation
+                    b_vals = read_sub[(read_sub["block_size_bytes"] == bs) & (read_sub["kernel_variant"] == "baseline_control")]["value"].values
+                    m_vals = read_sub[(read_sub["block_size_bytes"] == bs) & (read_sub["kernel_variant"] == "mitigated_on")]["value"].values
+                    n_b, n_m = len(b_vals), len(m_vals)
+                    delta = (margin_pct / 100.0) * base_mean
+                    
+                    if n_b >= 2 and n_m >= 2:
+                        se = math.sqrt(np.var(b_vals, ddof=1)/n_b + np.var(m_vals, ddof=1)/n_m)
+                        diff = mit_mean - base_mean
+                        t1 = (diff - (-delta)) / se if se > 0 else 0
+                        t2 = (diff - delta) / se if se > 0 else 0
+                        df_val = n_b + n_m - 2
+                        p1 = 1 - stats.t.cdf(t1, df_val)
+                        p2 = stats.t.cdf(t2, df_val)
+                        p_tost = max(p1, p2)
+                        equiv = f"Yes (p={p_tost:.3f})" if p_tost < 0.05 else f"No (p={p_tost:.3f})"
+                    else:
+                        equiv = "Yes (Point Est)" if abs(diff_pct) <= margin_pct else "No (Point Est)"
+                else:
+                    equiv = "Within Bound" if abs(diff_pct) <= margin_pct else "Outside Bound"
+                
+                rows.append((format_bytes(bs), f"{base_mean:.1f}", f"{mit_mean:.1f}", f"{diff_pct:+.2f}%", f"±{margin_pct:.1f}%", equiv))
     
     # Write Markdown version
     with open(md_path, "w", encoding="utf-8") as f:
         f.write("# Table 1: Two One-Sided Tests (TOST) Read-Path Parity\n\n")
-        f.write("| Block Size | Baseline (ns) | Mitigated (ns) | Difference (%) | Equivalence Bound | Equivalent? |\n")
+        f.write("| Block Size | Baseline Mean (ns) | Mitigated Mean (ns) | Difference (%) | Equivalence Bound | Equivalent? |\n")
         f.write("|:---|:---|:---|:---|:---|:---|\n")
         for r in rows:
             f.write(f"| {r[0]} | {r[1]} | {r[2]} | {r[3]} | {r[4]} | **{r[5]}** |\n")
-        f.write("\n*Note: Valid statistical equivalence requires identical virtualization environments (KVM vs KVM or TCG vs TCG).*\n")
+        
+        if not is_distribution:
+            f.write("\n*Note on Methodology: The above table reflects single-run point estimates. Formal hypothesis rejection (H01/H02 with α=0.05) requires evaluating N >= 30 independent runs to compute Welch's degrees of freedom and two one-sided t-statistics against the ±2.0% equivalence margin. Under QEMU TCG software emulation, translated MSR helper overhead inflates small-block measurements.*\n")
+        else:
+            f.write("\n*Note: Evaluated with Two One-Sided Tests (TOST) at 95% confidence level (α=0.05) across sample runs.*\n")
     
     # Write LaTeX version
     with open(tex_path, "w", encoding="utf-8") as f:
