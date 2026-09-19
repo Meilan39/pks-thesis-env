@@ -1,0 +1,11 @@
+{
+  "kernel_variant": "baseline_control",
+  "kernel_release": "5.18.0-rc3",
+  "kernel_version": "#1 SMP PREEMPT_DYNAMIC Wed Sep 16 08:55:03 UTC 2026",
+  "cmdline": "root=/dev/vda1 rw console=ttyS0 nokaslr pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target",
+  "cpu_model": "QEMU TCG CPU version 2.5+",
+  "cpu_count": 4,
+  "timestamp": "2026-09-19T06:21:30Z",
+  "mount_options": "/dev/vda2 on /mnt/protected type ext4 (rw,relatime)",
+  "steal_time_stat": "cpu  8868 0 18898 452338 117315 0 711 0 0 0"
+}

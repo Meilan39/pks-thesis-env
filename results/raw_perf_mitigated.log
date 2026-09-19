@@ -692,3 +692,5 @@ Welcome to [1mDebian GNU/Linux 12 (bookworm)[0m!
 [ 1233.931374] pks-autorun.sh[544]: delete
 [ 1233.952318] pks-autorun.sh[544]: 0
 [ 1254.964758] kworker/dying (68) used greatest stack depth: 12800 bytes left
+QEMU: Terminated
+
