@@ -1,75 +1,100 @@
-[   21.017646] pks-autorun.sh[229]:  [PKS AUTORUN] Triggered with mode: bench
-[   21.021569] pks-autorun.sh[229]: ================================================================
-[   21.227756] pks-autorun.sh[229]: --> [PKS AUTORUN] Executing fio benchmark suite...
-[   21.424586] pks-autorun.sh[237]: [INFO] Evaluating on protected mount: /mnt/protected
-[   21.547967] pks-autorun.sh[237]: ======================================================================
-[   21.551452] pks-autorun.sh[237]:  Starting PKS Performance Benchmark Suite
-[   21.556120] pks-autorun.sh[237]:  Kernel Variant: baseline_control
-[   21.599520] pks-autorun.sh[237]:  Kernel Release: 5.18.0-rc3
-[   21.601943] pks-autorun.sh[237]:  Output Dir:     /mnt/protected/bench_results/raw/baseline_control
-[   21.661158] pks-autorun.sh[237]:  Date:           Fri Sep 18 20:14:39 UTC 2026
-[   21.668027] pks-autorun.sh[237]: ======================================================================
-[   21.773308] pks-autorun.sh[237]: === [1/4] Executing Warm-Cache Multi-Syscall Sweep ===
-[   21.778939] pks-autorun.sh[237]: [INFO] Pre-allocating 64 MiB warm working files...
-[   38.091699] pks-autorun.sh[237]:   -> Warm sweep: block_size=512 bytes
-[   80.421673] pks-autorun.sh[237]:   -> Warm sweep: block_size=1024 bytes
-[  113.400709] pks-autorun.sh[237]:   -> Warm sweep: block_size=2048 bytes
-[  142.316916] pks-autorun.sh[237]:   -> Warm sweep: block_size=4096 bytes
-[  147.991227] pks-autorun.sh[237]:   -> Warm sweep: block_size=8192 bytes
-[  152.460248] pks-autorun.sh[237]:   -> Warm sweep: block_size=16384 bytes
-[  156.039641] pks-autorun.sh[237]:   -> Warm sweep: block_size=32768 bytes
-[  161.920328] pks-autorun.sh[237]:   -> Warm sweep: block_size=65536 bytes
-[  174.831737] pks-autorun.sh[237]:   -> Warm sweep: block_size=131072 bytes
-[  181.625897] pks-autorun.sh[237]:   -> Warm sweep: block_size=262144 bytes
-[  189.606286] pks-autorun.sh[237]:   -> Warm sweep: block_size=524288 bytes
-[  198.972266] pks-autorun.sh[237]:   -> Warm sweep: block_size=1048576 bytes
-[  211.012303] pks-autorun.sh[237]: === [2/4] Executing Cold-Cache Multi-Syscall Sweep ===
-[  211.129305] pks-autorun.sh[237]:   -> Cold sweep: block_size=512 bytes
-[  211.847391] bash (237): drop_caches: 3
-[  224.545968] bash (237): drop_caches: 3
-[  231.420744] pks-autorun.sh[237]:   -> Cold sweep: block_size=1024 bytes
-[  231.996465] bash (237): drop_caches: 3
-[  241.233595] bash (237): drop_caches: 3
-[  245.761936] pks-autorun.sh[237]:   -> Cold sweep: block_size=2048 bytes
-[  246.321217] bash (237): drop_caches: 3
-[  253.719694] bash (237): drop_caches: 3
-[  256.872272] pks-autorun.sh[237]:   -> Cold sweep: block_size=4096 bytes
-[  257.394901] bash (237): drop_caches: 3
-[  264.868975] bash (237): drop_caches: 3
-[  267.267515] pks-autorun.sh[237]:   -> Cold sweep: block_size=8192 bytes
-[  267.808905] bash (237): drop_caches: 3
-[  274.026261] bash (237): drop_caches: 3
-[  276.120662] pks-autorun.sh[237]:   -> Cold sweep: block_size=16384 bytes
-[  276.660158] bash (237): drop_caches: 3
-[  282.851599] bash (237): drop_caches: 3
-[  284.790152] pks-autorun.sh[237]:   -> Cold sweep: block_size=32768 bytes
-[  285.393419] bash (237): drop_caches: 3
-[  291.716295] bash (237): drop_caches: 3
-[  293.503191] pks-autorun.sh[237]:   -> Cold sweep: block_size=65536 bytes
-[  294.075751] bash (237): drop_caches: 3
-[  299.884780] bash (237): drop_caches: 3
-[  301.743059] pks-autorun.sh[237]:   -> Cold sweep: block_size=131072 bytes
-[  302.260220] bash (237): drop_caches: 3
-[  308.184658] bash (237): drop_caches: 3
-[  309.983088] pks-autorun.sh[237]:   -> Cold sweep: block_size=262144 bytes
-[  310.532602] bash (237): drop_caches: 3
-[  318.455726] bash (237): drop_caches: 3
-[  320.247777] pks-autorun.sh[237]:   -> Cold sweep: block_size=524288 bytes
-[  320.763421] bash (237): drop_caches: 3
-[  326.626344] bash (237): drop_caches: 3
-[  328.435868] pks-autorun.sh[237]:   -> Cold sweep: block_size=1048576 bytes
-[  329.036541] bash (237): drop_caches: 3
-[  334.992184] bash (237): drop_caches: 3
-[  336.952193] pks-autorun.sh[237]: === [3/4] Executing Multi-Core Concurrency Sweep ===
-[  336.974517] pks-autorun.sh[237]:   -> Concurrency test: numjobs=1 (private files, bs=4K)
-[  344.898859] pks-autorun.sh[237]:   -> Concurrency test: numjobs=2 (private files, bs=4K)
-[  358.782155] pks-autorun.sh[237]:   -> Concurrency test: numjobs=4 (private files, bs=4K)
-[  384.665697] pks-autorun.sh[237]: === [4/4] Executing SQLite Macrobenchmark ===
-[  384.986790] pks-autorun.sh[514]: [INFO] Running SQLite benchmark (synchronous=FULL, transactions=5000) on /mnt/protected...
-[  385.867286] pks-autorun.sh[522]: /benchmark/sqlite_bench.sh: line 53: sqlite3: command not found
-[  386.906863] pks-autorun.sh[229]: ================================================================
-[  386.912936] pks-autorun.sh[229]:  [PKS AUTORUN] Benchmarking complete. Powering off.
-[  386.916977] pks-autorun.sh[229]: ================================================================
-[  388.604520] e1000e: EEE TX LPI TIMER: 00000000
-[  388.614929] ACPI: PM: Preparing to enter system sleep state S5
-[  388.622005] reboot: Power down
+[   22.325036] pks-autorun.sh[223]:  [PKS AUTORUN] Triggered with mode: bench
+[   22.328807] pks-autorun.sh[223]: ================================================================
+[   22.535425] pks-autorun.sh[223]: --> [PKS AUTORUN] Executing fio benchmark suite...
+[   22.780238] pks-autorun.sh[234]: [INFO] Evaluating on protected mount: /mnt/protected
+[   22.902376] pks-autorun.sh[234]: ======================================================================
+[   22.905828] pks-autorun.sh[234]:  Starting PKS Performance Benchmark Suite
+[   22.909914] pks-autorun.sh[234]:  Kernel Variant: baseline_control
+[   22.960808] pks-autorun.sh[234]:  Kernel Release: 5.18.0-rc3
+[   22.966370] pks-autorun.sh[234]:  Output Dir:     /mnt/protected/bench_results/raw/baseline_control
+[   23.034525] pks-autorun.sh[234]:  Date:           Sat Sep 19 05:56:24 UTC 2026
+[   23.040053] pks-autorun.sh[234]: ======================================================================
+[   23.170248] pks-autorun.sh[234]: === [1/4] Executing Warm-Cache Multi-Syscall Sweep ===
+[   23.176341] pks-autorun.sh[234]: [INFO] Pre-allocating 32 MiB warm working files...
+[   25.587830] bash (234): drop_caches: 3
+[   34.652920] pks-autorun.sh[234]:   -> Warm sweep: block_size=512 bytes
+[   55.202702] pks-autorun.sh[234]:   -> Warm sweep: block_size=1024 bytes
+[   74.015587] pks-autorun.sh[234]:   -> Warm sweep: block_size=2048 bytes
+[   86.505921] pks-autorun.sh[234]:   -> Warm sweep: block_size=4096 bytes
+[   92.854584] pks-autorun.sh[234]:   -> Warm sweep: block_size=8192 bytes
+[   96.108813] pks-autorun.sh[234]:   -> Warm sweep: block_size=16384 bytes
+[   99.587340] pks-autorun.sh[234]:   -> Warm sweep: block_size=32768 bytes
+[  102.661956] pks-autorun.sh[234]:   -> Warm sweep: block_size=65536 bytes
+[  107.043866] pks-autorun.sh[234]:   -> Warm sweep: block_size=131072 bytes
+[  111.776676] pks-autorun.sh[234]:   -> Warm sweep: block_size=262144 bytes
+[  116.422732] pks-autorun.sh[234]:   -> Warm sweep: block_size=524288 bytes
+[  123.288809] pks-autorun.sh[234]:   -> Warm sweep: block_size=1048576 bytes
+[  129.165372] bash (234): drop_caches: 3
+[  129.168565] pks-autorun.sh[234]: === [2/4] Executing Cold-Cache Multi-Syscall Sweep ===
+[  129.319539] pks-autorun.sh[234]:   -> Cold sweep: block_size=512 bytes
+[  129.761291] bash (234): drop_caches: 3
+[  138.480261] bash (234): drop_caches: 3
+[  143.390185] pks-autorun.sh[234]:   -> Cold sweep: block_size=1024 bytes
+[  143.905848] bash (234): drop_caches: 3
+[  149.585305] bash (234): drop_caches: 3
+[  152.699820] pks-autorun.sh[234]:   -> Cold sweep: block_size=2048 bytes
+[  153.194105] bash (234): drop_caches: 3
+[  158.585340] bash (234): drop_caches: 3
+[  161.105549] pks-autorun.sh[234]:   -> Cold sweep: block_size=4096 bytes
+[  161.625097] bash (234): drop_caches: 3
+[  165.963121] bash (234): drop_caches: 3
+[  168.225095] pks-autorun.sh[234]:   -> Cold sweep: block_size=8192 bytes
+[  168.720022] bash (234): drop_caches: 3
+[  173.778346] bash (234): drop_caches: 3
+[  175.683635] pks-autorun.sh[234]:   -> Cold sweep: block_size=16384 bytes
+[  176.250963] bash (234): drop_caches: 3
+[  180.524936] bash (234): drop_caches: 3
+[  182.468070] pks-autorun.sh[234]:   -> Cold sweep: block_size=32768 bytes
+[  182.937896] bash (234): drop_caches: 3
+[  187.572336] bash (234): drop_caches: 3
+[  189.370640] pks-autorun.sh[234]:   -> Cold sweep: block_size=65536 bytes
+[  189.845793] bash (234): drop_caches: 3
+[  194.045719] bash (234): drop_caches: 3
+[  195.821995] pks-autorun.sh[234]:   -> Cold sweep: block_size=131072 bytes
+[  196.329881] bash (234): drop_caches: 3
+[  200.837013] bash (234): drop_caches: 3
+[  202.615971] pks-autorun.sh[234]:   -> Cold sweep: block_size=262144 bytes
+[  203.137011] bash (234): drop_caches: 3
+[  207.432605] bash (234): drop_caches: 3
+[  209.371808] pks-autorun.sh[234]:   -> Cold sweep: block_size=524288 bytes
+[  209.874530] bash (234): drop_caches: 3
+[  214.651007] bash (234): drop_caches: 3
+[  216.455391] pks-autorun.sh[234]:   -> Cold sweep: block_size=1048576 bytes
+[  217.065674] bash (234): drop_caches: 3
+[  221.305805] bash (234): drop_caches: 3
+[  223.729448] bash (234): drop_caches: 3
+[  223.706866] pks-autorun.sh[234]: === [3/4] Executing Multi-Core Concurrency Sweep ===
+[  223.720064] pks-autorun.sh[234]:   -> Concurrency test: numjobs=1 (private files, bs=4K)
+[  224.186389] bash (234): drop_caches: 3
+[  229.382765] bash (234): drop_caches: 3
+[  229.368369] pks-autorun.sh[234]:   -> Concurrency test: numjobs=2 (private files, bs=4K)
+[  229.798001] bash (234): drop_caches: 3
+[  236.921375] bash (234): drop_caches: 3
+[  236.902175] pks-autorun.sh[234]:   -> Concurrency test: numjobs=4 (private files, bs=4K)
+[  237.246719] bash (234): drop_caches: 3
+[  247.785741] bash (234): drop_caches: 3
+[  247.769952] pks-autorun.sh[234]: === [4/4] Executing SQLite Macrobenchmark ===
+[  248.155145] pks-autorun.sh[514]: [INFO] Running SQLite benchmark (synchronous=FULL, transactions=5000) on /mnt/protected...
+[  249.367240] pks-autorun.sh[522]: delete
+[  249.372970] pks-autorun.sh[522]: 0
+         Starting [0;1;39msystemd-tmpfiles-…leanup of Temporary Directories...
+[[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-… Cleanup of Temporary Directories.
+         Starting [0;1;39mapt-daily-upgrade…pt upgrade and clean activities...
+[[0;32m  OK  [0m] Finished [0;1;39mapt-daily-upgrade… apt upgrade and clean activities.
+[ 1516.417484] pks-autorun.sh[583]: [INFO] SQLite (FULL): 5000 txns in 1266.415s -> 3.95 TPS, 253283014.8 ns/tx
+[ 1516.872562] pks-autorun.sh[585]: [INFO] Running SQLite benchmark (synchronous=OFF, transactions=5000) on /mnt/protected...
+[ 1517.380601] pks-autorun.sh[593]: delete
+[ 1517.385726] pks-autorun.sh[593]: 0
+[ 1528.286426] pks-autorun.sh[597]: [INFO] SQLite (OFF): 5000 txns in 10.067s -> 496.67 TPS, 2013423.3 ns/tx
+[ 1528.388944] pks-autorun.sh[234]: === Recording Environment Provenance Metadata ===
+[ 1529.528251] pks-autorun.sh[600]: [INFO] Metadata captured in /mnt/protected/bench_results/raw/baseline_control/run_metadata.json
+[ 1531.397930] pks-autorun.sh[234]: ======================================================================
+[ 1531.405542] pks-autorun.sh[234]:  Benchmark suite execution successfully completed!
+[ 1531.409641] pks-autorun.sh[234]:  Outputs archived in: /mnt/protected/bench_results/raw/baseline_control
+[ 1531.412308] pks-autorun.sh[234]: ======================================================================
+[ 1532.534217] pks-autorun.sh[223]: ================================================================
+[ 1532.541775] pks-autorun.sh[223]:  [PKS AUTORUN] Benchmarking complete. Powering off.
+[ 1532.546546] pks-autorun.sh[223]: ================================================================
+[ 1534.223931] e1000e: EEE TX LPI TIMER: 00000000
+[ 1534.237451] ACPI: PM: Preparing to enter system sleep state S5
+[ 1534.244800] reboot: Power down

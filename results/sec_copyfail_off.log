@@ -1,21 +1,22 @@
-[   57.941116] pks-autorun.sh[226]:  [PKS AUTORUN] Triggered with mode: sec_copyfail
-[   57.948738] pks-autorun.sh[226]: ================================================================
-[   59.071300] pks-autorun.sh[226]: --> [PKS AUTORUN] Executing Copy Fail exploit test...
-[   62.422949] pks-autorun.sh[234]: [-] Protected mount active: /mnt/protected without 'pks_pagecache' (standard ext4)
-[   62.823968] pks-autorun.sh[234]: === copy-fail ===
-[   62.836611] pks-autorun.sh[234]: Target: /mnt/protected/victim_file
-[   66.483250] run_tests.sh (234): drop_caches: 3
-[   67.308072] pks-autorun.sh[234]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
-[   77.206944] pks-autorun.sh[234]: target modified -> corruption detected
-[   81.454012] pks-autorun.sh[234]: post-run MD5: c502c7e0aa3b6df196b8dc7111d6dab0
-[   82.544683] pks-autorun.sh[234]: RESULT: copy-fail SUCCEEDED (page cache modified)
-[   84.803724] run_tests.sh (234): drop_caches: 3
-[   84.834237] pks-autorun.sh[234]: ---
-[   84.851192] pks-autorun.sh[234]: All tests completed.
-[   84.863663] pks-autorun.sh[234]: Logs: /tmp/exploit_results/
-[   86.699167] pks-autorun.sh[226]: ================================================================
-[   86.725876] pks-autorun.sh[226]:  [PKS AUTORUN] Copy Fail test complete. Powering off.
-[   86.738442] pks-autorun.sh[226]: ================================================================
-[   89.526045] e1000e: EEE TX LPI TIMER: 00000000
-[   89.541608] ACPI: PM: Preparing to enter system sleep state S5
-[   89.547039] reboot: Power down
+[   60.361652] pks-autorun.sh[227]:  [PKS AUTORUN] Triggered with mode: sec_copyfail
+[   60.371200] pks-autorun.sh[227]: ================================================================
+[   61.556057] pks-autorun.sh[227]: --> [PKS AUTORUN] Executing Copy Fail exploit test...
+[   65.264821] pks-autorun.sh[235]: [-] Protected mount active: /mnt/protected without 'pks_pagecache' (standard ext4)
+[   65.682134] pks-autorun.sh[235]: ======================================================================
+[   65.702722] pks-autorun.sh[235]: === copy-fail (pcache_pks=off) ===
+[   65.715155] pks-autorun.sh[235]: Target: /mnt/protected/victim_file
+[   69.246220] run_tests.sh (235): drop_caches: 3
+[   69.998827] pks-autorun.sh[235]: pre-run MD5:  bf3f1799b2782402b9bbe1d16fba90e5
+[   80.223613] pks-autorun.sh[235]: target modified -> corruption detected
+[   84.511130] pks-autorun.sh[235]: post-run MD5: c502c7e0aa3b6df196b8dc7111d6dab0
+[   85.579069] pks-autorun.sh[235]: RESULT: copy-fail SUCCEEDED (page cache modified)
+[   89.286070] run_tests.sh (235): drop_caches: 3
+[   89.302096] pks-autorun.sh[235]: ---
+[   89.320702] pks-autorun.sh[235]: All tests completed.
+[   89.332033] pks-autorun.sh[235]: Logs: /tmp/exploit_results/
+[   91.141031] pks-autorun.sh[227]: ================================================================
+[   91.162419] pks-autorun.sh[227]:  [PKS AUTORUN] Copy Fail test complete. Powering off.
+[   91.169006] pks-autorun.sh[227]: ================================================================
+[   93.735210] e1000e: EEE TX LPI TIMER: 00000000
+[   93.750858] ACPI: PM: Preparing to enter system sleep state S5
+[   93.754041] reboot: Power down

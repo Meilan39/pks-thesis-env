@@ -1,593 +1,594 @@
-[   70.582468] pks-autorun.sh[233]:  [PKS AUTORUN] Triggered with mode: compliance
-[   70.592632] pks-autorun.sh[233]: ================================================================
-[   73.281128] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
-[   73.380688] pks-autorun.sh[233]: --> [PKS AUTORUN] Executing Consolidated Compliance Suite (Single-Boot)...
-[   73.666903] pks-autorun.sh[233]: === [1/3] PKS In-Kernel Self-Test ===
-[   75.173174] pks-autorun.sh[249]: ================================================================
-[   75.190393] pks-autorun.sh[249]:  In-Kernel PKS Self-Test Suite (debugfs)
-[   75.202028] pks-autorun.sh[249]: ================================================================
-[   80.212576] pks-autorun.sh[255]: ================================================================
-[   80.310894] pks-autorun.sh[255]:  PKS Page-Cache Sanity & Subsystem Scoping Test Harness
-[   80.348246] pks-autorun.sh[255]: ================================================================
-[   80.358441] pks-autorun.sh[255]: [INFO] Connected to DebugFS: pool [0x170000, 0x180000), scopes=43364
-[   80.368117] pks-autorun.sh[255]: ==> [Suite 1] Supported VFS System-Call Scoping Verification
-[   80.380124] pks-autorun.sh[255]:     [PASS] write(2) scoped cleanly (+7 begin, +7 end)
-[   80.390673] pks-autorun.sh[255]:     [PASS] pwrite(2) scoped cleanly (+4 begin, +4 end)
-[   80.403775] pks-autorun.sh[255]:     [PASS] writev(2) scoped cleanly (+2 begin, +2 end)
-[   80.415586] pks-autorun.sh[255]:     [PASS] ftruncate(2) scoped cleanly (+3 begin, +3 end)
-[   80.424510] pks-autorun.sh[255]:     [PASS] fallocate(2) scoped cleanly (+15 begin, +15 end)
-[   80.432920] pks-autorun.sh[255]:     [FAIL] read(2) unexpectedly triggered write-scope toggle (+2)
-[   80.439695] pks-autorun.sh[255]: ==> [Suite 2] Static Pool Page-Cache Allocation Verification
-[   80.448510] pks-autorun.sh[255]:     [INFO] Pool PFN range: [0x170000, 0x180000)
-[   80.460173] pks-autorun.sh[255]:     [INFO] Inspected 1024 resident pages: 1024 in static pool, 0 outside
-[   80.469418] pks-autorun.sh[255]:     [PASS] 100% of resident page-cache folios reside strictly in the PKS static pool
-[   80.478701] pks-autorun.sh[255]: ==> [Suite 3] Fail-Closed Policy & Rejection Verification
-[   80.495852] pks-autorun.sh[255]:     [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP (Commit 06 policy)
-[   80.506469] pks-autorun.sh[255]:     [FAIL] open(O_DIRECT) did not return EOPNOTSUPP (ret=4, errno=95: Operation not supported)
-[   80.518081] pks-autorun.sh[255]: ================================================================
-[   80.525357] pks-autorun.sh[255]:  [FAIL] One or more sanity assertions failed
-[   80.533582] pks-autorun.sh[255]: ================================================================
-[   80.838320] pks-autorun.sh[249]: [INFO] Running upstream compiled test_pks selftest...
-[   80.874121] pks-autorun.sh[257]: [RUN]	check_defaults
-[   80.883165] pks-autorun.sh[257]: [OK]
-[   80.892023] pks-autorun.sh[257]: [RUN]	single
-[   80.902060] pks-autorun.sh[257]: [OK]
-[   80.913049] pks-autorun.sh[257]: [RUN]	context_switch
-[   80.921213] pks-autorun.sh[257]: do_context_switch: Child: running on cpu 0...
-[   80.931757] pks-autorun.sh[257]: do_context_switch: Child: Tell parent to go
-[   80.939674] pks-autorun.sh[257]: do_context_switch: Child: Waiting for parent...
-[   80.947314] pks-autorun.sh[257]: do_context_switch: Child: Checking result
-[   80.959162] pks-autorun.sh[257]: do_context_switch: Child: Result (P) PASS
-[   80.968390] pks-autorun.sh[257]: V
-[   82.070481] pks-autorun.sh[257]: [Sep18 19:24] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   82.083085] pks-autorun.sh[257]: [  +0.000212] pks_test:pks_write_file:635: Begin...
-[   82.092549] pks-autorun.sh[257]: [  +0.000113] pks_test:pks_write_file:657: check defaults test: 0x55555564
-[   82.102331] pks-autorun.sh[257]: [  +0.000061] pks_test:check_pkey_settings:501: cpu 3 0x55555564
-[   82.111525] pks-autorun.sh[257]: [  +0.000989] pks_test:check_pkey_settings:501: cpu 0 0x55555564
-[   82.123036] pks-autorun.sh[257]: [  -0.000344] pks_test:check_pkey_settings:501: cpu 1 0x55555564
-[   82.134424] pks-autorun.sh[257]: [  +0.001796] pks_test:check_pkey_settings:501: cpu 2 0x55555564
-[   82.143862] pks-autorun.sh[257]: [  +0.005064] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.152140] pks-autorun.sh[257]: [  +0.000052] pks_test:debug_result:107: Test complete [0]: PASS
-[   82.159067] pks-autorun.sh[257]: [  +0.000283] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test PASS
-[   82.168006] pks-autorun.sh[257]: [  +0.003390] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   82.177941] pks-autorun.sh[257]: [  +0.000092] pks_test:pks_write_file:635: Begin...
-[   82.187714] pks-autorun.sh[257]: [  +0.000040] pks_test:pks_write_file:661: Single key
-[   82.201600] pks-autorun.sh[257]: [  +0.000119] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000002c75e7fd
-[   82.212746] pks-autorun.sh[257]: [  +0.000052] pks_test:set_ctx_data:371: Setting context data; 00000000e1dd6080
-[   82.224370] pks-autorun.sh[257]: [  +0.002635] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000e1dd6080
-[   82.232950] pks-autorun.sh[257]: [  +0.000153] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000e1dd6080
-[   82.248060] pks-autorun.sh[257]: [  +0.001655] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.270348] pks-autorun.sh[257]: [  +0.000029] pks_test:debug_result:107: Test complete [1]: PASS
-[   82.287436] pks-autorun.sh[257]: [  +0.000952] pks_test:debug_session:95: Freeing session ctx 00000000e1dd6080; unlock 0; crash 0; last test PASS
-[   82.302130] pks-autorun.sh[257]: [  +0.019821] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   82.316843] pks-autorun.sh[257]: [  +0.026101] pks_test:pks_write_file:635: Begin...
-[   82.337585] pks-autorun.sh[257]: [  +0.000070] pks_test:pks_write_file:661: Single key
-[   82.351941] pks-autorun.sh[257]: [  +0.000052] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000066be5915
-[   82.371193] pks-autorun.sh[257]: [  +0.000016] pks_test:set_ctx_data:371: Setting context data; 000000007d3c2a36
-[   82.394140] pks-autorun.sh[257]: [  +0.000026] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007d3c2a36
-[   82.402849] pks-autorun.sh[257]: [  +0.000047] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007d3c2a36
-[   82.411718] pks-autorun.sh[257]: [  +0.002439] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.423430] pks-autorun.sh[257]: [  +0.000037] pks_test:debug_result:107: Test complete [1]: PASS
-[   82.437575] pks-autorun.sh[257]: [  +0.000111] pks_test:pks_write_file:635: Begin...
-[   82.449359] pks-autorun.sh[257]: [  +0.000036] pks_test:pks_write_file:665: Arming Context switch test
-[   82.457521] pks-autorun.sh[257]: [  +0.000055] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000009942095
-[   82.466659] pks-autorun.sh[257]: [  +0.000031] pks_test:set_ctx_data:368: Context data already set
-[   82.475760] pks-autorun.sh[257]: [  +0.000058] pks_test:set_ctx_data:371: Setting context data; 000000002cf6a6be
-[   82.483771] pks-autorun.sh[257]: [  +0.000033] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.495067] pks-autorun.sh[257]: [  +0.000021] pks_test:debug_result:107: Test complete [2]: PASS
-[   82.503718] pks-autorun.sh[257]: [  +0.004235] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   82.514857] pks-autorun.sh[257]: [  +0.003413] pks_test:pks_write_file:635: Begin...
-[   82.521793] pks-autorun.sh[257]: [  +0.000046] pks_test:pks_write_file:661: Single key
-[   82.534324] pks-autorun.sh[257]: [  +0.000046] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000169138ab
-[   82.545056] pks-autorun.sh[257]: [  +0.000015] pks_test:set_ctx_data:371: Setting context data; 000000007d3c2a36
-[   82.558855] pks-autorun.sh[257]: [  +0.000022] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007d3c2a36
-[   82.566568] pks-autorun.sh[257]: [  +0.000042] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007d3c2a36
-[   82.576953] pks-autorun.sh[257]: [  +0.000045] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.582905] pks-autorun.sh[257]: [  +0.000020] pks_test:debug_result:107: Test complete [1]: PASS
-[   82.592575] pks-autorun.sh[257]: [  +0.002988] pks_test:pks_write_file:635: Begin...
-[   82.601708] pks-autorun.sh[257]: [  +0.000047] pks_test:pks_write_file:669: Checking Context switch test
-[   82.610643] pks-autorun.sh[257]: [  +0.000046] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.620009] pks-autorun.sh[257]: [  +0.000010] pks_test:debug_result:107: Test complete [3]: PASS
-[   82.629648] pks-autorun.sh[257]: [  +0.003157] pks_test:debug_session:95: Freeing session ctx 000000007d3c2a36; unlock 0; crash 0; last test PASS
-[   82.640125] pks-autorun.sh[257]: [  +0.003693] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   82.651884] pks-autorun.sh[257]: [  +0.000094] pks_test:pks_write_file:635: Begin...
-[   82.664099] pks-autorun.sh[257]: [  +0.000057] pks_test:pks_write_file:673: Exception checking
-[   82.675832] pks-autorun.sh[257]: [  +0.000057] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000dbacbb16
-[   82.685157] pks-autorun.sh[257]: [  +0.000036] pks_test:set_ctx_data:371: Setting context data; 000000007d3c2a36
-[   82.694698] pks-autorun.sh[257]: [  +0.000063] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007d3c2a36
-[   82.703700] pks-autorun.sh[257]: [  +0.009003] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.716443] pks-autorun.sh[257]: [  +0.000032] pks_test:debug_result:107: Test complete [4]: PASS
-[   82.729055] pks-autorun.sh[257]: [  +0.000198] pks_test:debug_session:95: Freeing session ctx 000000002cf6a6be; unlock 0; crash 0; last test PASS
-[   82.740831] pks-autorun.sh[257]: [  +0.010723] pks_test:debug_session:95: Freeing session ctx 000000007d3c2a36; unlock 0; crash 0; last test PASS
-[   82.751775] pks-autorun.sh[257]: [  +0.000247] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   82.760685] pks-autorun.sh[257]: [  +0.000076] pks_test:pks_write_file:635: Begin...
-[   82.770490] pks-autorun.sh[257]: [  +0.000045] pks_test:pks_write_file:677: Fault clear test
-[   82.780535] pks-autorun.sh[257]: [  +0.000930] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000063ed2e98
-[   82.793830] pks-autorun.sh[257]: [  +0.001310] pks_test:set_ctx_data:371: Setting context data; 000000007d3c2a36
-[   82.803083] pks-autorun.sh[257]: [  +0.000075] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007d3c2a36
-[   82.812175] pks-autorun.sh[257]: [  +0.000035] pks_test:handle_update_exception:171: Updating pkey 1 during exception
-[   82.821787] pks-autorun.sh[257]: [  +0.000125] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.830751] pks-autorun.sh[257]: [  +0.000021] pks_test:debug_result:107: Test complete [5]: PASS
-[   82.839497] pks-autorun.sh[257]: [  +0.000109] pks_test:debug_session:95: Freeing session ctx 000000007d3c2a36; unlock 0; crash 0; last test PASS
-[   82.853883] pks-autorun.sh[257]: [  +0.002971] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   82.862880] pks-autorun.sh[257]: [  +0.000092] pks_test:pks_write_file:635: Begin...
-[   82.871557] pks-autorun.sh[257]: [  +0.000057] pks_test:pks_write_file:687: Unknown test
-[   82.880629] pks-autorun.sh[257]: [  +0.000019] pks_test:pks_write_file:694: Clearing crash test arm
-[   82.888889] pks-autorun.sh[257]: [  +0.000009] pks_test:debug_result:107: Test complete [6]: FAIL
-[   82.896805] pks-autorun.sh[257]: [  +0.000094] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   82.913656] pks-autorun.sh[257]: do_context_switch: Parent: Waiting for child
-[   82.922656] pks-autorun.sh[257]: do_context_switch: Parent: running on cpu 0
-[   82.930799] pks-autorun.sh[257]: do_context_switch: Parent: Signaling child
-[   82.941726] pks-autorun.sh[257]: do_context_switch: Parent: exiting with rc (P) 0
-[   82.952359] pks-autorun.sh[257]: [OK]
-[   82.962507] pks-autorun.sh[257]: [RUN]	exception
-[   82.975154] pks-autorun.sh[257]: [OK]
-[   82.984515] pks-autorun.sh[257]: [RUN]	exception_update
-[   82.993859] pks-autorun.sh[257]: [OK]
-[   83.002637] pks-autorun.sh[257]: [RUN]	run_all
-[   83.016667] pks-autorun.sh[257]: [SKIP] Test not supported
-[   83.029615] pks-autorun.sh[257]: 	Debug output command (approximate start time):
-[   83.056102] pks-autorun.sh[257]: 		dmesg -H --since '2026-9-18 19:24:41' | grep pks_test
-[   83.104672] pks-autorun.sh[249]: --- Kernel Debug Log (dmesg) ---
-[   83.136735] pks-autorun.sh[264]: [   80.565392] pks_test:pks_write_file:669: Checking Context switch test
-[   83.147707] pks-autorun.sh[264]: [   80.565438] pks_test:pks_write_file:694: Clearing crash test arm
-[   83.156591] pks-autorun.sh[264]: [   80.565448] pks_test:debug_result:107: Test complete [3]: PASS
-[   83.170688] pks-autorun.sh[264]: [   80.568605] pks_test:debug_session:95: Freeing session ctx 000000007d3c2a36; unlock 0; crash 0; last test PASS
-[   83.182740] pks-autorun.sh[264]: [   80.572298] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   83.192421] pks-autorun.sh[264]: [   80.572392] pks_test:pks_write_file:635: Begin...
-[   83.201644] pks-autorun.sh[264]: [   80.572449] pks_test:pks_write_file:673: Exception checking
-[   83.211401] pks-autorun.sh[264]: [   80.572506] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000dbacbb16
-[   83.225109] pks-autorun.sh[264]: [   80.572542] pks_test:set_ctx_data:371: Setting context data; 000000007d3c2a36
-[   83.237219] pks-autorun.sh[264]: [   80.572605] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007d3c2a36
-[   83.245706] pks-autorun.sh[264]: [   80.581608] pks_test:pks_write_file:694: Clearing crash test arm
-[   83.254574] pks-autorun.sh[264]: [   80.581640] pks_test:debug_result:107: Test complete [4]: PASS
-[   83.264540] pks-autorun.sh[264]: [   80.581838] pks_test:debug_session:95: Freeing session ctx 000000002cf6a6be; unlock 0; crash 0; last test PASS
-[   83.273437] pks-autorun.sh[264]: [   80.592561] pks_test:debug_session:95: Freeing session ctx 000000007d3c2a36; unlock 0; crash 0; last test PASS
-[   83.286848] pks-autorun.sh[264]: [   80.592808] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   83.299603] pks-autorun.sh[264]: [   80.592884] pks_test:pks_write_file:635: Begin...
-[   83.307009] pks-autorun.sh[264]: [   80.592929] pks_test:pks_write_file:677: Fault clear test
-[   83.313854] pks-autorun.sh[264]: [   80.593859] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000063ed2e98
-[   83.319780] pks-autorun.sh[264]: [   80.595169] pks_test:set_ctx_data:371: Setting context data; 000000007d3c2a36
-[   83.327651] pks-autorun.sh[264]: [   80.595244] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007d3c2a36
-[   83.340940] pks-autorun.sh[264]: [   80.595279] pks_test:handle_update_exception:171: Updating pkey 1 during exception
-[   83.350184] pks-autorun.sh[264]: [   80.595404] pks_test:pks_write_file:694: Clearing crash test arm
-[   83.359126] pks-autorun.sh[264]: [   80.595425] pks_test:debug_result:107: Test complete [5]: PASS
-[   83.368455] pks-autorun.sh[264]: [   80.595534] pks_test:debug_session:95: Freeing session ctx 000000007d3c2a36; unlock 0; crash 0; last test PASS
-[   83.383007] pks-autorun.sh[264]: [   80.598505] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   83.393283] pks-autorun.sh[264]: [   80.598597] pks_test:pks_write_file:635: Begin...
-[   83.399647] pks-autorun.sh[264]: [   80.598654] pks_test:pks_write_file:687: Unknown test
-[   83.406684] pks-autorun.sh[264]: [   80.598673] pks_test:pks_write_file:694: Clearing crash test arm
-[   83.418660] pks-autorun.sh[264]: [   80.598682] pks_test:debug_result:107: Test complete [6]: FAIL
-[   83.428189] pks-autorun.sh[264]: [   80.598776] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[   83.437122] pks-autorun.sh[249]: --------------------------------
-[   84.093575] pks-autorun.sh[249]: [WARN] One or more PKS unit/sanity tests failed (rc=1)
-[   84.128579] pks-autorun.sh[233]: === [2/3] File System Exerciser (fsx) ===
-[   85.690014] pks-autorun.sh[268]: ================================================================
-[   85.704328] pks-autorun.sh[268]:  File System Exerciser (fsx) - Automated PKS Test Suite
-[   85.712561] pks-autorun.sh[268]: ================================================================
-[   87.842045] pks-autorun.sh[268]: [OK]   Protected mount active: /mnt/protected with 'pks_pagecache'
-[   87.854583] pks-autorun.sh[268]:  Test | Description                                | Result
-[   87.862833] pks-autorun.sh[268]: ------------------------------------------------------------------
-[  427.030399] pks-autorun.sh[268]:  1    | Rootfs vanilla ext4 (5K ops, all features) | [PASS]
-         Starting [0;1;39mapt-daily-upgrade…pt upgrade and clean activities...
-[[0;32m  OK  [0m] Finished [0;1;39mapt-daily-upgrade… apt upgrade and clean activities.
+[   59.404897] pks-autorun.sh[226]:  [PKS AUTORUN] Triggered with mode: compliance
+[   59.418555] pks-autorun.sh[226]: ================================================================
+[   62.079140] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
+[   62.206959] pks-autorun.sh[226]: --> [PKS AUTORUN] Executing Consolidated Compliance Suite (Single-Boot)...
+[   62.505248] pks-autorun.sh[226]: === [1/3] PKS In-Kernel Self-Test ===
+[   63.913923] pks-autorun.sh[244]: ================================================================
+[   63.925762] pks-autorun.sh[244]:  In-Kernel PKS Self-Test Suite (debugfs)
+[   63.939521] pks-autorun.sh[244]: ================================================================
+[   68.486990] pks-autorun.sh[250]: ================================================================
+[   68.519561] pks-autorun.sh[250]:  PKS Page-Cache Sanity & Subsystem Scoping Test Harness
+[   68.531907] pks-autorun.sh[250]: ================================================================
+[   68.539729] pks-autorun.sh[250]: [INFO] Connected to DebugFS: pool [0x170000, 0x180000), scopes=44521
+[   68.552408] pks-autorun.sh[250]: ==> [Suite 1] Supported VFS System-Call Scoping Verification
+[   68.563233] pks-autorun.sh[250]:     [PASS] write(2) scoped cleanly (+6 begin, +6 end)
+[   68.573302] pks-autorun.sh[250]:     [PASS] pwrite(2) scoped cleanly (+3 begin, +3 end)
+[   68.584416] pks-autorun.sh[250]:     [PASS] writev(2) scoped cleanly (+6 begin, +6 end)
+[   68.593657] pks-autorun.sh[250]:     [PASS] ftruncate(2) scoped cleanly (+6 begin, +6 end)
+[   68.602442] pks-autorun.sh[250]:     [PASS] fallocate(2) scoped cleanly (+16 begin, +16 end)
+[   68.611022] pks-autorun.sh[250]:     [FAIL] read(2) unexpectedly triggered write-scope toggle (+3)
+[   68.624556] pks-autorun.sh[250]: ==> [Suite 2] Static Pool Page-Cache Allocation Verification
+[   68.634811] pks-autorun.sh[250]:     [INFO] Pool PFN range: [0x170000, 0x180000)
+[   68.646866] pks-autorun.sh[250]:     [INFO] Inspected 1024 resident pages: 1024 in static pool, 0 outside
+[   68.653715] pks-autorun.sh[250]:     [PASS] 100% of resident page-cache folios reside strictly in the PKS static pool
+[   68.666973] pks-autorun.sh[250]: ==> [Suite 3] Fail-Closed Policy & Rejection Verification
+[   68.678409] pks-autorun.sh[250]:     [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP (Commit 06 policy)
+[   68.690192] pks-autorun.sh[250]:     [FAIL] open(O_DIRECT) did not return EOPNOTSUPP (ret=4, errno=95: Operation not supported)
+[   68.699188] pks-autorun.sh[250]: ================================================================
+[   68.706927] pks-autorun.sh[250]:  [FAIL] One or more sanity assertions failed
+[   68.716502] pks-autorun.sh[250]: ================================================================
+[   69.155783] pks-autorun.sh[244]: [INFO] Running upstream compiled test_pks selftest...
+[   69.192498] pks-autorun.sh[252]: [RUN]	check_defaults
+[   69.203190] pks-autorun.sh[252]: [OK]
+[   69.215666] pks-autorun.sh[252]: [RUN]	single
+[   69.224622] pks-autorun.sh[252]: [OK]
+[   69.234420] pks-autorun.sh[252]: [RUN]	context_switch
+[   69.240517] pks-autorun.sh[252]: do_context_switch: Child: running on cpu 0...
+[   69.250463] pks-autorun.sh[252]: do_context_switch: Child: Tell parent to go
+[   69.259731] pks-autorun.sh[252]: do_context_switch: Child: Waiting for parent...
+[   69.270559] pks-autorun.sh[252]: do_context_switch: Child: Checking result
+[   69.279624] pks-autorun.sh[252]: do_context_switch: Child: Result (P) PASS
+[   69.288644] pks-autorun.sh[252]: U
+[   70.400638] pks-autorun.sh[252]: [Sep19 05:04] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   70.412184] pks-autorun.sh[252]: [  +0.001004] pks_test:pks_write_file:635: Begin...
+[   70.418519] pks-autorun.sh[252]: [  +0.001766] pks_test:pks_write_file:657: check defaults test: 0x55555564
+[   70.427779] pks-autorun.sh[252]: [  +0.000075] pks_test:check_pkey_settings:501: cpu 3 0x55555564
+[   70.438918] pks-autorun.sh[252]: [  +0.000333] pks_test:check_pkey_settings:501: cpu 1 0x55555564
+[   70.447312] pks-autorun.sh[252]: [  +0.000478] pks_test:check_pkey_settings:501: cpu 0 0x55555564
+[   70.457566] pks-autorun.sh[252]: [  +0.001334] pks_test:check_pkey_settings:501: cpu 2 0x55555564
+[   70.467731] pks-autorun.sh[252]: [  +0.002192] pks_test:pks_write_file:694: Clearing crash test arm
+[   70.476430] pks-autorun.sh[252]: [  +0.000052] pks_test:debug_result:107: Test complete [0]: PASS
+[   70.488683] pks-autorun.sh[252]: [  +0.000243] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test PASS
+[   70.495814] pks-autorun.sh[252]: [  +0.002889] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   70.504373] pks-autorun.sh[252]: [  +0.000094] pks_test:pks_write_file:635: Begin...
+[   70.517242] pks-autorun.sh[252]: [  +0.000047] pks_test:pks_write_file:661: Single key
+[   70.532485] pks-autorun.sh[252]: [  +0.000134] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000a293d954
+[   70.544513] pks-autorun.sh[252]: [  +0.000057] pks_test:set_ctx_data:371: Setting context data; 00000000670f5349
+[   70.554448] pks-autorun.sh[252]: [  +0.002432] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000670f5349
+[   70.563547] pks-autorun.sh[252]: [  +0.000271] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000670f5349
+[   70.576995] pks-autorun.sh[252]: [  +0.000087] pks_test:pks_write_file:694: Clearing crash test arm
+[   70.585996] pks-autorun.sh[252]: [  +0.000021] pks_test:debug_result:107: Test complete [1]: PASS
+[   70.602492] pks-autorun.sh[252]: [  +0.000118] pks_test:debug_session:95: Freeing session ctx 00000000670f5349; unlock 0; crash 0; last test PASS
+[   70.617513] pks-autorun.sh[252]: [  +0.014941] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   70.629513] pks-autorun.sh[252]: [  +0.020245] pks_test:pks_write_file:635: Begin...
+[   70.643013] pks-autorun.sh[252]: [  +0.000042] pks_test:pks_write_file:661: Single key
+[   70.652964] pks-autorun.sh[252]: [  +0.000051] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000005a4b7f0d
+[   70.659480] pks-autorun.sh[252]: [  +0.000016] pks_test:set_ctx_data:371: Setting context data; 00000000c1cd7f2a
+[   70.680989] pks-autorun.sh[252]: [  +0.000022] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000c1cd7f2a
+[   70.691981] pks-autorun.sh[252]: [  +0.000044] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000c1cd7f2a
+[   70.703954] pks-autorun.sh[252]: [  +0.000045] pks_test:pks_write_file:694: Clearing crash test arm
+[   70.717017] pks-autorun.sh[252]: [  +0.000019] pks_test:debug_result:107: Test complete [1]: PASS
+[   70.729136] pks-autorun.sh[252]: [  +0.000080] pks_test:pks_write_file:635: Begin...
+[   70.735580] pks-autorun.sh[252]: [  +0.000034] pks_test:pks_write_file:665: Arming Context switch test
+[   70.744599] pks-autorun.sh[252]: [  +0.000048] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000e83ed5fb
+[   70.752773] pks-autorun.sh[252]: [  +0.000031] pks_test:set_ctx_data:368: Context data already set
+[   70.760649] pks-autorun.sh[252]: [  +0.000046] pks_test:set_ctx_data:371: Setting context data; 000000004fceca5f
+[   70.772241] pks-autorun.sh[252]: [  +0.001963] pks_test:pks_write_file:694: Clearing crash test arm
+[   70.778336] pks-autorun.sh[252]: [  +0.000036] pks_test:debug_result:107: Test complete [2]: PASS
+[   70.787908] pks-autorun.sh[252]: [  +0.002559] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   70.795634] pks-autorun.sh[252]: [  +0.000118] pks_test:pks_write_file:635: Begin...
+[   70.803341] pks-autorun.sh[252]: [  +0.000027] pks_test:pks_write_file:661: Single key
+[   70.812262] pks-autorun.sh[252]: [  +0.000046] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000039562db8
+[   70.821308] pks-autorun.sh[252]: [  +0.000016] pks_test:set_ctx_data:371: Setting context data; 00000000c1cd7f2a
+[   70.829360] pks-autorun.sh[252]: [  +0.000020] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000c1cd7f2a
+[   70.838607] pks-autorun.sh[252]: [  +0.000895] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000c1cd7f2a
+[   70.847363] pks-autorun.sh[252]: [  +0.000061] pks_test:pks_write_file:694: Clearing crash test arm
+[   70.856420] pks-autorun.sh[252]: [  +0.000021] pks_test:debug_result:107: Test complete [1]: PASS
+[   70.868937] pks-autorun.sh[252]: [  +0.005303] pks_test:pks_write_file:635: Begin...
+[   70.876782] pks-autorun.sh[252]: [  +0.000053] pks_test:pks_write_file:669: Checking Context switch test
+[   70.885487] pks-autorun.sh[252]: [  +0.000045] pks_test:pks_write_file:694: Clearing crash test arm
+[   70.895000] pks-autorun.sh[252]: [  +0.000010] pks_test:debug_result:107: Test complete [3]: PASS
+[   70.904429] pks-autorun.sh[252]: [  +0.002955] pks_test:debug_session:95: Freeing session ctx 00000000c1cd7f2a; unlock 0; crash 0; last test PASS
+[   70.910716] pks-autorun.sh[252]: [  +0.000288] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   70.921801] pks-autorun.sh[252]: [  +0.000087] pks_test:pks_write_file:635: Begin...
+[   70.928541] pks-autorun.sh[252]: [  +0.001936] pks_test:pks_write_file:673: Exception checking
+[   70.937599] pks-autorun.sh[252]: [  +0.000070] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000cdf7a997
+[   70.946561] pks-autorun.sh[252]: [  +0.000031] pks_test:set_ctx_data:371: Setting context data; 00000000c1cd7f2a
+[   70.953464] pks-autorun.sh[252]: [  +0.000077] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000c1cd7f2a
+[   70.962636] pks-autorun.sh[252]: [  +0.000214] pks_test:pks_write_file:694: Clearing crash test arm
+[   70.971745] pks-autorun.sh[252]: [  +0.000022] pks_test:debug_result:107: Test complete [4]: PASS
+[   70.983822] pks-autorun.sh[252]: [  +0.001712] pks_test:debug_session:95: Freeing session ctx 00000000c1cd7f2a; unlock 0; crash 0; last test PASS
+[   70.996798] pks-autorun.sh[252]: [  +0.001123] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   71.005617] pks-autorun.sh[252]: [  +0.000115] pks_test:pks_write_file:635: Begin...
+[   71.017578] pks-autorun.sh[252]: [  +0.004273] pks_test:debug_session:95: Freeing session ctx 000000004fceca5f; unlock 0; crash 0; last test PASS
+[   71.028644] pks-autorun.sh[252]: [  +0.011444] pks_test:pks_write_file:677: Fault clear test
+[   71.046014] pks-autorun.sh[252]: [  +0.000082] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000006fe37626
+[   71.057084] pks-autorun.sh[252]: [  +0.000030] pks_test:set_ctx_data:371: Setting context data; 000000004fceca5f
+[   71.069398] pks-autorun.sh[252]: [  +0.000057] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000004fceca5f
+[   71.081521] pks-autorun.sh[252]: [  +0.000032] pks_test:handle_update_exception:171: Updating pkey 1 during exception
+[   71.092261] pks-autorun.sh[252]: [  +0.000120] pks_test:pks_write_file:694: Clearing crash test arm
+[   71.102440] pks-autorun.sh[252]: [  +0.000021] pks_test:debug_result:107: Test complete [5]: PASS
+[   71.118135] pks-autorun.sh[252]: [  +0.000111] pks_test:debug_session:95: Freeing session ctx 000000004fceca5f; unlock 0; crash 0; last test PASS
+[   71.127501] pks-autorun.sh[252]: [  +0.002594] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   71.150197] pks-autorun.sh[252]: [  +0.000106] pks_test:pks_write_file:635: Begin...
+[   71.164975] pks-autorun.sh[252]: [  +0.000044] pks_test:pks_write_file:687: Unknown test
+[   71.175984] pks-autorun.sh[252]: [  +0.000025] pks_test:pks_write_file:694: Clearing crash test arm
+[   71.186798] pks-autorun.sh[252]: [  +0.000010] pks_test:debug_result:107: Test complete [6]: FAIL
+[   71.195917] pks-autorun.sh[252]: [  +0.000091] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   71.206625] pks-autorun.sh[252]: do_context_switch: Parent: Waiting for child
+[   71.219293] pks-autorun.sh[252]: do_context_switch: Parent: running on cpu 0
+[   71.228692] pks-autorun.sh[252]: do_context_switch: Parent: Signaling child
+[   71.237586] pks-autorun.sh[252]: do_context_switch: Parent: exiting with rc (P) 0
+[   71.246341] pks-autorun.sh[252]: [OK]
+[   71.256938] pks-autorun.sh[252]: [RUN]	exception
+[   71.264860] pks-autorun.sh[252]: [OK]
+[   71.273440] pks-autorun.sh[252]: [RUN]	exception_update
+[   71.285811] pks-autorun.sh[252]: [OK]
+[   71.293475] pks-autorun.sh[252]: [RUN]	run_all
+[   71.305407] pks-autorun.sh[252]: [SKIP] Test not supported
+[   71.315194] pks-autorun.sh[252]: 	Debug output command (approximate start time):
+[   71.323558] pks-autorun.sh[252]: 		dmesg -H --since '2026-9-19 5:4:46' | grep pks_test
+[   71.355690] pks-autorun.sh[244]: --- Kernel Debug Log (dmesg) ---
+[   71.379469] pks-autorun.sh[259]: [   68.807034] pks_test:pks_write_file:669: Checking Context switch test
+[   71.393207] pks-autorun.sh[259]: [   68.807079] pks_test:pks_write_file:694: Clearing crash test arm
+[   71.402148] pks-autorun.sh[259]: [   68.807089] pks_test:debug_result:107: Test complete [3]: PASS
+[   71.409704] pks-autorun.sh[259]: [   68.810044] pks_test:debug_session:95: Freeing session ctx 00000000c1cd7f2a; unlock 0; crash 0; last test PASS
+[   71.418969] pks-autorun.sh[259]: [   68.810332] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   71.429214] pks-autorun.sh[259]: [   68.810419] pks_test:pks_write_file:635: Begin...
+[   71.435372] pks-autorun.sh[259]: [   68.812355] pks_test:pks_write_file:673: Exception checking
+[   71.446625] pks-autorun.sh[259]: [   68.812425] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000cdf7a997
+[   71.455544] pks-autorun.sh[259]: [   68.812456] pks_test:set_ctx_data:371: Setting context data; 00000000c1cd7f2a
+[   71.467939] pks-autorun.sh[259]: [   68.812533] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000c1cd7f2a
+[   71.477334] pks-autorun.sh[259]: [   68.812747] pks_test:pks_write_file:694: Clearing crash test arm
+[   71.486798] pks-autorun.sh[259]: [   68.812769] pks_test:debug_result:107: Test complete [4]: PASS
+[   71.494760] pks-autorun.sh[259]: [   68.814481] pks_test:debug_session:95: Freeing session ctx 00000000c1cd7f2a; unlock 0; crash 0; last test PASS
+[   71.504712] pks-autorun.sh[259]: [   68.815604] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   71.512717] pks-autorun.sh[259]: [   68.815719] pks_test:pks_write_file:635: Begin...
+[   71.523181] pks-autorun.sh[259]: [   68.819992] pks_test:debug_session:95: Freeing session ctx 000000004fceca5f; unlock 0; crash 0; last test PASS
+[   71.535824] pks-autorun.sh[259]: [   68.831436] pks_test:pks_write_file:677: Fault clear test
+[   71.548946] pks-autorun.sh[259]: [   68.831518] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000006fe37626
+[   71.558799] pks-autorun.sh[259]: [   68.831548] pks_test:set_ctx_data:371: Setting context data; 000000004fceca5f
+[   71.566582] pks-autorun.sh[259]: [   68.831605] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000004fceca5f
+[   71.579202] pks-autorun.sh[259]: [   68.831637] pks_test:handle_update_exception:171: Updating pkey 1 during exception
+[   71.585411] pks-autorun.sh[259]: [   68.831757] pks_test:pks_write_file:694: Clearing crash test arm
+[   71.594665] pks-autorun.sh[259]: [   68.831778] pks_test:debug_result:107: Test complete [5]: PASS
+[   71.603371] pks-autorun.sh[259]: [   68.831889] pks_test:debug_session:95: Freeing session ctx 000000004fceca5f; unlock 0; crash 0; last test PASS
+[   71.618622] pks-autorun.sh[259]: [   68.834483] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   71.630492] pks-autorun.sh[259]: [   68.834589] pks_test:pks_write_file:635: Begin...
+[   71.638526] pks-autorun.sh[259]: [   68.834633] pks_test:pks_write_file:687: Unknown test
+[   71.649451] pks-autorun.sh[259]: [   68.834658] pks_test:pks_write_file:694: Clearing crash test arm
+[   71.663020] pks-autorun.sh[259]: [   68.834668] pks_test:debug_result:107: Test complete [6]: FAIL
+[   71.669013] pks-autorun.sh[259]: [   68.834759] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[   71.684970] pks-autorun.sh[244]: --------------------------------
+[   72.496362] pks-autorun.sh[244]: [WARN] One or more PKS unit/sanity tests failed (rc=1)
+[   72.534284] pks-autorun.sh[226]: === [2/3] File System Exerciser (fsx) ===
+[   74.016261] pks-autorun.sh[263]: ================================================================
+[   74.035421] pks-autorun.sh[263]:  File System Exerciser (fsx) - Automated PKS Test Suite
+[   74.045622] pks-autorun.sh[263]: ================================================================
+[   76.188125] pks-autorun.sh[263]: [OK]   Protected mount active: /mnt/protected with 'pks_pagecache'
+[   76.196711] pks-autorun.sh[263]:  Test | Description                                | Result
+[   76.205507] pks-autorun.sh[263]: ------------------------------------------------------------------
+[  428.965205] pks-autorun.sh[263]:  1    | Rootfs vanilla ext4 (5K ops, all features) | [PASS]
          Starting [0;1;39msystemd-tmpfiles-…leanup of Temporary Directories...
 [[0;32m  OK  [0m] Finished [0;1;39msystemd-tmpfiles-… Cleanup of Temporary Directories.
-[ 1166.664860] pks-autorun.sh[268]:  2    | Protected mount in-scope (10K ops, 64MB)   | [PASS]
-[ 1167.726099] pks-autorun.sh[268]:  3    | Commit 06 policy (verify -EOPNOTSUPP mmap) | [PASS]
-[ 1167.738559] pks-autorun.sh[268]: ------------------------------------------------------------------
-[ 1167.746581] pks-autorun.sh[268]:  Summary: 3 / 3 test phases passed
-[ 1168.729633] pks-autorun.sh[268]: [OK]   All fsx filesystem exerciser tests passed without data corruption.
-[ 1168.766745] pks-autorun.sh[233]: === [3/3] POSIX Compliance Tests (pjdfstest) ===
-[ 1184.568852] pks-autorun.sh[348]: tests/chown/00.t: 21: cd: can't cd to pjdfstest_6916817807090fb93076df94a27fb43a
-[ 1188.288077] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1198.752434] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1209.214872] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1219.516422] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1230.056576] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1239.480799] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1252.668412] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1270.969923] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1289.202872] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1307.610808] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1326.115601] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1344.495048] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1733.728644] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1736.176717] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1736.188665] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1738.673013] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1739.263077] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1741.766570] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1741.778072] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1744.198947] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1745.961888] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1748.351554] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1748.365568] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1750.733654] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1751.927795] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1754.331864] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1754.339671] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1756.750572] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1757.329045] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1759.797805] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1759.810666] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1762.218624] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1764.046509] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1766.500559] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1766.525506] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1769.027863] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1770.219162] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1772.764542] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1772.776924] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1775.305333] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1775.909084] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1778.388894] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1778.400025] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1780.898084] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1782.724834] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1785.158819] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1785.169910] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1787.632159] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1788.864075] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1791.386875] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1791.400610] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1793.865439] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1794.486065] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1797.032447] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1797.058438] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1799.504416] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1801.286947] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1803.718448] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1803.730448] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1806.177453] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1807.463945] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1809.905139] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1809.916319] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1812.355119] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1813.007672] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1815.468645] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1815.478024] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1817.914909] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1819.817722] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1822.326666] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1822.344153] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1824.865547] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1826.076702] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1828.514824] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1828.523733] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1830.987415] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1831.597727] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1834.059630] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1834.072130] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1836.564761] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1838.361698] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1840.885417] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1840.896971] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1843.573806] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1844.801806] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1847.326899] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1847.378489] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1849.812547] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1851.055651] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1852.966789] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1854.159114] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1855.971878] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1858.455948] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1860.294357] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1862.115446] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1863.965136] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1865.149654] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1866.997448] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1869.626468] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1871.456376] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1873.277760] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1875.368118] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1876.600999] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1878.448350] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1880.952107] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1882.779002] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1884.667497] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1886.548736] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1888.393902] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1890.167763] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1892.540801] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1894.380879] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1896.195428] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1898.182350] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1899.390483] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1901.266819] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1903.678771] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1905.471539] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1907.308139] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1909.137350] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1910.331134] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1912.171523] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1914.655846] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1916.460006] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1918.371584] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1920.210681] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1922.041601] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1925.133156] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1926.343836] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1929.455787] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1931.826053] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1934.901558] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1936.718710] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1939.751792] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1941.028054] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1944.029727] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1946.587677] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1949.782361] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1951.671556] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1954.688123] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1955.955766] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1958.979316] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1961.336172] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1964.319592] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1966.152665] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1969.239696] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1970.480790] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1973.561891] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1976.081156] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1979.208389] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1981.003812] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1984.027751] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1985.314620] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1988.594135] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1991.105571] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1994.144520] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1996.016967] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 1999.052811] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 2000.315651] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 2003.359856] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 2005.867688] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 2009.184328] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 2010.991006] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 2014.057518] pks-autorun.sh[348]: tests/chown/00.t: 1: //pjdfstest: Permission denied
-[ 2015.944843] pks-autorun.sh[348]: tests/chown/00.t .....
-[ 2015.965799] pks-autorun.sh[348]: Failed 1196/1280 subtests
-[ 2015.972695] pks-autorun.sh[348]: 	(19 TODO tests unexpectedly succeeded)
-[ 2032.581385] pks-autorun.sh[348]: tests/chown/01.t .....
-[ 2032.597590] pks-autorun.sh[348]: Failed 22/22 subtests
-[ 2034.459083] pks-autorun.sh[348]: tests/chown/02.t: 1: //pjdfstest: Permission denied
-[ 2035.390907] pks-autorun.sh[348]: tests/chown/02.t: 127: [: -lt: argument expected
-[ 2035.672968] pks-autorun.sh[348]: cut: invalid range with no endpoint: -
-[ 2035.686652] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2042.612540] pks-autorun.sh[348]: tests/chown/02.t .....
-[ 2042.729939] pks-autorun.sh[348]: Failed 10/10 subtests
-[ 2044.471548] pks-autorun.sh[348]: tests/chown/03.t: 1: //pjdfstest: Permission denied
-[ 2044.542856] pks-autorun.sh[348]: tests/chown/03.t: 1: //pjdfstest: Permission denied
-[ 2045.678003] pks-autorun.sh[348]: cut: invalid decreasing range
-[ 2045.688498] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2046.222412] pks-autorun.sh[348]: cut: invalid byte or character range
-[ 2046.233608] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2046.907111] pks-autorun.sh[348]: mkdir: cannot create directory ‘’: No such file or directory
-[ 2053.198575] pks-autorun.sh[348]: tests/chown/03.t .....
-[ 2053.210646] pks-autorun.sh[348]: Failed 10/10 subtests
-[ 2062.269567] pks-autorun.sh[348]: tests/chown/04.t .....
-[ 2062.295585] pks-autorun.sh[348]: Failed 9/9 subtests
-[ 2066.507866] pks-autorun.sh[348]: tests/chown/05.t: 17: cd: can't cd to pjdfstest_9caa235877c8c91690697a320c66f022
-[ 2076.755528] pks-autorun.sh[348]: tests/chown/05.t .....
-[ 2076.780900] pks-autorun.sh[348]: Failed 18/18 subtests
-[ 2085.922285] pks-autorun.sh[348]: tests/chown/06.t .....
-[ 2085.941947] pks-autorun.sh[348]: Failed 10/10 subtests
-[ 2090.863351] pks-autorun.sh[348]: tests/chown/07.t: 18: cd: can't cd to pjdfstest_4b4aba44057e2ab808f58a5eebaef532
-[ 2170.429470] pks-autorun.sh[348]: tests/chown/07.t .....
-[ 2170.600551] pks-autorun.sh[348]: Failed 132/132 subtests
-[ 2172.401914] pks-autorun.sh[348]: tests/chown/08.t ..... ok
-[ 2174.173989] pks-autorun.sh[348]: tests/chown/09.t ..... ok
-[ 2178.602736] pks-autorun.sh[348]: tests/chown/10.t .....
-[ 2178.629776] pks-autorun.sh[348]: Failed 4/4 subtests
-[ 2183.011492] pks-autorun.sh[348]: tests/chmod/00.t: 21: cd: can't cd to pjdfstest_718464f1c592ff1ff359452d63e4062b
-[ 2185.448483] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2191.509985] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2197.517444] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2203.645682] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2209.662124] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2215.651601] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2219.913503] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2221.792488] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2223.037560] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2224.854914] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2226.033822] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2227.958983] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2229.177946] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2231.004778] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2232.212709] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2234.069364] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2235.262125] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2237.075920] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2238.357069] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2240.208561] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2241.422703] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2243.260556] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2244.575493] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2246.409249] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2247.640101] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2249.543926] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2250.825753] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2252.684955] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2253.886571] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2255.727552] pks-autorun.sh[348]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
-[ 2262.627662] pks-autorun.sh[348]: tests/chmod/00.t .....
-[ 2262.639809] pks-autorun.sh[348]: Failed 107/119 subtests
-[ 2276.071093] pks-autorun.sh[348]: tests/chmod/01.t .....
-[ 2276.097565] pks-autorun.sh[348]: Failed 17/17 subtests
-[ 2277.929719] pks-autorun.sh[348]: tests/chmod/02.t: 1: //pjdfstest: Permission denied
-[ 2278.852930] pks-autorun.sh[348]: tests/chmod/02.t: 127: [: -lt: argument expected
-[ 2279.116702] pks-autorun.sh[348]: cut: invalid range with no endpoint: -
-[ 2279.128576] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2282.254859] pks-autorun.sh[348]: tests/chmod/02.t .....
-[ 2282.269796] pks-autorun.sh[348]: Failed 5/5 subtests
-[ 2284.135312] pks-autorun.sh[348]: tests/chmod/03.t: 1: //pjdfstest: Permission denied
-[ 2284.146502] pks-autorun.sh[348]: tests/chmod/03.t: 1: //pjdfstest: Permission denied
-[ 2285.300316] pks-autorun.sh[348]: cut: invalid decreasing range
-[ 2285.309853] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2285.792806] pks-autorun.sh[348]: cut: invalid byte or character range
-[ 2285.806119] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2286.456305] pks-autorun.sh[348]: mkdir: cannot create directory ‘’: No such file or directory
-[ 2290.611598] pks-autorun.sh[348]: tests/chmod/03.t .....
-[ 2290.731773] pks-autorun.sh[348]: Failed 5/5 subtests
-[ 2298.548106] pks-autorun.sh[348]: tests/chmod/04.t .....
-[ 2298.560663] pks-autorun.sh[348]: Failed 7/7 subtests
-[ 2302.815958] pks-autorun.sh[348]: tests/chmod/05.t: 21: cd: can't cd to pjdfstest_ddd8120c540c679042fd94bea95a5ebd
-[ 2310.709485] pks-autorun.sh[348]: tests/chmod/05.t .....
-[ 2310.758379] pks-autorun.sh[348]: Failed 14/14 subtests
-[ 2318.631568] pks-autorun.sh[348]: tests/chmod/06.t .....
-[ 2318.659147] pks-autorun.sh[348]: Failed 8/8 subtests
-[ 2323.588351] pks-autorun.sh[348]: tests/chmod/07.t: 22: cd: can't cd to pjdfstest_26bcb0744b133c5a40c8857312f94640
-[ 2338.306094] pks-autorun.sh[348]: tests/chmod/07.t .....
-[ 2338.448383] pks-autorun.sh[348]: Failed 25/25 subtests
-[ 2340.112161] pks-autorun.sh[348]: tests/chmod/08.t ..... ok
-[ 2341.988677] pks-autorun.sh[348]: tests/chmod/09.t ..... ok
-[ 2345.125904] pks-autorun.sh[348]: tests/chmod/10.t .....
-[ 2345.217519] pks-autorun.sh[348]: Failed 2/2 subtests
-[ 2349.503617] pks-autorun.sh[348]: tests/chmod/11.t: 21: cd: can't cd to pjdfstest_fd882d496b54a066f0454addddb6a2e7
-[ 2415.042970] pks-autorun.sh[348]: tests/chmod/11.t .....
-[ 2415.242651] pks-autorun.sh[348]: Failed 109/109 subtests
-[ 2419.486580] pks-autorun.sh[348]: tests/chmod/12.t: 17: cd: can't cd to pjdfstest_f7638d9b569f012c0335089f37911a6a
-[ 2427.326407] pks-autorun.sh[348]: tests/chmod/12.t .....
-[ 2427.352137] pks-autorun.sh[348]: Failed 14/14 subtests
-[ 2430.976144] pks-autorun.sh[348]: tests/truncate/00.t: 16: cd: can't cd to pjdfstest_86e7632f3755ad5c7b6d54d3d37b2811
-[ 2438.599498] pks-autorun.sh[348]: tests/truncate/00.t: 1: //pjdfstest: Permission denied
-[ 2440.482721] pks-autorun.sh[348]: tests/truncate/00.t: 1: //pjdfstest: Permission denied
-[ 2441.684166] pks-autorun.sh[348]: tests/truncate/00.t: 1: //pjdfstest: Permission denied
-[ 2443.703721] pks-autorun.sh[348]: tests/truncate/00.t: 1: //pjdfstest: Permission denied
-[ 2445.003665] pks-autorun.sh[348]: tests/truncate/00.t ..
-[ 2445.016565] pks-autorun.sh[348]: Failed 19/21 subtests
-[ 2451.051086] pks-autorun.sh[348]: tests/truncate/01.t ..
-[ 2451.088064] pks-autorun.sh[348]: Failed 5/5 subtests
-[ 2452.818584] pks-autorun.sh[348]: tests/truncate/02.t: 1: //pjdfstest: Permission denied
-[ 2453.661908] pks-autorun.sh[348]: tests/truncate/02.t: 127: [: -lt: argument expected
-[ 2453.949499] pks-autorun.sh[348]: cut: invalid range with no endpoint: -
-[ 2453.960468] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2457.016435] pks-autorun.sh[348]: tests/truncate/02.t ..
-[ 2457.079683] pks-autorun.sh[348]: Failed 5/5 subtests
-[ 2458.825759] pks-autorun.sh[348]: tests/truncate/03.t: 1: //pjdfstest: Permission denied
-[ 2458.839678] pks-autorun.sh[348]: tests/truncate/03.t: 1: //pjdfstest: Permission denied
-[ 2460.111861] pks-autorun.sh[348]: cut: invalid decreasing range
-[ 2460.125624] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2460.612730] pks-autorun.sh[348]: cut: invalid byte or character range
-[ 2460.628508] pks-autorun.sh[348]: Try 'cut --help' for more information.
-[ 2461.267887] pks-autorun.sh[348]: mkdir: cannot create directory ‘’: No such file or directory
-[ 2464.491822] pks-autorun.sh[348]: tests/truncate/03.t ..
-[ 2464.523191] pks-autorun.sh[348]: Failed 5/5 subtests
-[ 2470.085049] pks-autorun.sh[348]: tests/truncate/04.t ..
-[ 2470.100338] pks-autorun.sh[348]: Failed 4/4 subtests
-[ 2474.460608] pks-autorun.sh[348]: tests/truncate/05.t: 17: cd: can't cd to pjdfstest_20fce8e94346f6065fbbe97a46cbb724
-[ 2482.962314] pks-autorun.sh[348]: tests/truncate/05.t ..
-[ 2482.991694] pks-autorun.sh[348]: Failed 15/15 subtests
-[ 2486.742804] pks-autorun.sh[348]: tests/truncate/06.t: 16: cd: can't cd to pjdfstest_b97f1eafbbfc69275cc4414a80f989c1
-[ 2490.964729] pks-autorun.sh[348]: tests/truncate/06.t ..
-[ 2490.990178] pks-autorun.sh[348]: Failed 8/8 subtests
-[ 2497.732501] pks-autorun.sh[348]: tests/truncate/07.t ..
-[ 2497.755803] pks-autorun.sh[348]: Failed 6/6 subtests
-[ 2499.594559] pks-autorun.sh[348]: tests/truncate/08.t .. ok
-[ 2503.905439] pks-autorun.sh[348]: tests/truncate/09.t ..
-[ 2503.933096] pks-autorun.sh[348]: Failed 3/3 subtests
-[ 2505.673490] pks-autorun.sh[348]: tests/truncate/10.t .. ok
-[ 2507.472674] pks-autorun.sh[348]: tests/truncate/11.t .. ok
-[ 2511.189599] pks-autorun.sh[348]: tests/truncate/12.t ..
-[ 2511.209745] pks-autorun.sh[348]: Failed 3/3 subtests
-[ 2516.597474] pks-autorun.sh[348]: tests/truncate/13.t ..
-[ 2516.733930] pks-autorun.sh[348]: Failed 4/4 subtests
-[ 2519.600760] pks-autorun.sh[348]: tests/truncate/14.t ..
-[ 2519.611605] pks-autorun.sh[348]: Failed 2/2 subtests
-[ 2519.648079] pks-autorun.sh[348]: Test Summary Report
-[ 2519.655812] pks-autorun.sh[348]: -------------------
-[ 2519.676207] pks-autorun.sh[348]: tests/chown/00.t   (Wstat: 0 Tests: 1280 Failed: 1196)
-[ 2519.750642] pks-autorun.sh[348]:   Failed tests:  1-649, 651-653, 655-664, 667-670, 673-685
-[ 2519.764038] pks-autorun.sh[348]:                 687-689, 691-902, 904-905, 907-909, 911-912
-[ 2519.773485] pks-autorun.sh[348]:                 914-918, 920-921, 923-926, 928-929, 931-933
-[ 2519.783790] pks-autorun.sh[348]:                 935-936, 938-942, 944-945, 947-950, 952-953
-[ 2519.795720] pks-autorun.sh[348]:                 955-957, 959-960, 962-966, 968-969, 971-974
-[ 2519.804765] pks-autorun.sh[348]:                 976-977, 979-981, 983-984, 986-990, 992-993
-[ 2519.813753] pks-autorun.sh[348]:                 995-998, 1000-1001, 1003-1005, 1007-1008
-[ 2519.824952] pks-autorun.sh[348]:                 1010-1014, 1016-1017, 1019-1022, 1024-1025
-[ 2519.835872] pks-autorun.sh[348]:                 1027-1029, 1031-1032, 1034-1038, 1040-1041
-[ 2519.843736] pks-autorun.sh[348]:                 1043-1046, 1048-1049, 1051-1053, 1055-1057
-[ 2519.855455] pks-autorun.sh[348]:                 1059-1063, 1065-1068, 1070-1072, 1074-1078
-[ 2519.865762] pks-autorun.sh[348]:                 1080-1083, 1085-1087, 1089-1093, 1095-1098
-[ 2519.874552] pks-autorun.sh[348]:                 1100-1102, 1104-1108, 1110-1113, 1115-1117
-[ 2519.883146] pks-autorun.sh[348]:                 1119-1123, 1125-1128, 1130-1132, 1134-1138
-[ 2519.890789] pks-autorun.sh[348]:                 1140-1143, 1145-1150, 1152-1156, 1158-1164
-[ 2519.900745] pks-autorun.sh[348]:                 1166-1171, 1173-1177, 1179-1185, 1187-1192
-[ 2519.910739] pks-autorun.sh[348]:                 1194-1198, 1200-1206, 1208-1213, 1215-1219
-[ 2519.922697] pks-autorun.sh[348]:                 1221-1227, 1229-1234, 1236-1240, 1242-1248
-[ 2519.931681] pks-autorun.sh[348]:                 1250-1255, 1257-1261, 1263-1269, 1271-1276
-[ 2519.941800] pks-autorun.sh[348]:                 1278-1280
-[ 2519.948623] pks-autorun.sh[348]:   TODO passed:   1054, 1058, 1064, 1069, 1073, 1079, 1084
-[ 2519.959743] pks-autorun.sh[348]:                 1088, 1094, 1099, 1103, 1109, 1114, 1118
-[ 2519.970701] pks-autorun.sh[348]:                 1124, 1129, 1133, 1139, 1144
-[ 2519.986389] pks-autorun.sh[348]: tests/chown/01.t   (Wstat: 0 Tests: 22 Failed: 22)
-[ 2519.993202] pks-autorun.sh[348]:   Failed tests:  1-22
-[ 2520.000558] pks-autorun.sh[348]: tests/chown/02.t   (Wstat: 0 Tests: 10 Failed: 10)
-[ 2520.010114] pks-autorun.sh[348]:   Failed tests:  1-10
-[ 2520.019400] pks-autorun.sh[348]: tests/chown/03.t   (Wstat: 0 Tests: 10 Failed: 10)
-[ 2520.034063] pks-autorun.sh[348]:   Failed tests:  1-10
-[ 2520.047082] pks-autorun.sh[348]: tests/chown/04.t   (Wstat: 0 Tests: 9 Failed: 9)
-[ 2520.058173] pks-autorun.sh[348]:   Failed tests:  1-9
-[ 2520.068756] pks-autorun.sh[348]: tests/chown/05.t   (Wstat: 0 Tests: 18 Failed: 18)
-[ 2520.083671] pks-autorun.sh[348]:   Failed tests:  1-18
-[ 2520.089915] pks-autorun.sh[348]: tests/chown/06.t   (Wstat: 0 Tests: 10 Failed: 10)
-[ 2520.099585] pks-autorun.sh[348]:   Failed tests:  1-10
-[ 2520.108172] pks-autorun.sh[348]: tests/chown/07.t   (Wstat: 0 Tests: 132 Failed: 132)
-[ 2520.115572] pks-autorun.sh[348]:   Failed tests:  1-132
-[ 2520.123888] pks-autorun.sh[348]: tests/chown/10.t   (Wstat: 0 Tests: 4 Failed: 4)
-[ 2520.133615] pks-autorun.sh[348]:   Failed tests:  1-4
-[ 2520.144153] pks-autorun.sh[348]: tests/chmod/00.t   (Wstat: 0 Tests: 119 Failed: 107)
-[ 2520.152762] pks-autorun.sh[348]:   Failed tests:  1-63, 65-67, 69-71, 73-75, 77-79, 81-83
-[ 2520.165508] pks-autorun.sh[348]:                 85-87, 89-91, 93-95, 97-99, 101-103, 105-107
-[ 2520.176566] pks-autorun.sh[348]:                 109-119
-[ 2520.185764] pks-autorun.sh[348]: tests/chmod/01.t   (Wstat: 0 Tests: 17 Failed: 17)
-[ 2520.197005] pks-autorun.sh[348]:   Failed tests:  1-17
-[ 2520.205586] pks-autorun.sh[348]: tests/chmod/02.t   (Wstat: 0 Tests: 5 Failed: 5)
-[ 2520.216721] pks-autorun.sh[348]:   Failed tests:  1-5
-[ 2520.225819] pks-autorun.sh[348]: tests/chmod/03.t   (Wstat: 0 Tests: 5 Failed: 5)
-[ 2520.238506] pks-autorun.sh[348]:   Failed tests:  1-5
-[ 2520.247796] pks-autorun.sh[348]: tests/chmod/04.t   (Wstat: 0 Tests: 7 Failed: 7)
-[ 2520.258968] pks-autorun.sh[348]:   Failed tests:  1-7
-[ 2520.266845] pks-autorun.sh[348]: tests/chmod/05.t   (Wstat: 0 Tests: 14 Failed: 14)
-[ 2520.279152] pks-autorun.sh[348]:   Failed tests:  1-14
-[ 2520.290901] pks-autorun.sh[348]: tests/chmod/06.t   (Wstat: 0 Tests: 8 Failed: 8)
-[ 2520.300725] pks-autorun.sh[348]:   Failed tests:  1-8
-[ 2520.310514] pks-autorun.sh[348]: tests/chmod/07.t   (Wstat: 0 Tests: 25 Failed: 25)
-[ 2520.320612] pks-autorun.sh[348]:   Failed tests:  1-25
-[ 2520.337940] pks-autorun.sh[348]: tests/chmod/10.t   (Wstat: 0 Tests: 2 Failed: 2)
-[ 2520.355015] pks-autorun.sh[348]:   Failed tests:  1-2
-[ 2520.364502] pks-autorun.sh[348]: tests/chmod/11.t   (Wstat: 0 Tests: 109 Failed: 109)
-[ 2520.376949] pks-autorun.sh[348]:   Failed tests:  1-109
-[ 2520.385690] pks-autorun.sh[348]: tests/chmod/12.t   (Wstat: 0 Tests: 14 Failed: 14)
-[ 2520.401408] pks-autorun.sh[348]:   Failed tests:  1-14
-[ 2520.409663] pks-autorun.sh[348]: tests/truncate/00.t (Wstat: 0 Tests: 21 Failed: 19)
-[ 2520.422875] pks-autorun.sh[348]:   Failed tests:  1-14, 16-18, 20-21
-[ 2520.431753] pks-autorun.sh[348]: tests/truncate/01.t (Wstat: 0 Tests: 5 Failed: 5)
-[ 2520.443107] pks-autorun.sh[348]:   Failed tests:  1-5
-[ 2520.451754] pks-autorun.sh[348]: tests/truncate/02.t (Wstat: 0 Tests: 5 Failed: 5)
-[ 2520.461846] pks-autorun.sh[348]:   Failed tests:  1-5
-[ 2520.469171] pks-autorun.sh[348]: tests/truncate/03.t (Wstat: 0 Tests: 5 Failed: 5)
-[ 2520.484164] pks-autorun.sh[348]:   Failed tests:  1-5
-[ 2520.493830] pks-autorun.sh[348]: tests/truncate/04.t (Wstat: 0 Tests: 4 Failed: 4)
-[ 2520.501103] pks-autorun.sh[348]:   Failed tests:  1-4
-[ 2520.510719] pks-autorun.sh[348]: tests/truncate/05.t (Wstat: 0 Tests: 15 Failed: 15)
-[ 2520.522359] pks-autorun.sh[348]:   Failed tests:  1-15
-[ 2520.533829] pks-autorun.sh[348]: tests/truncate/06.t (Wstat: 0 Tests: 8 Failed: 8)
-[ 2520.543184] pks-autorun.sh[348]:   Failed tests:  1-8
-[ 2520.551911] pks-autorun.sh[348]: tests/truncate/07.t (Wstat: 0 Tests: 6 Failed: 6)
-[ 2520.564046] pks-autorun.sh[348]:   Failed tests:  1-6
-[ 2520.596438] pks-autorun.sh[348]: tests/truncate/09.t (Wstat: 0 Tests: 3 Failed: 3)
-[ 2520.602777] pks-autorun.sh[348]:   Failed tests:  1-3
-[ 2520.611675] pks-autorun.sh[348]: tests/truncate/12.t (Wstat: 0 Tests: 3 Failed: 3)
-[ 2520.619813] pks-autorun.sh[348]:   Failed tests:  1-3
-[ 2520.628367] pks-autorun.sh[348]: tests/truncate/13.t (Wstat: 0 Tests: 4 Failed: 4)
-[ 2520.636658] pks-autorun.sh[348]:   Failed tests:  1-4
-[ 2520.645550] pks-autorun.sh[348]: tests/truncate/14.t (Wstat: 0 Tests: 2 Failed: 2)
-[ 2520.655756] pks-autorun.sh[348]:   Failed tests:  1-2
-[ 2520.664518] pks-autorun.sh[348]: Files=39, Tests=1908, 1343 wallclock secs (27.40 usr  7.97 sys + 884.99 cusr 465.42 csys = 1385.78 CPU)
-[ 2520.674030] pks-autorun.sh[348]: Result: FAIL
-[ 2525.540170] pks-autorun.sh[233]: ================================================================
-[ 2525.570766] pks-autorun.sh[233]:  [PKS AUTORUN] Compliance testing complete. Powering off.
-[ 2525.579826] pks-autorun.sh[233]: ================================================================
-[ 2528.049574] e1000e: EEE TX LPI TIMER: 00000000
-[ 2528.092793] ACPI: PM: Preparing to enter system sleep state S5
-[ 2528.110212] reboot: Power down
+[ 1169.472753] pks-autorun.sh[263]:  2    | Protected mount in-scope (10K ops, 64MB)   | [PASS]
+[ 1170.537971] pks-autorun.sh[263]:  3    | Commit 06 policy (verify -EOPNOTSUPP mmap) | [PASS]
+[ 1170.549677] pks-autorun.sh[263]: ------------------------------------------------------------------
+[ 1170.556516] pks-autorun.sh[263]:  Summary: 3 / 3 test phases passed
+[ 1171.646701] pks-autorun.sh[263]: [OK]   All fsx filesystem exerciser tests passed without data corruption.
+[ 1171.685392] pks-autorun.sh[226]: === [3/3] POSIX Compliance Tests (pjdfstest) ===
+[ 1188.439895] pks-autorun.sh[303]: tests/chown/00.t: 21: cd: can't cd to pjdfstest_4b99d2fef3f299b80acdb2c64c1ccf3d
+[ 1192.417160] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1203.136427] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1213.750137] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1224.674794] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1235.367929] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1246.102283] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1253.680709] hrtimer: interrupt took 3083993 ns
+[ 1260.978326] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1279.475212] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1298.103642] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1316.561364] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1335.121022] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1354.504270] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1414.663565] kworker/dying (69) used greatest stack depth: 13080 bytes left
+[ 1760.480991] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1763.655444] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1763.778675] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1766.064007] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1766.708628] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1769.190570] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1769.199876] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1771.739427] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1773.643628] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1776.093554] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1776.105953] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1778.695773] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1779.956351] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1782.487008] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1782.496644] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1784.994244] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1785.591282] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1788.187585] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1788.199922] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1790.658748] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1792.559086] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1795.146726] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1795.158841] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1797.748342] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1798.983893] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1801.467918] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1801.477419] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1803.975171] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1804.617203] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1807.150731] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1807.164718] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1809.661401] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1811.642544] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1814.229470] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1814.249629] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1816.828645] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1818.113069] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1820.572304] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1820.586253] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1823.107897] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1823.719746] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1826.197393] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1826.208780] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1828.708790] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1831.054294] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1833.596467] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1833.606235] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1836.115835] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1837.355961] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1839.929727] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1839.942815] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1842.439428] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1843.086230] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1845.685843] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1845.696448] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1848.216768] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1850.185020] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1852.700850] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1852.710396] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1855.314955] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1856.545665] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1859.066462] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1859.075673] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1861.570368] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1862.185285] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1864.745551] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1864.757301] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1867.210693] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1869.175197] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1871.765767] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1871.779029] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1874.365256] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1875.685651] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1878.155496] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1878.167499] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1880.659376] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1881.935336] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1883.868432] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1885.246836] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1887.121505] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1889.739278] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1891.598211] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1893.549672] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1895.420656] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1896.745896] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1898.712216] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1901.240240] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1903.440554] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1905.467004] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1907.349788] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1908.602587] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1910.447542] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1912.927243] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1914.809494] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1916.784317] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1918.668935] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1919.923248] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1921.753691] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1924.272380] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1926.125305] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1928.072137] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1929.973696] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1931.217594] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1933.039548] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1935.575661] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1937.516952] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1939.411235] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1941.250381] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1942.477715] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1944.336692] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1947.547935] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1949.223932] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1951.128903] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1952.947704] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1954.857667] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1958.167836] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1959.516016] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1962.614482] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1965.099745] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1968.257783] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1970.066419] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1973.112728] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1974.394690] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1977.536450] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1979.988001] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1983.117150] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1984.987713] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1988.125931] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1989.351090] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1992.471797] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1994.911251] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1998.071235] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 1999.997856] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2003.008657] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2004.535008] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2007.697187] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2010.290566] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2013.392659] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2015.340616] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2018.426255] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2019.697985] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2022.835114] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2025.294796] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2028.539451] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2030.454582] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2033.540996] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2034.899950] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2038.235852] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2040.841291] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2044.022478] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2045.887975] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2049.109314] pks-autorun.sh[303]: tests/chown/00.t: 1: //pjdfstest: Permission denied
+[ 2051.103989] pks-autorun.sh[303]: tests/chown/00.t .....
+[ 2051.132302] pks-autorun.sh[303]: Failed 1196/1280 subtests
+[ 2051.143837] pks-autorun.sh[303]: 	(19 TODO tests unexpectedly succeeded)
+[ 2068.382238] pks-autorun.sh[303]: tests/chown/01.t .....
+[ 2068.593907] pks-autorun.sh[303]: Failed 22/22 subtests
+[ 2070.263223] pks-autorun.sh[303]: tests/chown/02.t: 1: //pjdfstest: Permission denied
+[ 2071.256572] pks-autorun.sh[303]: tests/chown/02.t: 127: [: -lt: argument expected
+[ 2071.475490] pks-autorun.sh[303]: cut: invalid range with no endpoint: -
+[ 2071.487444] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2077.675025] pks-autorun.sh[303]: tests/chown/02.t .....
+[ 2077.706025] pks-autorun.sh[303]: Failed 10/10 subtests
+[ 2079.612857] pks-autorun.sh[303]: tests/chown/03.t: 1: //pjdfstest: Permission denied
+[ 2079.628974] pks-autorun.sh[303]: tests/chown/03.t: 1: //pjdfstest: Permission denied
+[ 2080.996872] pks-autorun.sh[303]: cut: invalid decreasing range
+[ 2081.017240] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2081.612796] pks-autorun.sh[303]: cut: invalid byte or character range
+[ 2081.626902] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2082.313183] pks-autorun.sh[303]: mkdir: cannot create directory ‘’: No such file or directory
+[ 2088.853141] pks-autorun.sh[303]: tests/chown/03.t .....
+[ 2088.871811] pks-autorun.sh[303]: Failed 10/10 subtests
+[ 2098.870637] pks-autorun.sh[303]: tests/chown/04.t .....
+[ 2098.945473] pks-autorun.sh[303]: Failed 9/9 subtests
+[ 2103.376200] pks-autorun.sh[303]: tests/chown/05.t: 17: cd: can't cd to pjdfstest_81f2e46ec79af147544e725acc6196cd
+[ 2114.252595] pks-autorun.sh[303]: tests/chown/05.t .....
+[ 2114.312223] pks-autorun.sh[303]: Failed 18/18 subtests
+[ 2123.583956] pks-autorun.sh[303]: tests/chown/06.t .....
+[ 2123.603420] pks-autorun.sh[303]: Failed 10/10 subtests
+[ 2128.706400] pks-autorun.sh[303]: tests/chown/07.t: 18: cd: can't cd to pjdfstest_8e589e61a5c6854865aa2a0087ca3268
+[ 2210.475184] pks-autorun.sh[303]: tests/chown/07.t .....
+[ 2210.508477] pks-autorun.sh[303]: Failed 132/132 subtests
+[ 2212.459814] pks-autorun.sh[303]: tests/chown/08.t ..... ok
+[ 2214.432238] pks-autorun.sh[303]: tests/chown/09.t ..... ok
+[ 2219.437453] pks-autorun.sh[303]: tests/chown/10.t .....
+[ 2219.529684] pks-autorun.sh[303]: Failed 4/4 subtests
+[ 2223.965211] pks-autorun.sh[303]: tests/chmod/00.t: 21: cd: can't cd to pjdfstest_42b1ff127e1c5ca844e238c9b349b694
+[ 2226.440480] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2232.598582] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2238.855427] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2245.186818] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2251.483188] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2257.633334] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2262.196388] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2264.175440] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2265.427066] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2267.263890] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2268.488454] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2270.346781] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2271.622351] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2273.457626] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2274.860242] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2276.731010] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2278.039984] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2279.987476] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2281.302705] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2283.222745] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2284.522416] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2286.440427] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2287.693871] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2289.575598] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2290.835268] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2292.700994] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2293.987882] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2295.823619] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2297.155153] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2299.038191] pks-autorun.sh[303]: tests/chmod/00.t: 1: //pjdfstest: Permission denied
+[ 2306.184586] pks-autorun.sh[303]: tests/chmod/00.t .....
+[ 2306.202501] pks-autorun.sh[303]: Failed 107/119 subtests
+[ 2320.343369] pks-autorun.sh[303]: tests/chmod/01.t .....
+[ 2320.389618] pks-autorun.sh[303]: Failed 17/17 subtests
+[ 2322.327839] pks-autorun.sh[303]: tests/chmod/02.t: 1: //pjdfstest: Permission denied
+[ 2323.227451] pks-autorun.sh[303]: tests/chmod/02.t: 127: [: -lt: argument expected
+[ 2323.503881] pks-autorun.sh[303]: cut: invalid range with no endpoint: -
+[ 2323.518737] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2326.761258] pks-autorun.sh[303]: tests/chmod/02.t .....
+[ 2326.777469] pks-autorun.sh[303]: Failed 5/5 subtests
+[ 2328.608953] pks-autorun.sh[303]: tests/chmod/03.t: 1: //pjdfstest: Permission denied
+[ 2328.628185] pks-autorun.sh[303]: tests/chmod/03.t: 1: //pjdfstest: Permission denied
+[ 2329.824685] pks-autorun.sh[303]: cut: invalid decreasing range
+[ 2329.838404] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2330.417719] pks-autorun.sh[303]: cut: invalid byte or character range
+[ 2330.428051] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2331.127937] pks-autorun.sh[303]: mkdir: cannot create directory ‘’: No such file or directory
+[ 2334.495707] pks-autorun.sh[303]: tests/chmod/03.t .....
+[ 2334.507761] pks-autorun.sh[303]: Failed 5/5 subtests
+[ 2342.811434] pks-autorun.sh[303]: tests/chmod/04.t .....
+[ 2342.826909] pks-autorun.sh[303]: Failed 7/7 subtests
+[ 2347.369606] pks-autorun.sh[303]: tests/chmod/05.t: 21: cd: can't cd to pjdfstest_f1d0dd2d8854002c658b674e7eaf72a1
+[ 2356.041633] pks-autorun.sh[303]: tests/chmod/05.t .....
+[ 2356.197627] pks-autorun.sh[303]: Failed 14/14 subtests
+[ 2364.618464] pks-autorun.sh[303]: tests/chmod/06.t .....
+[ 2364.634328] pks-autorun.sh[303]: Failed 8/8 subtests
+[ 2369.997553] pks-autorun.sh[303]: tests/chmod/07.t: 22: cd: can't cd to pjdfstest_64509f161e3730fd03b56501b1c3d43f
+[ 2385.110392] pks-autorun.sh[303]: tests/chmod/07.t .....
+[ 2385.124920] pks-autorun.sh[303]: Failed 25/25 subtests
+[ 2387.120280] pks-autorun.sh[303]: tests/chmod/08.t ..... ok
+[ 2389.072002] pks-autorun.sh[303]: tests/chmod/09.t ..... ok
+[ 2392.386548] pks-autorun.sh[303]: tests/chmod/10.t .....
+[ 2392.416990] pks-autorun.sh[303]: Failed 2/2 subtests
+[ 2396.964375] pks-autorun.sh[303]: tests/chmod/11.t: 21: cd: can't cd to pjdfstest_e0421b91d100fdc4b61261a21a4b42de
+[ 2464.583928] pks-autorun.sh[303]: tests/chmod/11.t .....
+[ 2464.623631] pks-autorun.sh[303]: Failed 109/109 subtests
+[ 2469.512276] pks-autorun.sh[303]: tests/chmod/12.t: 17: cd: can't cd to pjdfstest_ea6f5559a4094e2a88d0637903b4f43f
+[ 2477.149756] pks-autorun.sh[303]: tests/chmod/12.t .....
+[ 2477.167414] pks-autorun.sh[303]: Failed 14/14 subtests
+[ 2481.174644] pks-autorun.sh[303]: tests/truncate/00.t: 16: cd: can't cd to pjdfstest_ee424b574035d9c4e012de8e8d2e513d
+[ 2488.980582] pks-autorun.sh[303]: tests/truncate/00.t: 1: //pjdfstest: Permission denied
+[ 2490.900828] pks-autorun.sh[303]: tests/truncate/00.t: 1: //pjdfstest: Permission denied
+[ 2492.118409] pks-autorun.sh[303]: tests/truncate/00.t: 1: //pjdfstest: Permission denied
+[ 2493.944262] pks-autorun.sh[303]: tests/truncate/00.t: 1: //pjdfstest: Permission denied
+[ 2495.231578] pks-autorun.sh[303]: tests/truncate/00.t ..
+[ 2495.273312] pks-autorun.sh[303]: Failed 19/21 subtests
+[ 2501.417357] pks-autorun.sh[303]: tests/truncate/01.t ..
+[ 2501.464439] pks-autorun.sh[303]: Failed 5/5 subtests
+[ 2503.304436] pks-autorun.sh[303]: tests/truncate/02.t: 1: //pjdfstest: Permission denied
+[ 2504.173630] pks-autorun.sh[303]: tests/truncate/02.t: 127: [: -lt: argument expected
+[ 2504.438297] pks-autorun.sh[303]: cut: invalid range with no endpoint: -
+[ 2504.447912] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2507.630230] pks-autorun.sh[303]: tests/truncate/02.t ..
+[ 2507.641425] pks-autorun.sh[303]: Failed 5/5 subtests
+[ 2509.597299] pks-autorun.sh[303]: tests/truncate/03.t: 1: //pjdfstest: Permission denied
+[ 2509.608520] pks-autorun.sh[303]: tests/truncate/03.t: 1: //pjdfstest: Permission denied
+[ 2510.771252] pks-autorun.sh[303]: cut: invalid decreasing range
+[ 2510.787563] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2511.306653] pks-autorun.sh[303]: cut: invalid byte or character range
+[ 2511.319590] pks-autorun.sh[303]: Try 'cut --help' for more information.
+[ 2511.967127] pks-autorun.sh[303]: mkdir: cannot create directory ‘’: No such file or directory
+[ 2515.349193] pks-autorun.sh[303]: tests/truncate/03.t ..
+[ 2515.361791] pks-autorun.sh[303]: Failed 5/5 subtests
+[ 2521.089791] pks-autorun.sh[303]: tests/truncate/04.t ..
+[ 2521.105347] pks-autorun.sh[303]: Failed 4/4 subtests
+[ 2525.664619] pks-autorun.sh[303]: tests/truncate/05.t: 17: cd: can't cd to pjdfstest_f086b1daf10546a523b69398696457fb
+[ 2534.313162] pks-autorun.sh[303]: tests/truncate/05.t ..
+[ 2534.345370] pks-autorun.sh[303]: Failed 15/15 subtests
+[ 2538.053693] pks-autorun.sh[303]: tests/truncate/06.t: 16: cd: can't cd to pjdfstest_97ca6f3ce339fea2b7c80813f82a5316
+[ 2542.436850] pks-autorun.sh[303]: tests/truncate/06.t ..
+[ 2542.462678] pks-autorun.sh[303]: Failed 8/8 subtests
+[ 2549.692530] pks-autorun.sh[303]: tests/truncate/07.t ..
+[ 2549.708765] pks-autorun.sh[303]: Failed 6/6 subtests
+[ 2551.565657] pks-autorun.sh[303]: tests/truncate/08.t .. ok
+[ 2555.886517] pks-autorun.sh[303]: tests/truncate/09.t ..
+[ 2555.925556] pks-autorun.sh[303]: Failed 3/3 subtests
+[ 2557.695166] pks-autorun.sh[303]: tests/truncate/10.t .. ok
+[ 2559.506847] pks-autorun.sh[303]: tests/truncate/11.t .. ok
+[ 2563.384964] pks-autorun.sh[303]: tests/truncate/12.t ..
+[ 2563.413665] pks-autorun.sh[303]: Failed 3/3 subtests
+[ 2568.413481] pks-autorun.sh[303]: tests/truncate/13.t ..
+[ 2568.428882] pks-autorun.sh[303]: Failed 4/4 subtests
+[ 2571.400998] pks-autorun.sh[303]: tests/truncate/14.t ..
+[ 2571.417253] pks-autorun.sh[303]: Failed 2/2 subtests
+[ 2571.438142] pks-autorun.sh[303]: Test Summary Report
+[ 2571.450517] pks-autorun.sh[303]: -------------------
+[ 2571.464665] pks-autorun.sh[303]: tests/chown/00.t   (Wstat: 0 Tests: 1280 Failed: 1196)
+[ 2571.552504] pks-autorun.sh[303]:   Failed tests:  1-649, 651-653, 655-664, 667-670, 673-685
+[ 2571.564195] pks-autorun.sh[303]:                 687-689, 691-902, 904-905, 907-909, 911-912
+[ 2571.574619] pks-autorun.sh[303]:                 914-918, 920-921, 923-926, 928-929, 931-933
+[ 2571.590909] pks-autorun.sh[303]:                 935-936, 938-942, 944-945, 947-950, 952-953
+[ 2571.603384] pks-autorun.sh[303]:                 955-957, 959-960, 962-966, 968-969, 971-974
+[ 2571.614942] pks-autorun.sh[303]:                 976-977, 979-981, 983-984, 986-990, 992-993
+[ 2571.624516] pks-autorun.sh[303]:                 995-998, 1000-1001, 1003-1005, 1007-1008
+[ 2571.636196] pks-autorun.sh[303]:                 1010-1014, 1016-1017, 1019-1022, 1024-1025
+[ 2571.642444] pks-autorun.sh[303]:                 1027-1029, 1031-1032, 1034-1038, 1040-1041
+[ 2571.651535] pks-autorun.sh[303]:                 1043-1046, 1048-1049, 1051-1053, 1055-1057
+[ 2571.661720] pks-autorun.sh[303]:                 1059-1063, 1065-1068, 1070-1072, 1074-1078
+[ 2571.670096] pks-autorun.sh[303]:                 1080-1083, 1085-1087, 1089-1093, 1095-1098
+[ 2571.677713] pks-autorun.sh[303]:                 1100-1102, 1104-1108, 1110-1113, 1115-1117
+[ 2571.684532] pks-autorun.sh[303]:                 1119-1123, 1125-1128, 1130-1132, 1134-1138
+[ 2571.693632] pks-autorun.sh[303]:                 1140-1143, 1145-1150, 1152-1156, 1158-1164
+[ 2571.703477] pks-autorun.sh[303]:                 1166-1171, 1173-1177, 1179-1185, 1187-1192
+[ 2571.715288] pks-autorun.sh[303]:                 1194-1198, 1200-1206, 1208-1213, 1215-1219
+[ 2571.724470] pks-autorun.sh[303]:                 1221-1227, 1229-1234, 1236-1240, 1242-1248
+[ 2571.735511] pks-autorun.sh[303]:                 1250-1255, 1257-1261, 1263-1269, 1271-1276
+[ 2571.743724] pks-autorun.sh[303]:                 1278-1280
+[ 2571.752966] pks-autorun.sh[303]:   TODO passed:   1054, 1058, 1064, 1069, 1073, 1079, 1084
+[ 2571.767737] pks-autorun.sh[303]:                 1088, 1094, 1099, 1103, 1109, 1114, 1118
+[ 2571.775928] pks-autorun.sh[303]:                 1124, 1129, 1133, 1139, 1144
+[ 2571.791785] pks-autorun.sh[303]: tests/chown/01.t   (Wstat: 0 Tests: 22 Failed: 22)
+[ 2571.802802] pks-autorun.sh[303]:   Failed tests:  1-22
+[ 2571.810560] pks-autorun.sh[303]: tests/chown/02.t   (Wstat: 0 Tests: 10 Failed: 10)
+[ 2571.830245] pks-autorun.sh[303]:   Failed tests:  1-10
+[ 2571.839595] pks-autorun.sh[303]: tests/chown/03.t   (Wstat: 0 Tests: 10 Failed: 10)
+[ 2571.848825] pks-autorun.sh[303]:   Failed tests:  1-10
+[ 2571.857281] pks-autorun.sh[303]: tests/chown/04.t   (Wstat: 0 Tests: 9 Failed: 9)
+[ 2571.864871] pks-autorun.sh[303]:   Failed tests:  1-9
+[ 2571.870529] pks-autorun.sh[303]: tests/chown/05.t   (Wstat: 0 Tests: 18 Failed: 18)
+[ 2571.880617] pks-autorun.sh[303]:   Failed tests:  1-18
+[ 2571.892025] pks-autorun.sh[303]: tests/chown/06.t   (Wstat: 0 Tests: 10 Failed: 10)
+[ 2571.900480] pks-autorun.sh[303]:   Failed tests:  1-10
+[ 2571.909610] pks-autorun.sh[303]: tests/chown/07.t   (Wstat: 0 Tests: 132 Failed: 132)
+[ 2571.917740] pks-autorun.sh[303]:   Failed tests:  1-132
+[ 2571.926466] pks-autorun.sh[303]: tests/chown/10.t   (Wstat: 0 Tests: 4 Failed: 4)
+[ 2571.936863] pks-autorun.sh[303]:   Failed tests:  1-4
+[ 2571.945658] pks-autorun.sh[303]: tests/chmod/00.t   (Wstat: 0 Tests: 119 Failed: 107)
+[ 2571.952801] pks-autorun.sh[303]:   Failed tests:  1-63, 65-67, 69-71, 73-75, 77-79, 81-83
+[ 2571.965120] pks-autorun.sh[303]:                 85-87, 89-91, 93-95, 97-99, 101-103, 105-107
+[ 2571.975761] pks-autorun.sh[303]:                 109-119
+[ 2571.984481] pks-autorun.sh[303]: tests/chmod/01.t   (Wstat: 0 Tests: 17 Failed: 17)
+[ 2571.999421] pks-autorun.sh[303]:   Failed tests:  1-17
+[ 2572.029325] prove (302) used greatest stack depth: 13024 bytes left
+[ 2572.011474] pks-autorun.sh[303]: tests/chmod/02.t   (Wstat: 0 Tests: 5 Failed: 5)
+[ 2572.019437] pks-autorun.sh[303]:   Failed tests:  1-5
+[ 2572.029661] pks-autorun.sh[303]: tests/chmod/03.t   (Wstat: 0 Tests: 5 Failed: 5)
+[ 2572.036544] pks-autorun.sh[303]:   Failed tests:  1-5
+[ 2572.045810] pks-autorun.sh[303]: tests/chmod/04.t   (Wstat: 0 Tests: 7 Failed: 7)
+[ 2572.055914] pks-autorun.sh[303]:   Failed tests:  1-7
+[ 2572.066879] pks-autorun.sh[303]: tests/chmod/05.t   (Wstat: 0 Tests: 14 Failed: 14)
+[ 2572.076248] pks-autorun.sh[303]:   Failed tests:  1-14
+[ 2572.087354] pks-autorun.sh[303]: tests/chmod/06.t   (Wstat: 0 Tests: 8 Failed: 8)
+[ 2572.096336] pks-autorun.sh[303]:   Failed tests:  1-8
+[ 2572.106816] pks-autorun.sh[303]: tests/chmod/07.t   (Wstat: 0 Tests: 25 Failed: 25)
+[ 2572.116255] pks-autorun.sh[303]:   Failed tests:  1-25
+[ 2572.126943] pks-autorun.sh[303]: tests/chmod/10.t   (Wstat: 0 Tests: 2 Failed: 2)
+[ 2572.140520] pks-autorun.sh[303]:   Failed tests:  1-2
+[ 2572.153635] pks-autorun.sh[303]: tests/chmod/11.t   (Wstat: 0 Tests: 109 Failed: 109)
+[ 2572.171438] pks-autorun.sh[303]:   Failed tests:  1-109
+[ 2572.182330] pks-autorun.sh[303]: tests/chmod/12.t   (Wstat: 0 Tests: 14 Failed: 14)
+[ 2572.193426] pks-autorun.sh[303]:   Failed tests:  1-14
+[ 2572.204303] pks-autorun.sh[303]: tests/truncate/00.t (Wstat: 0 Tests: 21 Failed: 19)
+[ 2572.214877] pks-autorun.sh[303]:   Failed tests:  1-14, 16-18, 20-21
+[ 2572.226490] pks-autorun.sh[303]: tests/truncate/01.t (Wstat: 0 Tests: 5 Failed: 5)
+[ 2572.237236] pks-autorun.sh[303]:   Failed tests:  1-5
+[ 2572.245349] pks-autorun.sh[303]: tests/truncate/02.t (Wstat: 0 Tests: 5 Failed: 5)
+[ 2572.261480] pks-autorun.sh[303]:   Failed tests:  1-5
+[ 2572.269614] pks-autorun.sh[303]: tests/truncate/03.t (Wstat: 0 Tests: 5 Failed: 5)
+[ 2572.279580] pks-autorun.sh[303]:   Failed tests:  1-5
+[ 2572.285840] pks-autorun.sh[303]: tests/truncate/04.t (Wstat: 0 Tests: 4 Failed: 4)
+[ 2572.298316] pks-autorun.sh[303]:   Failed tests:  1-4
+[ 2572.304602] pks-autorun.sh[303]: tests/truncate/05.t (Wstat: 0 Tests: 15 Failed: 15)
+[ 2572.313639] pks-autorun.sh[303]:   Failed tests:  1-15
+[ 2572.324577] pks-autorun.sh[303]: tests/truncate/06.t (Wstat: 0 Tests: 8 Failed: 8)
+[ 2572.335836] pks-autorun.sh[303]:   Failed tests:  1-8
+[ 2572.344949] pks-autorun.sh[303]: tests/truncate/07.t (Wstat: 0 Tests: 6 Failed: 6)
+[ 2572.354556] pks-autorun.sh[303]:   Failed tests:  1-6
+[ 2572.363435] pks-autorun.sh[303]: tests/truncate/09.t (Wstat: 0 Tests: 3 Failed: 3)
+[ 2572.393299] pks-autorun.sh[303]:   Failed tests:  1-3
+[ 2572.420005] pks-autorun.sh[303]: tests/truncate/12.t (Wstat: 0 Tests: 3 Failed: 3)
+[ 2572.432182] pks-autorun.sh[303]:   Failed tests:  1-3
+[ 2572.442159] pks-autorun.sh[303]: tests/truncate/13.t (Wstat: 0 Tests: 4 Failed: 4)
+[ 2572.448706] pks-autorun.sh[303]:   Failed tests:  1-4
+[ 2572.458062] pks-autorun.sh[303]: tests/truncate/14.t (Wstat: 0 Tests: 2 Failed: 2)
+[ 2572.466545] pks-autorun.sh[303]:   Failed tests:  1-2
+[ 2572.475244] pks-autorun.sh[303]: Files=39, Tests=1908, 1390 wallclock secs (28.27 usr  8.43 sys + 914.03 cusr 489.47 csys = 1440.20 CPU)
+[ 2572.484404] pks-autorun.sh[303]: Result: FAIL
+[ 2577.262304] pks-autorun.sh[226]: ================================================================
+[ 2577.289599] pks-autorun.sh[226]:  [PKS AUTORUN] Compliance testing complete. Powering off.
+[ 2577.300438] pks-autorun.sh[226]: ================================================================
+[ 2579.885584] e1000e: EEE TX LPI TIMER: 00000000
+[ 2579.916180] ACPI: PM: Preparing to enter system sleep state S5
+[ 2579.928341] reboot: Power down

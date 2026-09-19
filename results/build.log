@@ -2464,3 +2464,162 @@ sudo: unable to resolve host ubuntu: Temporary failure in name resolution
 [1m================================================================[0m
 [1m  Build Pipeline Completed Successfully[0m
 [1m================================================================[0m
+
+[1m================================================================[0m
+[1m  PKS Thesis: Autonomous Build Pipeline[0m
+[1m================================================================[0m
+  [2mStart Time:     [0m Sat Sep 19 04:59:43 UTC 2026
+  [2mBuild Log:      [0m /home/vmuser/src/env/results/build.log
+[1;36m==>[0m [1m[1/4] Compiling Security Kernel (build_sec)...[0m
+
+================================================================
+  Building Security Kernel (build_sec)
+================================================================
+  Kernel Tree:     /home/vmuser/src/linux-pks-thesis
+  Output Dir:      /home/vmuser/src/linux-pks-thesis/build_sec
+  Build Jobs:      1
+==> Configuring baseline defconfig + kvm_guest
+==> Enabling storage and virtio drivers
+==> Enabling exploit prerequisite subsystems
+==> Enabling crypto primitives
+==> Enabling RxRPC fallback cipher paths
+==> Configuring PKS page-cache protection
+==> Configuring diagnostic debug options and fail-open handling
+==> Finalizing configuration and compiling bzImage
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis/build_sec'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#6)
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis/build_sec'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis'
+[OK]   Security kernel build complete: /home/vmuser/src/linux-pks-thesis/build_sec/arch/x86/boot/bzImage
+[1;36m==>[0m [1m[2/4] Compiling Mitigated Performance Kernel (build_perf)...[0m
+
+================================================================
+  Building Mitigated Performance Kernel (build_perf, dev)
+================================================================
+  Kernel Tree:     /home/vmuser/src/linux-pks-thesis
+  Output Dir:      /home/vmuser/src/linux-pks-thesis/build_perf
+  Build Jobs:      1
+==> Configuring baseline defconfig + kvm_guest
+==> Enabling storage and virtio drivers
+==> Enabling exploit prerequisite subsystems
+==> Enabling crypto primitives
+==> Enabling RxRPC fallback cipher paths
+==> Configuring PKS page-cache protection
+==> Disabling debug overhead for performance measurement
+==> Finalizing configuration and compiling bzImage
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis/build_perf'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#2)
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis/build_perf'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis'
+[OK]   Mitigated performance kernel build complete: /home/vmuser/src/linux-pks-thesis/build_perf/arch/x86/boot/bzImage
+[1;36m==>[0m [1m[3/4] Compiling Baseline Control Kernel (build_control)...[0m
+
+================================================================
+  Building Control Baseline Kernel (build_perf, control)
+================================================================
+  Kernel Tree:     /home/vmuser/src/linux-pks-thesis-control
+  Output Dir:      /home/vmuser/src/linux-pks-thesis-control/build_perf
+  Build Jobs:      1
+==> Configuring baseline defconfig + kvm_guest
+==> Enabling storage and virtio drivers
+==> Enabling exploit prerequisite subsystems
+==> Enabling crypto primitives
+==> Enabling RxRPC fallback cipher paths
+==> Disabling debug overhead for performance measurement
+==> Finalizing configuration and compiling bzImage
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_perf'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#1)
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_perf'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+[OK]   Control kernel build complete: /home/vmuser/src/linux-pks-thesis-control/build_perf/arch/x86/boot/bzImage
+[1;36m==>[0m [1m[4/4] Preparing Disk Image (/home/vmuser/src/env/images/disk.img)...[0m
+[1;34m[INFO][0m Existing disk image detected. Synchronizing guest assets via update_disk.sh...
+
+================================================================
+  Updating Guest Assets in Disk Image
+================================================================
+  Disk Image:      /home/vmuser/src/env/images/disk.img
+  Assets Dir:      /home/vmuser/src/env/guest-assets
+==> Attaching loop device with partition scanning
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Synchronizing /exploit into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Recompiling dirty-frag harness inside chroot
+==> Recompiling fragnesia harness inside chroot
+==> Synchronizing /benchmark into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Installing sqlite3 inside guest chroot
+==> Synchronizing /unit-tests into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Compiling pks_sanity_test inside chroot
+==> Synchronizing /fsx into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Recompiling fsx harness inside chroot
+rm -f fsx
+cc -O2 -Wall -Wextra -D_GNU_SOURCE -o fsx fsx.c
+==> Synchronizing /pjdfstest into guest rootfs
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+==> Updating headless autorun service
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+[OK]   Disk image updated successfully
+==> Detaching mounts and loop devices
+
+[1m================================================================[0m
+[1m  Build Pipeline Completed Successfully[0m
+[1m================================================================[0m
+  [2mEnd Time:       [0m Sat Sep 19 05:01:46 UTC 2026
+[1;32m[OK][0m   All kernels compiled and disk image prepared.

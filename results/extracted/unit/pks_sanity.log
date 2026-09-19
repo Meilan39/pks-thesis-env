@@ -1,15 +1,15 @@
 ================================================================
  PKS Page-Cache Sanity & Subsystem Scoping Test Harness
 ================================================================
-[INFO] Connected to DebugFS: pool [0x170000, 0x180000), scopes=43364
+[INFO] Connected to DebugFS: pool [0x170000, 0x180000), scopes=44521
 
 ==> [Suite 1] Supported VFS System-Call Scoping Verification
-    [PASS] write(2) scoped cleanly (+7 begin, +7 end)
-    [PASS] pwrite(2) scoped cleanly (+4 begin, +4 end)
-    [PASS] writev(2) scoped cleanly (+2 begin, +2 end)
-    [PASS] ftruncate(2) scoped cleanly (+3 begin, +3 end)
-    [PASS] fallocate(2) scoped cleanly (+15 begin, +15 end)
-    [FAIL] read(2) unexpectedly triggered write-scope toggle (+2)
+    [PASS] write(2) scoped cleanly (+6 begin, +6 end)
+    [PASS] pwrite(2) scoped cleanly (+3 begin, +3 end)
+    [PASS] writev(2) scoped cleanly (+6 begin, +6 end)
+    [PASS] ftruncate(2) scoped cleanly (+6 begin, +6 end)
+    [PASS] fallocate(2) scoped cleanly (+16 begin, +16 end)
+    [FAIL] read(2) unexpectedly triggered write-scope toggle (+3)
 
 ==> [Suite 2] Static Pool Page-Cache Allocation Verification
     [INFO] Pool PFN range: [0x170000, 0x180000)
