@@ -6,9 +6,9 @@
     "cmdline": "root=/dev/vda1 rw console=ttyS0 nokaslr pcache_pks=off pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target",
     "cpu_model": "QEMU TCG CPU version 2.5+",
     "cpu_count": 4,
-    "timestamp": "2026-09-19T16:02:13Z",
+    "timestamp": "2026-09-21T12:32:31Z",
     "mount_options": "/dev/vda2 on /mnt/protected type ext4 (rw,relatime)",
-    "steal_time_stat": "cpu  23927 0 39473 368719 22294 0 1686 0 0 0"
+    "steal_time_stat": "cpu  24614 0 40987 381111 23561 0 1885 0 0 0"
   },
   "mitigated_on": {
     "kernel_variant": "mitigated_on",
@@ -17,9 +17,9 @@
     "cmdline": "root=/dev/vda1 rw console=ttyS0 nokaslr pcache_pks=on pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target",
     "cpu_model": "QEMU TCG CPU version 2.5+",
     "cpu_count": 4,
-    "timestamp": "2026-09-19T16:25:20Z",
+    "timestamp": "2026-09-21T12:56:22Z",
     "mount_options": "/dev/vda2 on /mnt/protected type ext4 (rw,relatime,pks_pagecache)",
-    "steal_time_stat": "cpu  23900 0 43213 394646 24814 0 1491 0 0 0"
+    "steal_time_stat": "cpu  24984 0 45519 407434 21549 0 1958 0 0 0"
   },
   "baseline_control": {
     "kernel_variant": "baseline_control",
@@ -28,8 +28,8 @@
     "cmdline": "root=/dev/vda1 rw console=ttyS0 nokaslr pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target",
     "cpu_model": "QEMU TCG CPU version 2.5+",
     "cpu_count": 4,
-    "timestamp": "2026-09-19T15:40:46Z",
+    "timestamp": "2026-09-21T12:10:02Z",
     "mount_options": "/dev/vda2 on /mnt/protected type ext4 (rw,relatime)",
-    "steal_time_stat": "cpu  6408 0 10252 100367 17877 0 222 0 0 0"
+    "steal_time_stat": "cpu  24930 124 40937 382344 23589 0 1814 0 0 0"
   }
 }
