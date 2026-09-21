@@ -40,19 +40,19 @@ if [ "$QEMU_ACCEL" = "kvm" ]; then
     CPU_MODE="KVM / host (Forced KVM)"
     CPU_ARGS=(-enable-kvm -cpu host)
 elif [ "$QEMU_ACCEL" = "tcg" ]; then
-    CPU_MODE="TCG / max (Forced TCG)"
-    CPU_ARGS=(-cpu max)
+    CPU_MODE="TCG / max,vendor=GenuineIntel,pks=on (Forced TCG)"
+    CPU_ARGS=(-cpu max,vendor=GenuineIntel,pks=on)
 elif [ -e /dev/kvm ] && grep -qw pks /proc/cpuinfo; then
     CPU_MODE="KVM / host (Hardware PKS verified)"
     CPU_ARGS=(-enable-kvm -cpu host)
 elif [ -e /dev/kvm ]; then
-    CPU_MODE="TCG / max (Host lacks PKS, matching perf VM TCG mode)"
-    CPU_ARGS=(-cpu max)
-    log_warn "Host CPU lacks supervisor PKS. Running control in TCG mode to match perf VM execution environment."
+    CPU_MODE="TCG / max,vendor=GenuineIntel,pks=on (Host lacks PKS, matching perf VM TCG mode)"
+    CPU_ARGS=(-cpu max,vendor=GenuineIntel,pks=on)
+    log_warn "Host CPU lacks supervisor PKS. Running control in TCG mode with pks=on to match perf VM execution environment."
 else
-    CPU_MODE="TCG / max"
-    CPU_ARGS=(-cpu max)
-    log_warn "KVM not available; using TCG. Micro-benchmark results will not be representative."
+    CPU_MODE="TCG / max,vendor=GenuineIntel,pks=on"
+    CPU_ARGS=(-cpu max,vendor=GenuineIntel,pks=on)
+    log_warn "KVM not available; using TCG with pks=on to match perf VM baseline. Micro-benchmark results will not be representative."
 fi
 
 TASKSET_CMD=()

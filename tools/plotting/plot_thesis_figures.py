@@ -151,6 +151,7 @@ def plot_figure2(df: pd.DataFrame, out_dir: Path):
         return
     
     merged = pd.merge(w_sub, c_sub, on="block_size_bytes", suffixes=("_warm", "_cold"))
+    merged = merged.sort_values("block_size_bytes").reset_index(drop=True)
     merged["delta_alloc_ns"] = merged["value_cold"] - merged["value_warm"]
     merged["delta_alloc_us"] = merged["delta_alloc_ns"] / 1000.0
     
@@ -308,31 +309,46 @@ def plot_figure5(df: pd.DataFrame, out_dir: Path):
     """Figure 5: SQLite Macrobenchmark Throughput & Latency."""
     sub = df[(df["workload"] == "sqlite_macro") & (df["metric"] == "tps")]
     
-    fig, ax = plt.subplots(figsize=(7, 4.5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.5))
     if sub.empty:
-        # Render a clean, informative placeholder chart
-        ax.text(0.5, 0.5, "SQLite Macrobenchmark Not Executed\n(sqlite3 was not installed on guest disk)\n\nRun 'make update-disk' to compile sqlite3,\nthen re-run 'make bench'.",
-                ha="center", va="center", fontsize=11, color="#666666",
-                bbox=dict(boxstyle="round,pad=1.0", facecolor="#f8f9fa", edgecolor="#ced4da", linewidth=1.5))
-        ax.set_axis_off()
-        ax.set_title("Figure 5: SQLite Macrobenchmark (Pending Execution)")
+        ax1.text(0.5, 0.5, "SQLite Macrobenchmark Not Executed", ha="center", va="center")
+        ax1.set_axis_off()
+        ax2.set_axis_off()
     else:
-        pivot = sub.pivot_table(index="cache_state", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
-        x = np.arange(len(pivot))
-        width = 0.35
+        pivot = sub.pivot_table(index="cache_state", columns="kernel_variant", values="value", aggfunc="mean")
+        variants = [v for v in ["baseline_control", "mitigated_off", "mitigated_on"] if v in pivot.columns]
+        colors = {"baseline_control": "#7f7f7f", "mitigated_off": "#1f77b4", "mitigated_on": "#d62728"}
+        labels = {"baseline_control": "Baseline Control", "mitigated_off": "Mitigated Off (Ablation)", "mitigated_on": "Mitigated On (PKS)"}
         
-        if "baseline_control" in pivot.columns:
-            ax.bar(x - width/2, pivot["baseline_control"], width, label="Baseline Control", color="#7f7f7f")
-        if "mitigated_on" in pivot.columns:
-            ax.bar(x + width/2, pivot["mitigated_on"], width, label="Mitigated On", color="#d62728")
+        # Panel (a): synchronous=FULL
+        if "sync_full" in pivot.index:
+            vals_full = [pivot.loc["sync_full", v] for v in variants]
+            bars1 = ax1.bar(variants, vals_full, color=[colors[v] for v in variants], width=0.55)
+            ax1.set_title("(a) synchronous=FULL (fsync bounded)")
+            ax1.set_ylabel("Transactions Per Second (TPS)")
+            ax1.set_xticks(range(len(variants)))
+            ax1.set_xticklabels([labels[v] for v in variants], rotation=15, ha="right")
+            ax1.grid(axis="y")
+            for bar in bars1:
+                y = bar.get_height()
+                ax1.annotate(f"{y:.2f}", xy=(bar.get_x() + bar.get_width()/2, y),
+                             xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", fontsize=8.5)
         
-        ax.set_ylabel("Transactions Per Second (TPS)")
-        ax.set_title("Figure 5: SQLite Macrobenchmark (Rollback Journal Mode)")
-        ax.set_xticks(x)
-        labels = ["synchronous=FULL", "synchronous=OFF"] if len(x) == 2 else pivot["cache_state"]
-        ax.set_xticklabels(labels)
-        ax.legend()
-        ax.grid(axis="y")
+        # Panel (b): synchronous=OFF
+        if "sync_off" in pivot.index:
+            vals_off = [pivot.loc["sync_off", v] for v in variants]
+            bars2 = ax2.bar(variants, vals_off, color=[colors[v] for v in variants], width=0.55)
+            ax2.set_title("(b) synchronous=OFF (Memory Page Cache)")
+            ax2.set_ylabel("Transactions Per Second (TPS)")
+            ax2.set_xticks(range(len(variants)))
+            ax2.set_xticklabels([labels[v] for v in variants], rotation=15, ha="right")
+            ax2.grid(axis="y")
+            for bar in bars2:
+                y = bar.get_height()
+                ax2.annotate(f"{y:.1f}", xy=(bar.get_x() + bar.get_width()/2, y),
+                             xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", fontsize=8.5)
+        
+        fig.suptitle("Figure 5: SQLite Macrobenchmark (Rollback Journal Mode)", y=1.01)
     
     plt.tight_layout()
     fig.savefig(out_dir / "figure5_sqlite_macro.pdf", bbox_inches="tight")
