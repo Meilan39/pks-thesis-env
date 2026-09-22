@@ -18,6 +18,7 @@ QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
 TASKSET_CPUS="${TASKSET_CPUS:-}"
 TOTAL_MEM="${MEM_PERF_MITIGATED:-4096M}"
 RESULTS_DIR="${RESULTS_DIR:-$ENV_DIR/results}"
+BENCH_RUNS="${BENCH_RUNS:-5}"
 
 RUN_MODE="${1:---interactive}"
 PKS_STATE="${2:-on}"
@@ -66,13 +67,14 @@ if [ "$RUN_MODE" = "--batch" ]; then
         LOG_FILE="$RESULTS_DIR/perf_mitigated.log"
         RAW_LOG_FILE="$RESULTS_DIR/raw_perf_mitigated.log"
     fi
-    EXTRA_CMDLINE="pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
+    EXTRA_CMDLINE="pks_auto=bench pks_runs=$BENCH_RUNS panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
 fi
 
 log_header "Launching Mitigated Performance Benchmark VM"
 log_kv "Kernel"      "$KERNEL"
 log_kv "Disk Image"  "$DISK_IMG"
 log_kv "Execution"   "$RUN_MODE"
+log_kv "Iterations"  "$BENCH_RUNS runs"
 log_kv "PKS State"   "$PKS_STATE"
 log_kv "Total RAM"   "$TOTAL_MEM (256MB pool -> 3840MB usable)"
 log_kv "CPU Mode"    "$CPU_MODE"

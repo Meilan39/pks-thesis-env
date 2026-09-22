@@ -63,12 +63,25 @@ def calculate_overhead(df: pd.DataFrame, syscall: str, cache_state: str = "warm"
     if sub.empty:
         return None
     
-    pivot = sub.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean")
-    if "baseline_control" not in pivot.columns or "mitigated_on" not in pivot.columns:
+    pivot_mean = sub.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean")
+    if "baseline_control" not in pivot_mean.columns or "mitigated_on" not in pivot_mean.columns:
         return None
     
-    pivot["overhead_pct"] = ((pivot["mitigated_on"] - pivot["baseline_control"]) / pivot["baseline_control"]) * 100.0
-    return pivot.reset_index()
+    pivot_mean["overhead_pct"] = ((pivot_mean["mitigated_on"] - pivot_mean["baseline_control"]) / pivot_mean["baseline_control"]) * 100.0
+    
+    pivot_sem = sub.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="sem")
+    if "baseline_control" in pivot_sem.columns and "mitigated_on" in pivot_sem.columns and pivot_sem.notna().any().any():
+        m = pivot_mean["mitigated_on"]
+        b = pivot_mean["baseline_control"]
+        sm = pivot_sem["mitigated_on"].fillna(0)
+        sb = pivot_sem["baseline_control"].fillna(0)
+        rel_var = (sm / m)**2 + (sb / b)**2
+        pivot_mean["overhead_sem"] = (m / b) * np.sqrt(rel_var) * 100.0
+        pivot_mean["overhead_sem"] = pivot_mean["overhead_sem"].fillna(0)
+    else:
+        pivot_mean["overhead_sem"] = 0.0
+        
+    return pivot_mean.reset_index()
 
 
 def plot_figure1(df: pd.DataFrame, out_dir: Path):
@@ -90,13 +103,15 @@ def plot_figure1(df: pd.DataFrame, out_dir: Path):
                      (df["metric"] == "latency_ns") & (df["kernel_variant"] == "mitigated_on")]
         
         if not sub_base.empty:
-            p_base = sub_base.groupby("block_size_bytes")["value"].mean().reset_index()
-            ax1.plot(p_base["block_size_bytes"], p_base["value"] / 1000.0, 
-                     linestyle=":", color=color, marker=marker, alpha=0.7, label=f"{label} [Control]")
+            p_base = sub_base.groupby("block_size_bytes")["value"].agg(["mean", "sem"]).reset_index()
+            yerr_base = (p_base["sem"] / 1000.0) if (p_base["sem"].notna() & (p_base["sem"] > 0)).any() else None
+            ax1.errorbar(p_base["block_size_bytes"], p_base["mean"] / 1000.0, yerr=yerr_base, capsize=3,
+                         linestyle=":", color=color, marker=marker, alpha=0.7, label=f"{label} [Control]")
         if not sub_mit.empty:
-            p_mit = sub_mit.groupby("block_size_bytes")["value"].mean().reset_index()
-            ax1.plot(p_mit["block_size_bytes"], p_mit["value"] / 1000.0, 
-                     linestyle="-", color=color, marker=marker, label=f"{label} [Mitigated]")
+            p_mit = sub_mit.groupby("block_size_bytes")["value"].agg(["mean", "sem"]).reset_index()
+            yerr_mit = (p_mit["sem"] / 1000.0) if (p_mit["sem"].notna() & (p_mit["sem"] > 0)).any() else None
+            ax1.errorbar(p_mit["block_size_bytes"], p_mit["mean"] / 1000.0, yerr=yerr_mit, capsize=3,
+                         linestyle="-", color=color, marker=marker, label=f"{label} [Mitigated]")
     
     ax1.set_xscale("log", base=2)
     ax1.set_yscale("log")
@@ -111,15 +126,21 @@ def plot_figure1(df: pd.DataFrame, out_dir: Path):
     # Right: Relative Overhead (%)
     w_df = calculate_overhead(df, "write", "warm", "latency_ns")
     if w_df is not None and not w_df.empty:
-        ax2.plot(w_df["block_size_bytes"], w_df["overhead_pct"], marker="o", color="#1f77b4", label="write() [Scope Enter + Exit]")
+        yerr_w = w_df["overhead_sem"] if ("overhead_sem" in w_df.columns and (w_df["overhead_sem"] > 0).any()) else None
+        ax2.errorbar(w_df["block_size_bytes"], w_df["overhead_pct"], yerr=yerr_w, capsize=3,
+                     marker="o", color="#1f77b4", label="write() [Scope Enter + Exit]")
     
     r_df = calculate_overhead(df, "read", "warm", "latency_ns")
     if r_df is not None and not r_df.empty:
-        ax2.plot(r_df["block_size_bytes"], r_df["overhead_pct"], marker="s", color="#2ca02c", linestyle="--", label="read() [Zero Toggles]")
+        yerr_r = r_df["overhead_sem"] if ("overhead_sem" in r_df.columns and (r_df["overhead_sem"] > 0).any()) else None
+        ax2.errorbar(r_df["block_size_bytes"], r_df["overhead_pct"], yerr=yerr_r, capsize=3,
+                     marker="s", color="#2ca02c", linestyle="--", label="read() [Zero Toggles]")
     
     t_df = calculate_overhead(df, "ftruncate", "warm", "latency_ns")
     if t_df is not None and not t_df.empty:
-        ax2.plot(t_df["block_size_bytes"], t_df["overhead_pct"], marker="^", color="#ff7f0e", linestyle="-.", label="ftruncate() [Metadata Scope]")
+        yerr_t = t_df["overhead_sem"] if ("overhead_sem" in t_df.columns and (t_df["overhead_sem"] > 0).any()) else None
+        ax2.errorbar(t_df["block_size_bytes"], t_df["overhead_pct"], yerr=yerr_t, capsize=3,
+                     marker="^", color="#ff7f0e", linestyle="-.", label="ftruncate() [Metadata Scope]")
     
     ax2.axhline(0, color="gray", linestyle=":", linewidth=1.5, alpha=0.8)
     ax2.set_xscale("log", base=2)
@@ -150,18 +171,30 @@ def plot_figure2(df: pd.DataFrame, out_dir: Path):
         print("[WARN] Incomplete warm/cold write latency data for Figure 2. Skipping.")
         return
     
-    merged = pd.merge(w_sub, c_sub, on="block_size_bytes", suffixes=("_warm", "_cold"))
+    w_agg = w_sub.groupby("block_size_bytes")["value"].agg(["mean", "sem"]).reset_index()
+    c_agg = c_sub.groupby("block_size_bytes")["value"].agg(["mean", "sem"]).reset_index()
+    
+    merged = pd.merge(w_agg, c_agg, on="block_size_bytes", suffixes=("_warm", "_cold"))
     merged = merged.sort_values("block_size_bytes").reset_index(drop=True)
+    merged["value_warm"] = merged["mean_warm"]
+    merged["value_cold"] = merged["mean_cold"]
+    merged["sem_warm"] = merged["sem_warm"].fillna(0)
+    merged["sem_cold"] = merged["sem_cold"].fillna(0)
     merged["delta_alloc_ns"] = merged["value_cold"] - merged["value_warm"]
     merged["delta_alloc_us"] = merged["delta_alloc_ns"] / 1000.0
+    merged["delta_alloc_sem_us"] = np.sqrt(merged["sem_cold"]**2 + merged["sem_warm"]**2) / 1000.0
     
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     xticks = [512, 4096, 65536, 262144, 1048576]
     xticklabels = [format_bytes(x) for x in xticks]
     
     # Left: Warm vs Cold raw latencies
-    ax1.plot(merged["block_size_bytes"], merged["value_warm"] / 1000.0, marker="o", color="#1f77b4", label="Warm Cache (Overwrite)")
-    ax1.plot(merged["block_size_bytes"], merged["value_cold"] / 1000.0, marker="s", color="#d62728", label="Cold Cache (First-Touch Allocation)")
+    yerr_warm = (merged["sem_warm"] / 1000.0) if (merged["sem_warm"] > 0).any() else None
+    yerr_cold = (merged["sem_cold"] / 1000.0) if (merged["sem_cold"] > 0).any() else None
+    ax1.errorbar(merged["block_size_bytes"], merged["value_warm"] / 1000.0, yerr=yerr_warm, capsize=3,
+                 marker="o", color="#1f77b4", label="Warm Cache (Overwrite)")
+    ax1.errorbar(merged["block_size_bytes"], merged["value_cold"] / 1000.0, yerr=yerr_cold, capsize=3,
+                 marker="s", color="#d62728", label="Cold Cache (First-Touch Allocation)")
     ax1.set_xscale("log", base=2)
     ax1.set_xlabel("Operation Size (Bytes)")
     ax1.set_ylabel("Mean System-Call Latency (µs)")
@@ -172,7 +205,9 @@ def plot_figure2(df: pd.DataFrame, out_dir: Path):
     ax1.set_xticklabels(xticklabels)
     
     # Right: Isolated Allocation Overhead (Delta)
-    ax2.plot(merged["block_size_bytes"], merged["delta_alloc_us"], marker="^", color="#9467bd", label="Allocation Delta (Cold - Warm)")
+    yerr_delta = merged["delta_alloc_sem_us"] if (merged["delta_alloc_sem_us"] > 0).any() else None
+    ax2.errorbar(merged["block_size_bytes"], merged["delta_alloc_us"], yerr=yerr_delta, capsize=3,
+                 marker="^", color="#9467bd", label="Allocation Delta (Cold - Warm)")
     ax2.axhline(0, color="gray", linestyle=":", linewidth=1.5, alpha=0.7)
     ax2.set_xscale("log", base=2)
     ax2.set_xlabel("Operation Size (Bytes)")
@@ -201,7 +236,10 @@ def plot_figure3(df: pd.DataFrame, out_dir: Path):
         return
     
     p_tp = sub_tp.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
+    p_tp_sem = sub_tp.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="sem").reset_index()
+    
     p_lat = sub_lat.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="mean").reset_index() if not sub_lat.empty else pd.DataFrame()
+    p_lat_sem = sub_lat.pivot_table(index="block_size_bytes", columns="kernel_variant", values="value", aggfunc="sem").reset_index() if not sub_lat.empty else pd.DataFrame()
     
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
     xticks = [512, 2048, 8192, 32768, 131072, 524288, 1048576]
@@ -217,7 +255,9 @@ def plot_figure3(df: pd.DataFrame, out_dir: Path):
     # Left: Throughput
     for col in ["baseline_control", "mitigated_off", "mitigated_on"]:
         if col in p_tp.columns:
-            ax1.plot(p_tp["block_size_bytes"], p_tp[col], marker="o", color=colors.get(col, "#000"), label=labels.get(col, col))
+            yerr = p_tp_sem[col].fillna(0) if (col in p_tp_sem.columns and (p_tp_sem[col] > 0).any()) else None
+            ax1.errorbar(p_tp["block_size_bytes"], p_tp[col], yerr=yerr, capsize=3,
+                         marker="o", color=colors.get(col, "#000"), label=labels.get(col, col))
     
     ax1.set_xscale("log", base=2)
     ax1.set_xlabel("Block Size (Bytes)")
@@ -232,7 +272,9 @@ def plot_figure3(df: pd.DataFrame, out_dir: Path):
     if not p_lat.empty:
         for col in ["baseline_control", "mitigated_off", "mitigated_on"]:
             if col in p_lat.columns:
-                ax2.plot(p_lat["block_size_bytes"], p_lat[col] / 1000.0, marker="s", color=colors.get(col, "#000"), label=labels.get(col, col))
+                yerr = (p_lat_sem[col] / 1000.0).fillna(0) if (col in p_lat_sem.columns and (p_lat_sem[col] > 0).any()) else None
+                ax2.errorbar(p_lat["block_size_bytes"], p_lat[col] / 1000.0, yerr=yerr, capsize=3,
+                             marker="s", color=colors.get(col, "#000"), label=labels.get(col, col))
         ax2.set_xscale("log", base=2)
         ax2.set_yscale("log")
         ax2.set_xlabel("Block Size (Bytes)")
@@ -252,7 +294,7 @@ def plot_figure3(df: pd.DataFrame, out_dir: Path):
 
 
 def plot_figure4(df: pd.DataFrame, out_dir: Path):
-    """Figure 4: Multi-Core Concurrency Scaling (Aggregate Throughput & Scaling)."""
+    """Figure 4: Multi-Core Concurrency Scaling (Aggregate Throughput & Latency)."""
     sub_tp = df[(df["workload"] == "concurrency") & (df["metric"] == "throughput_mbs")]
     sub_lat = df[(df["workload"] == "concurrency") & (df["metric"] == "latency_ns")]
     
@@ -261,7 +303,10 @@ def plot_figure4(df: pd.DataFrame, out_dir: Path):
         return
     
     p_tp = sub_tp.pivot_table(index="num_jobs", columns="kernel_variant", values="value", aggfunc="mean").reset_index()
+    p_tp_sem = sub_tp.pivot_table(index="num_jobs", columns="kernel_variant", values="value", aggfunc="sem").reset_index()
+    
     p_lat = sub_lat.pivot_table(index="num_jobs", columns="kernel_variant", values="value", aggfunc="mean").reset_index() if not sub_lat.empty else pd.DataFrame()
+    p_lat_sem = sub_lat.pivot_table(index="num_jobs", columns="kernel_variant", values="value", aggfunc="sem").reset_index() if not sub_lat.empty else pd.DataFrame()
     
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
     jobs = sorted(p_tp["num_jobs"].unique())
@@ -276,7 +321,9 @@ def plot_figure4(df: pd.DataFrame, out_dir: Path):
     # Left: Aggregate Throughput
     for col in ["baseline_control", "mitigated_off", "mitigated_on"]:
         if col in p_tp.columns:
-            ax1.plot(p_tp["num_jobs"], p_tp[col], marker="o", linewidth=2.2, color=colors.get(col, "#000"), label=labels.get(col, col))
+            yerr = p_tp_sem[col].fillna(0) if (col in p_tp_sem.columns and (p_tp_sem[col] > 0).any()) else None
+            ax1.errorbar(p_tp["num_jobs"], p_tp[col], yerr=yerr, capsize=3,
+                         marker="o", linewidth=2.2, color=colors.get(col, "#000"), label=labels.get(col, col))
     
     ax1.set_xlabel("Concurrent Worker Threads (numjobs)")
     ax1.set_ylabel("Aggregate Throughput (MB/s)")
@@ -289,7 +336,9 @@ def plot_figure4(df: pd.DataFrame, out_dir: Path):
     if not p_lat.empty:
         for col in ["baseline_control", "mitigated_off", "mitigated_on"]:
             if col in p_lat.columns:
-                ax2.plot(p_lat["num_jobs"], p_lat[col] / 1000.0, marker="s", linewidth=2.2, color=colors.get(col, "#000"), label=labels.get(col, col))
+                yerr = (p_lat_sem[col] / 1000.0).fillna(0) if (col in p_lat_sem.columns and (p_lat_sem[col] > 0).any()) else None
+                ax2.errorbar(p_lat["num_jobs"], p_lat[col] / 1000.0, yerr=yerr, capsize=3,
+                             marker="s", linewidth=2.2, color=colors.get(col, "#000"), label=labels.get(col, col))
         ax2.set_xlabel("Concurrent Worker Threads (numjobs)")
         ax2.set_ylabel("Average Request Latency (µs)")
         ax2.set_title("(b) Per-Thread Request Latency")
@@ -315,37 +364,46 @@ def plot_figure5(df: pd.DataFrame, out_dir: Path):
         ax1.set_axis_off()
         ax2.set_axis_off()
     else:
-        pivot = sub.pivot_table(index="cache_state", columns="kernel_variant", values="value", aggfunc="mean")
-        variants = [v for v in ["baseline_control", "mitigated_off", "mitigated_on"] if v in pivot.columns]
+        pivot_mean = sub.pivot_table(index="cache_state", columns="kernel_variant", values="value", aggfunc="mean")
+        pivot_sem = sub.pivot_table(index="cache_state", columns="kernel_variant", values="value", aggfunc="sem")
+        variants = [v for v in ["baseline_control", "mitigated_off", "mitigated_on"] if v in pivot_mean.columns]
         colors = {"baseline_control": "#7f7f7f", "mitigated_off": "#1f77b4", "mitigated_on": "#d62728"}
         labels = {"baseline_control": "Baseline Control", "mitigated_off": "Mitigated Off (Ablation)", "mitigated_on": "Mitigated On (PKS)"}
         
         # Panel (a): synchronous=FULL
-        if "sync_full" in pivot.index:
-            vals_full = [pivot.loc["sync_full", v] for v in variants]
-            bars1 = ax1.bar(variants, vals_full, color=[colors[v] for v in variants], width=0.55)
+        if "sync_full" in pivot_mean.index:
+            vals_full = [pivot_mean.loc["sync_full", v] for v in variants]
+            yerr_full = [pivot_sem.loc["sync_full", v] if (v in pivot_sem.columns and pd.notna(pivot_sem.loc["sync_full", v])) else 0.0 for v in variants]
+            has_err_full = any(e > 0 for e in yerr_full)
+            bars1 = ax1.bar(variants, vals_full, yerr=yerr_full if has_err_full else None, capsize=3,
+                            color=[colors[v] for v in variants], width=0.55)
             ax1.set_title("(a) synchronous=FULL (fsync bounded)")
             ax1.set_ylabel("Transactions Per Second (TPS)")
             ax1.set_xticks(range(len(variants)))
             ax1.set_xticklabels([labels[v] for v in variants], rotation=15, ha="right")
             ax1.grid(axis="y")
-            for bar in bars1:
+            for idx, bar in enumerate(bars1):
                 y = bar.get_height()
-                ax1.annotate(f"{y:.2f}", xy=(bar.get_x() + bar.get_width()/2, y),
+                err = yerr_full[idx] if has_err_full else 0.0
+                ax1.annotate(f"{y:.2f}", xy=(bar.get_x() + bar.get_width()/2, y + err),
                              xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", fontsize=8.5)
         
         # Panel (b): synchronous=OFF
-        if "sync_off" in pivot.index:
-            vals_off = [pivot.loc["sync_off", v] for v in variants]
-            bars2 = ax2.bar(variants, vals_off, color=[colors[v] for v in variants], width=0.55)
+        if "sync_off" in pivot_mean.index:
+            vals_off = [pivot_mean.loc["sync_off", v] for v in variants]
+            yerr_off = [pivot_sem.loc["sync_off", v] if (v in pivot_sem.columns and pd.notna(pivot_sem.loc["sync_off", v])) else 0.0 for v in variants]
+            has_err_off = any(e > 0 for e in yerr_off)
+            bars2 = ax2.bar(variants, vals_off, yerr=yerr_off if has_err_off else None, capsize=3,
+                            color=[colors[v] for v in variants], width=0.55)
             ax2.set_title("(b) synchronous=OFF (Memory Page Cache)")
             ax2.set_ylabel("Transactions Per Second (TPS)")
             ax2.set_xticks(range(len(variants)))
             ax2.set_xticklabels([labels[v] for v in variants], rotation=15, ha="right")
             ax2.grid(axis="y")
-            for bar in bars2:
+            for idx, bar in enumerate(bars2):
                 y = bar.get_height()
-                ax2.annotate(f"{y:.1f}", xy=(bar.get_x() + bar.get_width()/2, y),
+                err = yerr_off[idx] if has_err_off else 0.0
+                ax2.annotate(f"{y:.1f}", xy=(bar.get_x() + bar.get_width()/2, y + err),
                              xytext=(0, 3), textcoords="offset points", ha="center", va="bottom", fontsize=8.5)
         
         fig.suptitle("Figure 5: SQLite Macrobenchmark (Rollback Journal Mode)", y=1.01)
@@ -384,18 +442,21 @@ def generate_table1_tost(df: pd.DataFrame, out_dir: Path):
                 diff_pct = ((mit_mean - base_mean) / base_mean) * 100.0
                 
                 if is_distribution and piv_std is not None:
-                    # Multi-sample TOST calculation
+                    # Multi-sample TOST calculation using Welch-Satterthwaite degrees of freedom
                     b_vals = read_sub[(read_sub["block_size_bytes"] == bs) & (read_sub["kernel_variant"] == "baseline_control")]["value"].values
                     m_vals = read_sub[(read_sub["block_size_bytes"] == bs) & (read_sub["kernel_variant"] == "mitigated_on")]["value"].values
                     n_b, n_m = len(b_vals), len(m_vals)
                     delta = (margin_pct / 100.0) * base_mean
                     
                     if n_b >= 2 and n_m >= 2:
-                        se = math.sqrt(np.var(b_vals, ddof=1)/n_b + np.var(m_vals, ddof=1)/n_m)
+                        v_b = np.var(b_vals, ddof=1) / n_b
+                        v_m = np.var(m_vals, ddof=1) / n_m
+                        se = math.sqrt(v_b + v_m)
                         diff = mit_mean - base_mean
                         t1 = (diff - (-delta)) / se if se > 0 else 0
                         t2 = (diff - delta) / se if se > 0 else 0
-                        df_val = n_b + n_m - 2
+                        denom = (v_b**2 / (n_b - 1)) + (v_m**2 / (n_m - 1)) if (n_b > 1 and n_m > 1) else 0
+                        df_val = ((v_b + v_m)**2 / denom) if denom > 0 else (n_b + n_m - 2)
                         p1 = 1 - stats.t.cdf(t1, df_val)
                         p2 = stats.t.cdf(t2, df_val)
                         p_tost = max(p1, p2)

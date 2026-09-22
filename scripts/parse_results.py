@@ -24,9 +24,9 @@ def parse_fio_json(file_path: Path, kernel_variant: str, run_id: str) -> List[Di
     fname = file_path.name
     
     # Identify test type from filename
-    # Pattern: fio_<write|read|truncate>_<warm|cold>_<bs>.json or fio_concurrency_jobs_<jobs>.json
-    m_sweep = re.match(r"fio_(write|read|truncate)_(warm|cold)_(\d+)\.json", fname)
-    m_concur = re.match(r"fio_concurrency_jobs_(\d+)\.json", fname)
+    # Pattern: fio_<write|read|truncate>_<warm|cold>_<bs>(_run<id>)?.json or fio_concurrency_jobs_<jobs>(_run<id>)?.json
+    m_sweep = re.match(r"fio_(write|read|truncate)_(warm|cold)_(\d+)(?:_run(\d+))?\.json", fname)
+    m_concur = re.match(r"fio_concurrency_jobs_(\d+)(?:_run(\d+))?\.json", fname)
     
     try:
         with open(file_path, "r", encoding="utf-8") as f:
@@ -46,6 +46,8 @@ def parse_fio_json(file_path: Path, kernel_variant: str, run_id: str) -> List[Di
         fio_dir = "write" if op == "truncate" else op
         cache_state = m_sweep.group(2)
         bs_bytes = int(m_sweep.group(3))
+        if m_sweep.group(4):
+            run_id = f"run_{int(m_sweep.group(4)):02d}"
         workload = "sweep"
         num_jobs = 1
     elif m_concur:
@@ -53,6 +55,8 @@ def parse_fio_json(file_path: Path, kernel_variant: str, run_id: str) -> List[Di
         fio_dir = "write"
         cache_state = "warm"
         bs_bytes = 4096
+        if m_concur.group(2):
+            run_id = f"run_{int(m_concur.group(2)):02d}"
         workload = "concurrency"
         num_jobs = int(m_concur.group(1))
     else:
@@ -131,13 +135,15 @@ def parse_fio_json(file_path: Path, kernel_variant: str, run_id: str) -> List[Di
 def parse_truncate_json(file_path: Path, kernel_variant: str, run_id: str) -> List[Dict[str, Any]]:
     rows = []
     fname = file_path.name
-    # Pattern: truncate_<warm|cold>_<bs>.json
-    m = re.match(r"truncate_(warm|cold)_(\d+)\.json", fname)
+    # Pattern: truncate_<warm|cold>_<bs>(_run<id>)?.json
+    m = re.match(r"truncate_(warm|cold)_(\d+)(?:_run(\d+))?\.json", fname)
     if not m:
         return []
     
     cache_state = m.group(1)
     bs_bytes = int(m.group(2))
+    if m.group(3):
+        run_id = f"run_{int(m.group(3)):02d}"
     
     try:
         with open(file_path, "r", encoding="utf-8") as f:
@@ -166,12 +172,14 @@ def parse_truncate_json(file_path: Path, kernel_variant: str, run_id: str) -> Li
 def parse_sqlite_json(file_path: Path, kernel_variant: str, run_id: str) -> List[Dict[str, Any]]:
     rows = []
     fname = file_path.name
-    # Pattern: sqlite_<FULL|OFF>.json
-    m = re.match(r"sqlite_(FULL|OFF)\.json", fname)
+    # Pattern: sqlite_<FULL|OFF>(_run<id>)?.json
+    m = re.match(r"sqlite_(FULL|OFF)(?:_run(\d+))?\.json", fname)
     if not m:
         return []
     
     sync_mode = m.group(1)
+    if m.group(2):
+        run_id = f"run_{int(m.group(2)):02d}"
     
     try:
         with open(file_path, "r", encoding="utf-8") as f:
@@ -289,8 +297,14 @@ def main() -> int:
                     meta["virtualization"] = "KVM"
             combined_meta[variant] = meta
         
-        for json_file in sorted(vdir.glob("*.json")):
+        json_files = sorted(vdir.glob("*.json"))
+        has_multi_run = any(re.search(r"_run\d+\.json$", f.name) for f in json_files)
+        
+        for json_file in json_files:
             if json_file.name == "run_metadata.json":
+                continue
+            if has_multi_run and not re.search(r"_run\d+\.json$", json_file.name):
+                # Skip legacy un-suffixed alias file to prevent duplicate rows
                 continue
             
             if json_file.name.startswith("fio_"):

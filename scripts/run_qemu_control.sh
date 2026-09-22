@@ -18,6 +18,7 @@ QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
 TASKSET_CPUS="${TASKSET_CPUS:-}"
 MEM="${MEM_PERF_CONTROL:-3840M}"
 RESULTS_DIR="${RESULTS_DIR:-$ENV_DIR/results}"
+BENCH_RUNS="${BENCH_RUNS:-5}"
 
 RUN_MODE="${1:---interactive}"
 
@@ -66,13 +67,14 @@ if [ "$RUN_MODE" = "--batch" ]; then
     mkdir -p "$RESULTS_DIR"
     LOG_FILE="$RESULTS_DIR/perf_control.log"
     RAW_LOG_FILE="$RESULTS_DIR/raw_perf_control.log"
-    EXTRA_CMDLINE="pks_auto=bench panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
+    EXTRA_CMDLINE="pks_auto=bench pks_runs=$BENCH_RUNS panic=1 systemd.mask=serial-getty@ttyS0.service systemd.mask=getty.target"
 fi
 
 log_header "Launching Control Baseline Benchmark VM"
 log_kv "Kernel"      "$KERNEL"
 log_kv "Disk Image"  "$DISK_IMG"
 log_kv "Execution"   "$RUN_MODE"
+log_kv "Iterations"  "$BENCH_RUNS runs"
 log_kv "Total RAM"   "$MEM (Equalized to mitigated usable RAM)"
 log_kv "CPU Mode"    "$CPU_MODE"
 log_kv "CPU Pinning" "${TASKSET_CPUS:-none}"
