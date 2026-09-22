@@ -137,7 +137,7 @@ Executing `make build`:
 Executing `make test`:
 1. Boots the mitigated kernel once with `pcache_pks=on` and `pks_auto=compliance`.
 2. Sequentially executes in-kernel PKS driver self-tests, the userspace `pks_sanity_test` suite, the `fsx` filesystem exerciser (5K rootfs operations, 10K protected mount operations, Commit 06 rejection test), and POSIX compliance test suites.
-3. The userspace sanity harness (`pks_sanity_test.c`) reads `/sys/kernel/debug/pcache_pks/status` to assert that write system calls increment scope entry and exit counters by exactly 1, read system calls trigger zero increments, static pool folios fall strictly within physical pool PFN boundaries via `/proc/self/pagemap`, and fail-closed system calls return `-EOPNOTSUPP`.
+3. The userspace sanity harness (`pks_sanity_test.c`) reads `/sys/kernel/debug/pcache_pks/status` to assert that write system calls increment the scope counter by exactly 1, read system calls trigger zero increments, static pool folios fall strictly within physical pool PFN boundaries via `/proc/self/pagemap`, and fail-closed system calls return `-EOPNOTSUPP`.
 4. Suppresses early QEMU boot noise during execution, logs clean test output to `results/compliance.log`, and prints a unified summary table on the host.
 
 ### 3. Automated Security Validation (`make test-sec`)

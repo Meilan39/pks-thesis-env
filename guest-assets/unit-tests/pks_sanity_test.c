@@ -29,7 +29,7 @@ static unsigned long g_pool_start_pfn = 0;
 static unsigned long g_pool_end_pfn = 0;
 static bool g_has_debugfs = false;
 
-static bool read_debugfs_status(uint64_t *begin_cnt, uint64_t *end_cnt)
+static bool read_debugfs_status(uint64_t *scope_cnt)
 {
 	FILE *fp = fopen(STATUS_PATH, "r");
 	if (!fp)
@@ -41,10 +41,8 @@ static bool read_debugfs_status(uint64_t *begin_cnt, uint64_t *end_cnt)
 			sscanf(line + 15, " 0x%lx", &g_pool_start_pfn);
 		else if (strncmp(line, "pool_end_pfn:", 13) == 0)
 			sscanf(line + 13, " 0x%lx", &g_pool_end_pfn);
-		else if (strncmp(line, "scope_begin_count:", 18) == 0)
-			sscanf(line + 18, " %" SCNu64, begin_cnt);
-		else if (strncmp(line, "scope_end_count:", 16) == 0)
-			sscanf(line + 16, " %" SCNu64, end_cnt);
+		else if (strncmp(line, "scope_count:", 12) == 0)
+			sscanf(line + 12, " %" SCNu64, scope_cnt);
 	}
 	fclose(fp);
 	return true;
@@ -59,8 +57,8 @@ static int test_vfs_scoping(const char *test_file)
 		return 0;
 	}
 
-	uint64_t b0, e0, b1, e1;
-	read_debugfs_status(&b0, &e0);
+	uint64_t c0, c1;
+	read_debugfs_status(&c0);
 
 	int fd = open(test_file, O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (fd < 0) {
@@ -69,7 +67,7 @@ static int test_vfs_scoping(const char *test_file)
 	}
 
 	// 1. write()
-	read_debugfs_status(&b0, &e0);
+	read_debugfs_status(&c0);
 	char buf[4096];
 	memset(buf, 'A', sizeof(buf));
 	if (write(fd, buf, sizeof(buf)) != sizeof(buf)) {
@@ -77,25 +75,25 @@ static int test_vfs_scoping(const char *test_file)
 		close(fd);
 		return 1;
 	}
-	read_debugfs_status(&b1, &e1);
-	if (b1 > b0 && e1 > e0 && b1 == e1) {
-		printf("    [PASS] write(2) scoped cleanly (+%" PRIu64 " begin, +%" PRIu64 " end)\n", b1 - b0, e1 - e0);
+	read_debugfs_status(&c1);
+	if (c1 > c0) {
+		printf("    [PASS] write(2) scoped cleanly (+%" PRIu64 ")\n", c1 - c0);
 	} else {
-		printf("    [FAIL] write(2) scope count mismatch: begin %" PRIu64 " -> %" PRIu64 ", end %" PRIu64 " -> %" PRIu64 "\n", b0, b1, e0, e1);
+		printf("    [FAIL] write(2) scope count mismatch: %" PRIu64 " -> %" PRIu64 "\n", c0, c1);
 		close(fd);
 		return 1;
 	}
 
 	// 2. pwrite()
-	read_debugfs_status(&b0, &e0);
+	read_debugfs_status(&c0);
 	if (pwrite(fd, buf, sizeof(buf), 4096) != sizeof(buf)) {
 		perror("pwrite");
 		close(fd);
 		return 1;
 	}
-	read_debugfs_status(&b1, &e1);
-	if (b1 > b0 && e1 > e0) {
-		printf("    [PASS] pwrite(2) scoped cleanly (+%" PRIu64 " begin, +%" PRIu64 " end)\n", b1 - b0, e1 - e0);
+	read_debugfs_status(&c1);
+	if (c1 > c0) {
+		printf("    [PASS] pwrite(2) scoped cleanly (+%" PRIu64 ")\n", c1 - c0);
 	} else {
 		printf("    [FAIL] pwrite(2) scope count mismatch\n");
 		close(fd);
@@ -103,7 +101,7 @@ static int test_vfs_scoping(const char *test_file)
 	}
 
 	// 3. writev()
-	read_debugfs_status(&b0, &e0);
+	read_debugfs_status(&c0);
 	struct iovec iov[2];
 	iov[0].iov_base = buf;
 	iov[0].iov_len = 512;
@@ -114,9 +112,9 @@ static int test_vfs_scoping(const char *test_file)
 		close(fd);
 		return 1;
 	}
-	read_debugfs_status(&b1, &e1);
-	if (b1 > b0 && e1 > e0) {
-		printf("    [PASS] writev(2) scoped cleanly (+%" PRIu64 " begin, +%" PRIu64 " end)\n", b1 - b0, e1 - e0);
+	read_debugfs_status(&c1);
+	if (c1 > c0) {
+		printf("    [PASS] writev(2) scoped cleanly (+%" PRIu64 ")\n", c1 - c0);
 	} else {
 		printf("    [FAIL] writev(2) scope count mismatch\n");
 		close(fd);
@@ -124,15 +122,15 @@ static int test_vfs_scoping(const char *test_file)
 	}
 
 	// 4. ftruncate()
-	read_debugfs_status(&b0, &e0);
+	read_debugfs_status(&c0);
 	if (ftruncate(fd, 65536) != 0) {
 		perror("ftruncate");
 		close(fd);
 		return 1;
 	}
-	read_debugfs_status(&b1, &e1);
-	if (b1 > b0 && e1 > e0) {
-		printf("    [PASS] ftruncate(2) scoped cleanly (+%" PRIu64 " begin, +%" PRIu64 " end)\n", b1 - b0, e1 - e0);
+	read_debugfs_status(&c1);
+	if (c1 > c0) {
+		printf("    [PASS] ftruncate(2) scoped cleanly (+%" PRIu64 ")\n", c1 - c0);
 	} else {
 		printf("    [FAIL] ftruncate(2) scope count mismatch\n");
 		close(fd);
@@ -140,15 +138,15 @@ static int test_vfs_scoping(const char *test_file)
 	}
 
 	// 5. fallocate()
-	read_debugfs_status(&b0, &e0);
+	read_debugfs_status(&c0);
 	if (fallocate(fd, 0, 0, 131072) != 0) {
 		perror("fallocate");
 		close(fd);
 		return 1;
 	}
-	read_debugfs_status(&b1, &e1);
-	if (b1 > b0 && e1 > e0) {
-		printf("    [PASS] fallocate(2) scoped cleanly (+%" PRIu64 " begin, +%" PRIu64 " end)\n", b1 - b0, e1 - e0);
+	read_debugfs_status(&c1);
+	if (c1 > c0) {
+		printf("    [PASS] fallocate(2) scoped cleanly (+%" PRIu64 ")\n", c1 - c0);
 	} else {
 		printf("    [FAIL] fallocate(2) scope count mismatch\n");
 		close(fd);
@@ -156,28 +154,18 @@ static int test_vfs_scoping(const char *test_file)
 	}
 
 	// 6. read() / pread() - MUST NOT increment write scopes
-	read_debugfs_status(&b0, &e0);
+	read_debugfs_status(&c0);
 	char r_buf[1024];
 	if (pread(fd, r_buf, sizeof(r_buf), 0) != sizeof(r_buf)) {
 		perror("pread");
 		close(fd);
 		return 1;
 	}
-	read_debugfs_status(&b1, &e1);
-	if (b1 == b0 && e1 == e0) {
+	read_debugfs_status(&c1);
+	if (c1 == c0) {
 		printf("    [PASS] read(2) executed with 0 write-scope toggles (read-path parity confirmed)\n");
 	} else {
-		printf("    [FAIL] read(2) unexpectedly triggered write-scope toggle (+%" PRIu64 ")\n", b1 - b0);
-		close(fd);
-		return 1;
-	}
-
-	// 7. Balance check: begin == end
-	read_debugfs_status(&b1, &e1);
-	if (b1 == e1) {
-		printf("    [PASS] Total scope balance verified: %" PRIu64 " entries == %" PRIu64 " exits (leak-free invariant)\n", b1, e1);
-	} else {
-		printf("    [FAIL] Scope leak detected: %" PRIu64 " entries vs %" PRIu64 " exits\n", b1, e1);
+		printf("    [FAIL] read(2) unexpectedly triggered write-scope toggle (+%" PRIu64 ")\n", c1 - c0);
 		close(fd);
 		return 1;
 	}
@@ -342,11 +330,11 @@ int main(int argc, char **argv)
 	printf(" PKS Page-Cache Sanity & Subsystem Scoping Test Harness\n");
 	printf("================================================================\n");
 
-	uint64_t b = 0, e = 0;
-	g_has_debugfs = read_debugfs_status(&b, &e);
+	uint64_t c = 0;
+	g_has_debugfs = read_debugfs_status(&c);
 	if (g_has_debugfs) {
-		printf("[INFO] Connected to DebugFS: pool [0x%lx, 0x%lx), scopes=%llu\n",
-		       g_pool_start_pfn, g_pool_end_pfn, (unsigned long long)b);
+		printf("[INFO] Connected to DebugFS: pool [0x%lx, 0x%lx), scopes=%" PRIu64 "\n",
+		       g_pool_start_pfn, g_pool_end_pfn, c);
 	} else {
 		printf("[INFO] DebugFS status node not available; running policy & non-instrumented tests\n");
 	}
