@@ -1,0 +1,27 @@
+  GEN     Makefile
+*** Default configuration is based on 'x86_64_defconfig'
+#
+# configuration written to .config
+#
+  GEN     Makefile
+Using .config as base
+Merging ../kernel/configs/kvm_guest.config
+#
+# merged configuration written to .config (needs make)
+#
+  GEN     Makefile
+#
+# configuration written to .config
+#
+  GEN     Makefile
+#
+# configuration written to .config
+#
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#9)

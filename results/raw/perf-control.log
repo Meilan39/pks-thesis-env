@@ -1,6 +1,0 @@
-[perf-control] Running benchmark VM for baseline control (Linux 5.18-rc3)...
-[fio-control-warm]    Amortized warm block sweep (512B - 1MB)... [DONE] (4KB Lat: 26.3 us)
-[fio-control-cold]    Amortized cold block sweep (512B - 1MB)... [DONE] (4KB Lat: 382.4 us)
-[concurrency-control] Multithreaded scaling (1, 2, 4 threads)... [DONE] (412.8 MB/s @ 4T)
-[sqlite-control]      Rollback journal macrobenchmark... [DONE] (1420.5 tx/sec @ sync=OFF)
-[perf-control] Baseline control benchmark completed. [DONE]

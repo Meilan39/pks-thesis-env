@@ -1,6 +1,0 @@
-======================================================================
- [sec] PKS Security Evaluation: End-to-End Exploit Neutralization
-======================================================================
-./scripts/run_qemu.sh sec off sec results/raw/sec-off.log
-./scripts/run_qemu.sh sec on sec results/raw/sec-on.log
-python3 scripts/data/analyze_sec.py

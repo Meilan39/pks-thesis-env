@@ -1,0 +1,118 @@
+cc -O2 -Wall -Wextra -o test_pks test_pks.c -lpthread
+test_pks.c: In function ‘do_context_switch’:
+test_pks.c:150:19: warning: comparison of integer expressions of different signedness: ‘long unsigned int’ and ‘long int’ [-Wsign-compare]
+  150 |         if (g_cpu >= sysconf(_SC_NPROCESSORS_ONLN)) {
+      |                   ^~
+test_pks.c:139:42: warning: unused parameter ‘debugfs_str’ [-Wunused-parameter]
+  139 | static int do_context_switch(const char *debugfs_str)
+      |                              ~~~~~~~~~~~~^~~~~~~~~~~
+test_pks.c: In function ‘setup_debug’:
+test_pks.c:416:16: warning: comparison of integer expressions of different signedness: ‘int’ and ‘size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+  416 |         if (rc != strlen(str))
+      |                ^~
+test_pks.c: In function ‘print_debug’:
+test_pks.c:435:16: warning: comparison of integer expressions of different signedness: ‘int’ and ‘size_t’ {aka ‘long unsigned int’} [-Wsign-compare]
+  435 |         if (rc != strlen(str))
+      |                ^~
+test_pks.c: In function ‘do_context_switch’:
+test_pks.c:191:17: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  191 |                 write(fd, RUN_SINGLE, 1);
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c:194:17: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  194 |                 write(fd, ARM_CTX_SWITCH, 1);
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c:197:17: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  197 |                 write(setup_done[1], &done, sizeof(done));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c:201:17: warning: ignoring return value of ‘read’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  201 |                 read(switch_done[0], &done, sizeof(done));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c:217:17: warning: ignoring return value of ‘read’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  217 |                 read(fd, result, 10);
+      |                 ^~~~~~~~~~~~~~~~~~~~
+test_pks.c:225:17: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  225 |                 write(setup_done[1], &done, sizeof(done));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c:232:9: warning: ignoring return value of ‘read’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  232 |         read(setup_done[0], &done, sizeof(done));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c:243:17: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  243 |                 write(switch_done[1], &done, sizeof(done));
+      |                 ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c:251:9: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  251 |         write(switch_done[1], &done, sizeof(done));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c:260:9: warning: ignoring return value of ‘read’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  260 |         read(setup_done[0], &done, sizeof(done));
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+test_pks.c: In function ‘print_debug’:
+test_pks.c:451:9: warning: ignoring return value of ‘system’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  451 |         system(str);
+      |         ^~~~~~~~~~~
+cc -O2 -Wall -Wextra -o pks_sanity_test pks_sanity_test.c
+pks_sanity_test.c: In function ‘main’:
+pks_sanity_test.c:339:14: warning: unused parameter ‘argc’ [-Wunused-parameter]
+  339 | int main(int argc, char **argv)
+      |          ~~~~^~~~
+pks_sanity_test.c:339:27: warning: unused parameter ‘argv’ [-Wunused-parameter]
+  339 | int main(int argc, char **argv)
+      |                    ~~~~~~~^~~~
+pks_sanity_test.c: In function ‘test_fail_closed_policy’:
+pks_sanity_test.c:306:9: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+  306 |         write(fd, "0123456789", 10);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~
+cc -O2 -Wall -Wextra -D_GNU_SOURCE -o fsx fsx.c
+cc -O2 -Wall -pthread -o exp exp.c
+exp.c: In function ‘rxrpc_lpe_main’:
+exp.c:1595:31: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+ 1595 |                         (void)write(STDOUT_FILENO, buf, n);
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+exp.c:1604:47: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+ 1604 |                                         (void)write(master, "\n", 1);
+      |                                               ^~~~~~~~~~~~~~~~~~~~~~
+exp.c:1617:39: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+ 1617 |                                 (void)write(master, buf, n);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~
+exp.c:1627:31: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+ 1627 |                         (void)write(master, cmd, sizeof(cmd) - 1);
+      |                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+exp.c:1639:39: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+ 1639 |                                 (void)write(STDOUT_FILENO, buf, n);
+      |                                       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At top level:
+exp.c:1782:12: warning: ‘run_root_pty’ defined but not used [-Wunused-function]
+ 1782 | static int run_root_pty(void)
+      |            ^~~~~~~~~~~~
+cc -O2 -Wall -pthread -o exp exp.c
+exp.c: In function ‘main’:
+exp.c:1307:9: warning: argument 2 null where non-null expected [-Wnonnull]
+ 1307 |         execve(target_file, NULL, NULL);
+      |         ^~~~~~
+In file included from /usr/include/x86_64-linux-gnu/bits/sigstksz.h:24,
+                 from /usr/include/signal.h:328,
+                 from exp.c:58:
+/usr/include/unistd.h:572:12: note: in a call to function ‘execve’ declared ‘nonnull’
+  572 | extern int execve (const char *__path, char *const __argv[],
+      |            ^~~~~~
+exp.c:1266:29: warning: unused variable ‘sample_len’ [-Wunused-variable]
+ 1266 |         size_t desired_len, sample_len;
+      |                             ^~~~~~~~~~
+exp.c:1306:9: warning: ignoring return value of ‘write’ declared with attribute ‘warn_unused_result’ [-Wunused-result]
+ 1306 |         write(STDOUT_FILENO, "\033[r\033[9999;1H\033[?25h\n", 19);
+      |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+At top level:
+exp.c:1241:13: warning: ‘usage’ defined but not used [-Wunused-function]
+ 1241 | static void usage(const char *prog)
+      |             ^~~~~
+exp.c:468:13: warning: ‘print_file_sample’ defined but not used [-Wunused-function]
+  468 | static void print_file_sample(const char *label, uint64_t off, size_t len)
+      |             ^~~~~~~~~~~~~~~~~
+exp.c:403:23: warning: ‘parse_hex_bytes_arg’ defined but not used [-Wunused-function]
+  403 | static unsigned char *parse_hex_bytes_arg(const char *s, size_t *len_out)
+      |                       ^~~~~~~~~~~~~~~~~~~
+exp.c:368:17: warning: ‘parse_u64_arg’ defined but not used [-Wunused-function]
+  368 | static uint64_t parse_u64_arg(const char *s, const char *name)
+      |                 ^~~~~~~~~~~~~
+exp.c:196:13: warning: ‘print_hex_row’ defined but not used [-Wunused-function]
+  196 | static void print_hex_row(const char *path, uint64_t highlight_off,
+      |             ^~~~~~~~~~~~~

@@ -1,8 +1,0 @@
-======================================================================
- [perf] PKS Performance Evaluation: Micro- & Macro-Benchmark Sweeps
-======================================================================
-./scripts/run_qemu.sh control off perf results/raw/perf-control.log
-./scripts/run_qemu.sh perf off perf results/raw/perf-off.log
-./scripts/run_qemu.sh perf on perf results/raw/perf-on.log
-./scripts/data/fetch_results.sh
-python3 scripts/data/analyze_perf.py

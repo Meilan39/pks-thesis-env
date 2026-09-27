@@ -1,18 +1,39 @@
 ======================================================================
  [build] PKS Kernel Compilation & Disk Environment Pipeline
 ======================================================================
-./scripts/build/build_sec.sh /Users/meilan/src/linux-pks-thesis
-./scripts/build/build_perf.sh /Users/meilan/src/linux-pks-thesis
-./scripts/build/build_control.sh /Users/meilan/src/linux-pks-thesis-control
-./scripts/disk/disk_provision.sh /Users/meilan/Documents/大学/3年前期/研究/卒論/pks-thesis-env/images/disk.img
-./scripts/disk/disk_update.sh /Users/meilan/Documents/大学/3年前期/研究/卒論/pks-thesis-env/images/disk.img
-./scripts/compile-all.sh
+[build-sec] Compiling Security Kernel...
+[build-sec] Compiling Security Kernel (/home/vmuser/src/linux-pks-thesis/build_sec/arch/x86/boot/bzImage)... [DONE] (0m 39s)
+
+[build-perf] Compiling Performance Kernel...
+[build-perf] Compiling Performance Kernel (/home/vmuser/src/linux-pks-thesis/build_perf/arch/x86/boot/bzImage)... [DONE] (0m 32s)
+
+[build-control] Compiling Control Baseline Kernel...
+[build-control] Compiling Control Baseline Kernel (/home/vmuser/src/linux-pks-thesis-control/build_perf/arch/x86/boot/bzImage)... [DONE] (1m 2s)
+
+[disk-provision] Bootstrapping Debian Bookworm and partitioning 8GB image...
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+[disk-provision] Bootstrapped Debian Bookworm and partitioned 8GB image... [DONE] (23m 32s)
+
+[disk-update] Synchronizing /pks-thesis-env into disk image...
+[disk-update] Synchronized /pks-thesis-env into disk image... [DONE]
+
+[compile] Compiling evaluation binaries across tests, sec, perf...
+[compile] Compiled all evaluation binaries across tests, sec, perf... [DONE]
+
 ======================================================================
  [build] Build Pipeline Summary & Artifact Verification
 ----------------------------------------------------------------------
-  Security Kernel:       [READY]
-  Performance Kernel:   [READY]
-  Control Kernel:       [READY]
-  Disk Image:           [READY]
+  Security Kernel:     11M  [READY]
+  Performance Kernel:  11M [READY]
+  Control Kernel:      11M [READY]
+  Disk Image:          8.0G [READY]
   Overall Status:      ALL 6 BUILD TARGETS COMPILED SUCCESSFULLY
 ======================================================================

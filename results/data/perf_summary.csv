@@ -1,8 +1,0 @@
-Benchmark,Metric,control,off,on,Overhead
-fio 4KB Warm,Read Lat,26.3 us,26.4 us,28.1 us,+6.44%
-fio 4KB Warm,Write Lat,47.9 us,48.1 us,51.2 us,+6.45%
-fio 4KB Cold,Write Lat,382.4 us,384.1 us,395.7 us,+3.02%
-fio 64KB Warm,Throughput,612.4 MB/s,610.8 MB/s,604.2 MB/s,-1.34%
-fio 1MB Warm,Throughput,842.1 MB/s,840.9 MB/s,838.4 MB/s,-0.44%
-concurrency (4T),Throughput,412.8 MB/s,411.2 MB/s,402.1 MB/s,-2.59%
-sqlite (sync=OFF),Tx/sec,1420.5 tx,1418.2 tx,1305.1 tx,-7.98%

@@ -1,0 +1,69 @@
+  GEN     Makefile
+*** Default configuration is based on 'x86_64_defconfig'
+#
+# configuration written to .config
+#
+  GEN     Makefile
+Using .config as base
+Merging ../kernel/configs/kvm_guest.config
+#
+# merged configuration written to .config (needs make)
+#
+  GEN     Makefile
+#
+# configuration written to .config
+#
+  GEN     Makefile
+#
+# configuration written to .config
+#
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+  CC      fs/9p/vfs_super.o
+  CC      fs/9p/vfs_inode.o
+  CC      fs/9p/vfs_inode_dotl.o
+  CC      fs/9p/v9fs.o
+  CC      fs/9p/xattr.o
+  CC      fs/9p/acl.o
+  AR      fs/9p/built-in.a
+  AR      fs/built-in.a
+  GEN     .version
+  CHK     include/generated/compile.h
+  UPD     include/generated/compile.h
+  CC      init/version.o
+  AR      init/built-in.a
+  LD      vmlinux.o
+  MODPOST vmlinux.symvers
+  MODINFO modules.builtin.modinfo
+  GEN     modules.builtin
+  LD      .tmp_vmlinux.kallsyms1
+  KSYMS   .tmp_vmlinux.kallsyms1.S
+  AS      .tmp_vmlinux.kallsyms1.S
+  LD      .tmp_vmlinux.kallsyms2
+  KSYMS   .tmp_vmlinux.kallsyms2.S
+  AS      .tmp_vmlinux.kallsyms2.S
+  LD      vmlinux
+  SYSMAP  System.map
+  SORTTAB vmlinux
+  VOFFSET arch/x86/boot/compressed/../voffset.h
+  CC      arch/x86/boot/compressed/misc.o
+  OBJCOPY arch/x86/boot/compressed/vmlinux.bin
+  RELOCS  arch/x86/boot/compressed/vmlinux.relocs
+  GZIP    arch/x86/boot/compressed/vmlinux.bin.gz
+  MKPIGGY arch/x86/boot/compressed/piggy.S
+  AS      arch/x86/boot/compressed/piggy.o
+  CC      arch/x86/boot/compressed/kaslr.o
+  LD      arch/x86/boot/compressed/vmlinux
+  ZOFFSET arch/x86/boot/zoffset.h
+  AS      arch/x86/boot/header.o
+  CC      arch/x86/boot/version.o
+  LD      arch/x86/boot/setup.elf
+  OBJCOPY arch/x86/boot/setup.bin
+  OBJCOPY arch/x86/boot/vmlinux.bin
+  BUILD   arch/x86/boot/bzImage
+Kernel: arch/x86/boot/bzImage is ready  (#2)

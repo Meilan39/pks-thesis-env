@@ -1,6 +1,0 @@
-[perf-off] Running benchmark VM for unmitigated ablation (pcache_pks=off)...
-[fio-off-warm]        Amortized warm block sweep (512B - 1MB)... [DONE] (4KB Lat: 26.4 us)
-[fio-off-cold]        Amortized cold block sweep (512B - 1MB)... [DONE] (4KB Lat: 384.1 us)
-[concurrency-off]     Multithreaded scaling (1, 2, 4 threads)... [DONE] (411.2 MB/s @ 4T)
-[sqlite-off]          Rollback journal macrobenchmark... [DONE] (1418.2 tx/sec @ sync=OFF)
-[perf-off] Unmitigated ablation benchmark completed. [DONE]
