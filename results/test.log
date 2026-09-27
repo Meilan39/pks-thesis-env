@@ -1,33 +1,6 @@
 ======================================================================
  [test] PKS Compliance & Functional Integrity Suite
 ======================================================================
-[test-off] Starting consolidated compliance run (pcache_pks=off)...
-[pks-unit-off] Architectural MSR/CPUID checks (4/4 passed)... [DONE]
-[sanity-off]   Page-cache scoping & debugfs checks (3/3 passed)... [DONE]
-[fsx-off]       10,000 randomized file operations (0 errors)... [DONE]
-[pjd-off]       POSIX compliance suite (284/284 assertions passed)... [DONE]
-[test-off] Consolidated compliance run completed. [DONE]
-
-[test-on] Starting consolidated compliance run (pcache_pks=on)...
-[pks-unit-on] Architectural MSR/CPUID checks (4/4 passed)... [DONE]
-[sanity-on]    Page-cache scoping & debugfs checks (4/4 passed)... [DONE]
-[fsx-on]       10,000 randomized file operations (0 errors)... [DONE]
-[pjd-on]       POSIX compliance suite (284/284 assertions passed)... [DONE]
-[test-on] Consolidated compliance run completed. [DONE]
-
-======================================================================
- [test] Compliance Evaluation Summary (make analyze-test)
-----------------------------------------------------------------------
- Suite        Variant         Passed   Failed   Total   Verdict
-----------------------------------------------------------------------
- pks-unit     pcache_pks=off       4        0       4   PASSED
- pks-unit     pcache_pks=on        4        0       4   PASSED
- sanity       pcache_pks=off       3        0       3   PASSED
- sanity       pcache_pks=on        4        0       4   PASSED
- fsx (10K)    pcache_pks=off   10000        0   10000   PASSED
- fsx (10K)    pcache_pks=on    10000        0   10000   PASSED
- pjd (POSIX)  pcache_pks=off     284        0     284   PASSED
- pjd (POSIX)  pcache_pks=on      284        0     284   PASSED
-----------------------------------------------------------------------
- Overall Verdict: ALL COMPLIANCE CHECKS PASSED (0 regressions detected)
-======================================================================
+./scripts/run_qemu.sh sec off test results/raw/test-off.log
+./scripts/run_qemu.sh sec on test results/raw/test-on.log
+python3 scripts/data/analyze_test.py

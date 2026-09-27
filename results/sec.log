@@ -1,26 +1,6 @@
 ======================================================================
  [sec] PKS Security Evaluation: End-to-End Exploit Neutralization
 ======================================================================
-[sec-off] Starting exploit suite under unmitigated baseline (pcache_pks=off)...
-[copy-fail-off]  AF_ALG splice out-of-bounds corruption... VULNERABLE (Corrupted)
-[dirty-frag-off] IPv4 packet fragment softirq injection... VULNERABLE (Corrupted)
-[fragnesia-off]  IPSec ESPINTCP crypto workqueue overwrite... VULNERABLE (Corrupted)
-[sec-off] Exploit suite execution completed. [DONE]
-
-[sec-on] Starting exploit suite under active mitigation (pcache_pks=on)...
-[copy-fail-on]   AF_ALG splice out-of-bounds corruption... NEUTRALIZED (Trapped -EFAULT)
-[dirty-frag-on]  IPv4 packet fragment softirq injection... NEUTRALIZED (Fail-Closed Panic)
-[fragnesia-on]   IPSec ESPINTCP crypto workqueue overwrite... NEUTRALIZED (Fail-Closed Panic)
-[sec-on] Exploit suite execution completed. [DONE]
-
-========================================================================================
- [sec] 3-Way Exploit Neutralization Matrix (make analyze-sec)
-----------------------------------------------------------------------------------------
- Vulnerability   Context          pcache_pks=off          pcache_pks=on (Hardware PKS)
-----------------------------------------------------------------------------------------
- Copy Fail       Syscall Splice   EXPLOITED (Corrupted)   NEUTRALIZED (Trapped -EFAULT)
- Dirty Frag      Softirq Network  EXPLOITED (Corrupted)   NEUTRALIZED (Fail-Closed Panic)
- Fragnesia       Crypto Worker    EXPLOITED (Corrupted)   NEUTRALIZED (Fail-Closed Panic)
-----------------------------------------------------------------------------------------
- Mitigation Effectiveness: 100% Neutralization (3/3 vectors blocked)
-========================================================================================
+./scripts/run_qemu.sh sec off sec results/raw/sec-off.log
+./scripts/run_qemu.sh sec on sec results/raw/sec-on.log
+python3 scripts/data/analyze_sec.py

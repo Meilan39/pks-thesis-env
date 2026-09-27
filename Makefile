@@ -15,14 +15,10 @@ $(shell mkdir -p results/raw results/data images)
 
 .PHONY: help build test sec perf \
         build-sec build-perf build-control disk-provision disk-update compile run-qemu end-qemu \
-        pks-unit pks-unit-off pks-unit-on sanity sanity-off sanity-on fsx fsx-off fsx-on pjd pjd-off pjd-on \
         test-off test-on analyze-test \
-        copy-fail copy-fail-off copy-fail-on dirty-frag dirty-frag-off dirty-frag-on fragnesia fragnesia-off fragnesia-on \
         sec-off sec-on analyze-sec \
-        fio-control-warm fio-control-cold fio-off-warm fio-off-cold fio-on-warm fio-on-cold \
-        fio fio-warm fio-cold concurrency concurrency-control concurrency-off concurrency-on \
-        sqlite sqlite-control sqlite-off sqlite-on perf-control perf-off perf-on analyze-perf \
-        clean clean-results clean-image clean-control clean-perf clean-sec clean-build clean-all
+        perf-control perf-off perf-on analyze-perf \
+        clean clean-results clean-image clean-build clean-all
 
 # ==============================================================================
 # Help
@@ -34,11 +30,11 @@ help:
 	@echo ""
 	@echo "  Primary Reproduction Entry Points:"
 	@echo "    make build              Compile kernels, provision disk, compile test harnesses"
-	@echo "    make test               Execute compliance & integrity test suite (off & on)"
+	@echo "    make test               Execute compliance & integrity test suite"
 	@echo "    make sec                Execute 3-way exploit neutralization evaluation"
 	@echo "    make perf               Execute full A/B performance benchmark sweeps"
 	@echo ""
-	@echo "  Granular Kernel & Disk Lifecycle:"
+	@echo "  Kernel & Disk Lifecycle:"
 	@echo "    make build-sec          Compile security diagnostic kernel"
 	@echo "    make build-perf         Compile performance mitigated kernel"
 	@echo "    make build-control      Compile baseline pristine upstream Linux v5.18-rc3"
@@ -48,27 +44,21 @@ help:
 	@echo "    make run-qemu           Launch interactive serial debugging console"
 	@echo "    make end-qemu           Terminate all active QEMU instances"
 	@echo ""
-	@echo "  Compliance & Unit Tests:"
-	@echo "    make pks-unit-[off|on]  Architectural MSR/CPUID PKS unit selftest"
-	@echo "    make sanity-[off|on]    PKS page-cache scoping & debugfs test"
-	@echo "    make fsx-[off|on]       Filesystem exerciser (10,000 random operations)"
-	@echo "    make pjd-[off|on]       POSIX filesystem compliance suite"
-	@echo "    make test-[off|on]      Consolidated single-boot compliance suite"
+	@echo "  Compliance & Integrity (Invoked by 'make test'):"
+	@echo "    make test-off           Execute compliance suite on unmitigated kernel"
+	@echo "    make test-on            Execute compliance suite on mitigated kernel"
 	@echo "    make analyze-test       Synthesize compliance evaluation report"
 	@echo ""
-	@echo "  Security Exploit Benchmarks:"
-	@echo "    make copy-fail-[off|on] CVE-2026-31431 AF_ALG splice exploit"
-	@echo "    make dirty-frag-[off|on] CVE-2026-43284 IPv4 fragment reassembly exploit"
-	@echo "    make fragnesia-[off|on] CVE-2026-46300 IPSec ESPINTCP workqueue exploit"
-	@echo "    make sec-[off|on]       Execute all 3 exploit vectors under specified mode"
+	@echo "  Security Evaluation (Invoked by 'make sec'):"
+	@echo "    make sec-off            Execute exploit vectors on unmitigated kernel"
+	@echo "    make sec-on             Execute exploit vectors on mitigated kernel"
 	@echo "    make analyze-sec        Synthesize 3-way exploit neutralization matrix"
 	@echo ""
-	@echo "  Performance Benchmarks:"
-	@echo "    make fio-[control|off|on]-[warm|cold] Amortized block sweep (512B - 1MB)"
-	@echo "    make concurrency-[control|off|on]     Multithreaded scaling (1, 2, 4 threads)"
-	@echo "    make sqlite-[control|off|on]          SQLite rollback journal macrobenchmark"
-	@echo "    make perf-[control|off|on]            Execute complete benchmark suite"
-	@echo "    make analyze-perf                     Synthesize normalized A/B performance summary"
+	@echo "  Performance Evaluation (Invoked by 'make perf'):"
+	@echo "    make perf-control       Execute benchmark suite on baseline control kernel"
+	@echo "    make perf-off           Execute benchmark suite on unmitigated kernel"
+	@echo "    make perf-on            Execute benchmark suite on mitigated kernel"
+	@echo "    make analyze-perf       Synthesize normalized A/B performance summary"
 	@echo ""
 	@echo "  Cleanup & Teardown:"
 	@echo "    make clean              Remove compiled test binaries across tests/, sec/, perf/"
@@ -170,38 +160,6 @@ end-qemu:
 # ==============================================================================
 # Group 3: Unit and Compliance Testing
 # ==============================================================================
-pks-unit-off:
-	@./scripts/run_qemu.sh sec off /pks-thesis-env/tests/pks-unit/run.sh results/raw/pks-unit-off.log
-
-pks-unit-on:
-	@./scripts/run_qemu.sh sec on /pks-thesis-env/tests/pks-unit/run.sh results/raw/pks-unit-on.log
-
-pks-unit: pks-unit-on
-
-sanity-off:
-	@./scripts/run_qemu.sh sec off /pks-thesis-env/tests/sanity/run.sh results/raw/sanity-off.log
-
-sanity-on:
-	@./scripts/run_qemu.sh sec on /pks-thesis-env/tests/sanity/run.sh results/raw/sanity-on.log
-
-sanity: sanity-on
-
-fsx-off:
-	@./scripts/run_qemu.sh sec off /pks-thesis-env/tests/fsx/run.sh results/raw/fsx-off.log
-
-fsx-on:
-	@./scripts/run_qemu.sh sec on /pks-thesis-env/tests/fsx/run.sh results/raw/fsx-on.log
-
-fsx: fsx-on
-
-pjd-off:
-	@./scripts/run_qemu.sh sec off /pks-thesis-env/tests/pjd/run.sh results/raw/pjd-off.log
-
-pjd-on:
-	@./scripts/run_qemu.sh sec on /pks-thesis-env/tests/pjd/run.sh results/raw/pjd-on.log
-
-pjd: pjd-on
-
 test-off:
 	@./scripts/run_qemu.sh sec off test results/raw/test-off.log
 
@@ -214,30 +172,6 @@ analyze-test:
 # ==============================================================================
 # Group 4: Security Benchmarks
 # ==============================================================================
-copy-fail-off:
-	@./scripts/run_qemu.sh sec off /pks-thesis-env/sec/copy-fail/run.sh results/raw/copy-fail-off.log
-
-copy-fail-on:
-	@./scripts/run_qemu.sh sec on /pks-thesis-env/sec/copy-fail/run.sh results/raw/copy-fail-on.log
-
-copy-fail: copy-fail-on
-
-dirty-frag-off:
-	@./scripts/run_qemu.sh sec off /pks-thesis-env/sec/dirty-frag/run.sh results/raw/dirty-frag-off.log
-
-dirty-frag-on:
-	@./scripts/run_qemu.sh sec on /pks-thesis-env/sec/dirty-frag/run.sh results/raw/dirty-frag-on.log
-
-dirty-frag: dirty-frag-on
-
-fragnesia-off:
-	@./scripts/run_qemu.sh sec off /pks-thesis-env/sec/fragnesia/run.sh results/raw/fragnesia-off.log
-
-fragnesia-on:
-	@./scripts/run_qemu.sh sec on /pks-thesis-env/sec/fragnesia/run.sh results/raw/fragnesia-on.log
-
-fragnesia: fragnesia-on
-
 sec-off:
 	@./scripts/run_qemu.sh sec off sec results/raw/sec-off.log
 
@@ -250,50 +184,6 @@ analyze-sec:
 # ==============================================================================
 # Group 5: Performance Benchmarks
 # ==============================================================================
-fio-control-warm:
-	@./scripts/run_qemu.sh control off /pks-thesis-env/perf/fio/run_warm.sh results/raw/fio-control-warm.log
-
-fio-control-cold:
-	@./scripts/run_qemu.sh control off /pks-thesis-env/perf/fio/run_cold.sh results/raw/fio-control-cold.log
-
-fio-off-warm:
-	@./scripts/run_qemu.sh perf off /pks-thesis-env/perf/fio/run_warm.sh results/raw/fio-off-warm.log
-
-fio-off-cold:
-	@./scripts/run_qemu.sh perf off /pks-thesis-env/perf/fio/run_cold.sh results/raw/fio-off-cold.log
-
-fio-on-warm:
-	@./scripts/run_qemu.sh perf on /pks-thesis-env/perf/fio/run_warm.sh results/raw/fio-on-warm.log
-
-fio-on-cold:
-	@./scripts/run_qemu.sh perf on /pks-thesis-env/perf/fio/run_cold.sh results/raw/fio-on-cold.log
-
-fio-warm: fio-control-warm fio-off-warm fio-on-warm
-fio-cold: fio-control-cold fio-off-cold fio-on-cold
-fio: fio-warm fio-cold
-
-concurrency-control:
-	@./scripts/run_qemu.sh control off /pks-thesis-env/perf/concurrency/run.sh results/raw/concurrency-control.log
-
-concurrency-off:
-	@./scripts/run_qemu.sh perf off /pks-thesis-env/perf/concurrency/run.sh results/raw/concurrency-off.log
-
-concurrency-on:
-	@./scripts/run_qemu.sh perf on /pks-thesis-env/perf/concurrency/run.sh results/raw/concurrency-on.log
-
-concurrency: concurrency-control concurrency-off concurrency-on
-
-sqlite-control:
-	@./scripts/run_qemu.sh control off /pks-thesis-env/perf/sqlite/run.sh results/raw/sqlite-control.log
-
-sqlite-off:
-	@./scripts/run_qemu.sh perf off /pks-thesis-env/perf/sqlite/run.sh results/raw/sqlite-off.log
-
-sqlite-on:
-	@./scripts/run_qemu.sh perf on /pks-thesis-env/perf/sqlite/run.sh results/raw/sqlite-on.log
-
-sqlite: sqlite-control sqlite-off sqlite-on
-
 perf-control:
 	@./scripts/run_qemu.sh control off perf results/raw/perf-control.log
 
@@ -323,22 +213,8 @@ clean-image:
 	@echo "[clean-image] Removed virtual disk container 'images/disk.img'. [DONE]"
 	@echo ""
 
-clean-control:
-	@rm -f build_control/arch/x86/boot/bzImage
-	@echo "[clean-control] Removed compiled bzImage for control baseline. [DONE]"
-	@echo ""
-
-clean-perf:
-	@rm -f build_perf/arch/x86/boot/bzImage
-	@echo "[clean-perf] Removed compiled bzImage for performance kernel. [DONE]"
-	@echo ""
-
-clean-sec:
-	@rm -f build_sec/arch/x86/boot/bzImage
-	@echo "[clean-sec] Removed compiled bzImage for security kernel. [DONE]"
-	@echo ""
-
-clean-build: clean-control clean-perf clean-sec
+clean-build:
+	@rm -f build_control/arch/x86/boot/bzImage build_perf/arch/x86/boot/bzImage build_sec/arch/x86/boot/bzImage
 	@echo "[clean-build] Removed all compiled bzImage kernel images. [DONE]"
 	@echo ""
 
