@@ -100,8 +100,7 @@ Run `make help` to inspect all available targets:
 | **Housekeeping** | `make clean` | Remove compiled test binaries across `tests/`, `sec/`, `perf/` |
 | | `make clean-results` | Remove execution logs and generated CSV datasets |
 | | `make clean-image` | Remove `images/disk.img` container |
-| | `make clean-build` | Remove compiled kernel bzImage binaries |
-| | `make clean-all` | Reset workspace to pristine pre-build state |
+| | `make clean-all` | Reset workspace to pristine state (kernel images preserved) |
 
 ---
 
