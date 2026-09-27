@@ -1,0 +1,8 @@
+======================================================================
+ [perf] PKS Performance Evaluation: Micro- & Macro-Benchmark Sweeps
+======================================================================
+./scripts/run/run_perf.sh all control
+./scripts/run/run_perf.sh all off
+./scripts/run/run_perf.sh all on
+./scripts/data/fetch_results.sh
+python3 scripts/data/analyze_perf.py

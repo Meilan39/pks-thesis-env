@@ -1,0 +1,6 @@
+======================================================================
+ [sec] PKS Security Evaluation: End-to-End Exploit Neutralization
+======================================================================
+./scripts/run/run_sec.sh all off
+./scripts/run/run_sec.sh all on
+python3 scripts/data/analyze_sec.py

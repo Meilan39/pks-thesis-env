@@ -1,0 +1,6 @@
+======================================================================
+ [test] PKS Compliance & Functional Integrity Suite
+======================================================================
+./scripts/run/run_test.sh all off
+./scripts/run/run_test.sh all on
+python3 scripts/data/analyze_test.py

@@ -1,62 +1,64 @@
 # PKS Page-Cache Protection Evaluation Testbed (`pks-thesis-env`)
 
-This repository provides an automated test harness, disk provisioning pipeline, and QEMU orchestration environment for evaluating Supervisor Protection Keys (PKS) page-cache isolation in the Linux kernel (`v5.18-rc3`).
+This repository provides a modular, reproducible evaluation testbed for Supervisor Protection Keys (PKS) page-cache isolation in the Linux kernel (`v5.18-rc3`).
 
-The entire workflow is controllable from the top-level `Makefile`, featuring headless batch execution, automatic result harvesting, interactive debugging consoles, unified logging, publication figure generation, and statistical equivalence testing.
+The workflow is orchestrated from the top-level [Makefile](file:///Users/meilan/Documents/大学/3年前期/研究/卒論/pks-thesis-env/Makefile), featuring headless batch execution, direct 9p workspace mounting, automatic result harvesting, interactive debugging consoles, unified logging with `tee`, and decoupled publication figure generation.
 
 ---
 
 ## Directory Layout
 
-```
+```text
 pks-thesis-env/
-├── config.mk               # Centralized configuration overrides (paths, RAM, SMP, etc.)
-├── guest-assets/
-│   ├── autorun/            # Headless automated execution service (systemd)
-│   │   ├── pks-autorun.sh
-│   │   └── pks-autorun.service
-│   ├── unit-tests/         # In-kernel PKS tests and userspace VFS sanity suite
-│   │   ├── pks_sanity_test.c # Asserts scope counting, static pool PFNs, and fail-closed policies
-│   │   ├── Makefile
-│   │   └── run_pks_unit.sh
-│   ├── fsx/                # File System Exerciser (stress tests read/write/truncate/mmap)
-│   │   ├── fsx.c
-│   │   ├── Makefile
-│   │   └── run_fsx.sh
-│   ├── pjdfstest/          # POSIX filesystem compliance test suite
-│   ├── exploit/
-│   │   ├── copy-fail/      # Copy Fail (CVE-2026-31431) exploit
-│   │   ├── dirty-frag/     # Dirty Frag (CVE-2026-43284, CVE-2026-43500) exploit
-│   │   ├── fragnesia/      # Fragnesia (CVE-2026-46300) XFRM ESPINTCP exploit
-│   │   └── run_tests.sh    # Security validation harness (A/B testing)
-│   └── benchmark/
-│       ├── fio_sweep.job   # Standardized synchronous fio job specification
-│       ├── sqlite_bench.sh # SQLite rollback journal macrobenchmark (FULL vs OFF)
-│       └── run_benchmarks.sh # Multi-phase benchmark orchestrator (warm/cold fio, concurrency, SQLite)
-├── scripts/
-│   ├── common.sh           # Unified logging utilities and pre-flight checks
-│   ├── build_sec.sh        # Compiles debug-enabled security kernel (pcache_pks + ESPINTCP / crypto)
-│   ├── build_perf.sh       # Compiles optimized mitigated performance kernel (zero debug overhead)
-│   ├── build_control.sh    # Compiles baseline upstream control kernel
-│   ├── build_all.sh        # Background tmux compilation orchestrator for all kernels
-│   ├── provision_disk.sh   # Provisions dual-partition ext4 Debian disk image
-│   ├── update_disk.sh      # Synchronizes guest-assets into disk image and compiles in chroot
-│   ├── fetch_results.sh    # Extracts artifacts and raw JSONs from disk image to host results/
-│   ├── parse_results.py    # Aggregates raw fio and SQLite JSONs into canonical tidy CSV
-│   ├── analyze_bench.py    # Benchmark analysis and statistical summary utilities
-│   ├── analyze_sec.py      # Parses exploit logs and generates 3-way exploit neutralization matrix
-│   ├── run_qemu_sec.sh     # QEMU launcher for security tests (batch and interactive)
-│   ├── run_qemu_perf.sh    # QEMU launcher for mitigated performance kernel
-│   ├── run_qemu_control.sh # QEMU launcher for baseline control kernel
-│   └── run_compliance.sh   # Single-boot compliance and functional integrity runner
-├── tools/
-│   └── plotting/
-│       ├── plot_thesis_figures.py # Publication-quality vector figures (Figures 1–5, Table 1 TOST)
-│       └── requirements.txt       # Python dependencies (pandas, matplotlib, scipy)
-├── results/                # Host-side captured serial logs and extracted data
-│   ├── raw/                # Extracted in-guest JSONs and system provenance metadata
-│   └── processed/          # Canonical benchmark_summary.csv and rendered figures
-└── Makefile                # Pipeline automation entry point
+├── Makefile                        # Unified command orchestrator matching environment-2.tex
+├── config.mk                       # Static paths, VM memory sizing, and CPU allocation
+│
+├── tests/                          # Unit and compliance validation workloads
+│   ├── Makefile                    # Sub-directory aggregator (make all, make clean)
+│   ├── pks-unit/                   # Upstream x86 PKS architectural selftest
+│   ├── sanity/                     # PKS page-cache scoping & debugfs integrity test
+│   ├── fsx/                        # Filesystem exerciser stress harness (10K ops)
+│   └── pjd/                        # POSIX filesystem compliance test suite
+│
+├── sec/                            # Security vulnerability exploit harnesses
+│   ├── Makefile                    # Sub-directory aggregator (make all, make clean)
+│   ├── copy-fail/                  # CVE-2026-31431 exploit harness (AF_ALG splice)
+│   ├── dirty-frag/                 # CVE-2026-43284 exploit harness (IPv4 fragment assembly)
+│   └── fragnesia/                  # CVE-2026-46300 exploit harness (IPSec ESPINTCP)
+│
+├── perf/                           # Performance evaluation benchmarks
+│   ├── Makefile                    # Sub-directory aggregator (make all, make clean)
+│   ├── fio/                        # Micro-benchmark: block-size latency/throughput sweeps
+│   ├── concurrency/                # Micro-benchmark: multithreaded scalability sweeps
+│   └── sqlite/                     # Macro-benchmark: transactional database workload
+│
+├── scripts/                        # Lean, single-purpose host automation scripts
+│   ├── common.sh                   # Shared console formatting and status print helpers
+│   ├── compile-all.sh              # Single loop calling 'make all' across tests/, sec/, perf/
+│   ├── clean-all.sh                # Single loop calling 'make clean' across tests/, sec/, perf/
+│   ├── build/                      # Kernel build automation (sec, perf, control)
+│   ├── disk/                       # Virtual disk lifecycle (provision, update, compile)
+│   ├── run/                        # Virtual machine runners and test dispatchers
+│   ├── data/                       # Telemetry extraction and report synthesis
+│   └── guest-autorun/              # Headless in-guest systemd autorun service
+│
+├── results/                        # Clean, structured evaluation artifacts
+│   ├── build.log                   # Full log for make build
+│   ├── test.log                    # Full log for make test
+│   ├── sec.log                     # Full log for make sec
+│   ├── perf.log                    # Full log for make perf
+│   ├── raw/                        # Granular per-target execution logs and JSONs
+│   └── data/                       # Canonical summarized deliverables
+│       ├── test_summary.csv        # Compliance and sanity test verdict summary
+│       ├── sec_summary.csv         # Neutralization verdict matrix across all 3 exploits
+│       └── perf_summary.csv        # Normalized tidy metrics dataset for all sweeps
+│
+└── tools/                          # Decoupled offline analysis and publication graphics
+    └── plotting/
+        ├── Makefile                # Standalone figure rendering makefile
+        ├── plot_thesis_figures.py  # Generates Figures 1-5 and Table 1 TOST
+        ├── requirements.txt        # Python dependencies (matplotlib, pandas, scipy)
+        └── figures/                # Output PDF and PNG vector graphics
 ```
 
 ---
@@ -67,124 +69,56 @@ Run `make help` to inspect all available targets:
 
 | Category | Command | Description |
 | :--- | :--- | :--- |
-| **Primary Workflow** | `make build` | Build all kernels and prepare disk image with tmux session support |
-| | `make test` | Run compliance and functional integrity suite in a single QEMU boot |
-| | `make test-sec` | Execute end-to-end exploit validation across Copy Fail, Dirty Frag, and Fragnesia |
-| | `make bench` | Execute complete A/B benchmark suite across control and mitigated kernels |
-| | `make parse-results` | Process raw fio and SQLite JSONs into canonical `benchmark_summary.csv` |
-| | `make plot-bench` | Render thesis publication vector figures and TOST statistical equivalence tables |
-| **Granular Build** | `make build-sec` | Compile security kernel with `pcache_pks` diagnostics and ESPINTCP support |
-| | `make build-perf` | Compile mitigated performance kernel with zero diagnostic overhead |
-| | `make build-control` | Compile baseline upstream control kernel |
-| | `make build-all` | Synchronously compile all three kernel configurations |
-| **Disk Image** | `make provision-disk` | Bootstrap fresh 8GB Debian raw disk image |
-| | `make update-disk` | Synchronize guest assets and recompile harnesses in chroot |
-| **Granular Security** | `make test-sec-copyfail` | Run Copy Fail exploit independently with dedicated off and on boots |
-| | `make test-sec-dirtyfrag`| Run Dirty Frag exploit independently with dedicated off and on boots |
-| | `make test-sec-fragnesia`| Run Fragnesia exploit independently with dedicated off and on boots |
-| | `make analyze-sec` | Parse exploit serial logs and display 3-way neutralization report |
-| **Granular Compliance** | `make test-fsx-off` | Run fsx exerciser with `pcache_pks=off` (vanilla ext4 baseline) |
-| | `make test-fsx-on` | Run fsx exerciser with `pcache_pks=on` (protected mount validation) |
-| | `make test-fsx` | Run both off and on fsx tests and summarize results |
-| | `make test-pks-unit` | Run low-level in-kernel PKS self-test via DebugFS |
-| **Benchmarking** | `make bench-control` | Run baseline control benchmark VM in batch mode |
-| | `make bench-mitigated`| Run mitigated benchmark VM with `pcache_pks=on` in batch mode |
-| | `make bench-off` | Run mitigated benchmark VM with `pcache_pks=off` for ablation in batch mode |
-| **Interactive Shells** | `make run-sec-off` | Interactive serial console with `pcache_pks=off` |
-| | `make run-sec-on` | Interactive serial console with `pcache_pks=on` |
-| | `make run-perf` | Interactive serial console for mitigated performance kernel |
-| | `make run-control` | Interactive serial console for baseline control kernel |
-| **Housekeeping** | `make check-deps` | Verify host prerequisites and required packages |
-| | `make fetch-results` | Extract JSONs and logs from VM disk image to host |
-| | `make clean-results` | Clear host results directory |
-| | `make clean-all` | Clear results and disk image container |
+| **Primary Workflow** | `make build` | Compile kernels, provision disk, compile test harnesses |
+| | `make test` | Execute compliance & integrity test suite (off & on) |
+| | `make sec` | Execute 3-way exploit neutralization evaluation |
+| | `make perf` | Execute full A/B performance benchmark sweeps |
+| **Granular Build** | `make build-sec` | Compile security diagnostic kernel |
+| | `make build-perf` | Compile performance mitigated kernel |
+| | `make build-control` | Compile baseline pristine upstream Linux v5.18-rc3 |
+| | `make disk-provision`| Bootstrap Debian Bookworm and partition `images/disk.img` |
+| | `make disk-update` | Synchronize `/pks-thesis-env` into virtual disk image |
+| | `make compile` | Compile all in-guest evaluation binaries |
+| | `make run-qemu` | Launch interactive serial debugging console |
+| | `make end-qemu` | Terminate all active QEMU instances |
+| **Granular Compliance** | `make pks-unit-[off\|on]` | Architectural MSR/CPUID PKS unit selftest |
+| | `make sanity-[off\|on]` | PKS page-cache scoping & debugfs test |
+| | `make fsx-[off\|on]` | Filesystem exerciser (10,000 random operations) |
+| | `make pjd-[off\|on]` | POSIX filesystem compliance suite |
+| | `make test-[off\|on]` | Consolidated single-boot compliance suite |
+| | `make analyze-test` | Synthesize compliance evaluation report (`results/data/test_summary.csv`) |
+| **Granular Security** | `make copy-fail-[off\|on]` | CVE-2026-31431 AF_ALG splice exploit |
+| | `make dirty-frag-[off\|on]` | CVE-2026-43284 IPv4 fragment reassembly exploit |
+| | `make fragnesia-[off\|on]` | CVE-2026-46300 IPSec ESPINTCP workqueue exploit |
+| | `make sec-[off\|on]` | Execute all 3 exploit vectors under specified mode |
+| | `make analyze-sec` | Synthesize 3-way exploit neutralization matrix (`results/data/sec_summary.csv`) |
+| **Benchmarking** | `make fio-[control\|off\|on]-[warm\|cold]` | Amortized block sweep (512B - 1MB) |
+| | `make concurrency-[control\|off\|on]` | Multithreaded scaling (1, 2, 4 threads) |
+| | `make sqlite-[control\|off\|on]` | SQLite rollback journal macrobenchmark |
+| | `make perf-[control\|off\|on]` | Execute complete benchmark suite on specified variant |
+| | `make analyze-perf` | Synthesize normalized A/B performance summary (`results/data/perf_summary.csv`) |
+| **Housekeeping** | `make clean` | Remove compiled test binaries across `tests/`, `sec/`, `perf/` |
+| | `make clean-results` | Remove execution logs and generated CSV datasets |
+| | `make clean-image` | Remove `images/disk.img` container |
+| | `make clean-build` | Remove compiled kernel bzImage binaries |
+| | `make clean-all` | Reset workspace to pristine pre-build state |
 
 ---
 
-## Configuration (`config.mk`)
+## Decoupled Offline Plotting
 
-All parameters are centralized in `config.mk` and can be overridden via environment variables or CLI arguments:
+Figure and table generation is completely decoupled from the testbed evaluation environment. It consumes `results/data/perf_summary.csv` purely as input data:
 
-```makefile
-# Override kernel source tree path
-make build-sec DEV_KERNEL_DIR=/path/to/linux-pks-thesis
-make build-control CONTROL_KERNEL_DIR=/path/to/linux-pks-thesis-control
-
-# Override CPU cores and RAM allocation
-make test-sec SMP=8 MEM_SEC=8G
-
-# Force matching virtualization accelerator (auto, kvm, or tcg)
-make bench QEMU_ACCEL=tcg
-
-# Force disk re-provisioning during build
-make build FORCE_REPROVISION=1
-```
-
----
-
-## Evaluation Workflows
-
-### 1. Autonomous Build Pipeline (`make build`)
-
-Executing `make build`:
-1. If `tmux` is available on the host, automatically launches or attaches to a detached background session (`pks-build`) so long compilations survive terminal disconnects.
-2. Sequentially compiles the security kernel (`build_sec`), mitigated performance kernel (`build_perf`), and control kernel (`build_control`).
-3. If an existing `images/disk.img` is present, synchronizes assets and recompiles binaries in chroot via `update_disk.sh`. If absent, provisions a fresh Debian disk via `provision_disk.sh`.
-4. Saves all build output to `results/build.log`.
-
-### 2. Single-Boot Compliance & Functional Integrity (`make test`)
-
-Executing `make test`:
-1. Boots the mitigated kernel once with `pcache_pks=on` and `pks_auto=compliance`.
-2. Sequentially executes in-kernel PKS driver self-tests, the userspace `pks_sanity_test` suite, the `fsx` filesystem exerciser (5K rootfs operations, 10K protected mount operations, Commit 06 rejection test), and POSIX compliance test suites.
-3. The userspace sanity harness (`pks_sanity_test.c`) reads `/sys/kernel/debug/pcache_pks/status` to assert that write system calls increment scope entry and exit counters by exactly 1, read system calls trigger zero increments, static pool folios fall strictly within physical pool PFN boundaries via `/proc/self/pagemap`, and fail-closed system calls return `-EOPNOTSUPP`.
-4. Suppresses early QEMU boot noise during execution, logs clean test output to `results/compliance.log`, and prints a unified summary table on the host.
-
-### 3. Automated Security Validation (`make test-sec`)
-
-Executing `make test-sec` runs dedicated QEMU boots for each exploit:
-1. **Copy Fail (`make test-sec-copyfail`)**:
-   * Evaluates process-context page cache corruption (CVE-2026-31431).
-   * In `pcache_pks=off`, the exploit overwrites target page-cache contents.
-   * In `pcache_pks=on`, hardware PKS intercepts the unauthorized store with `#PF (0x0023)` on Key 1, terminating the attacking task via process isolation (SIGSEGV) without destabilizing the operating system.
-2. **Dirty Frag (`make test-sec-dirtyfrag`)**:
-   * Evaluates softirq network defragmentation page cache corruption (CVE-2026-43284, CVE-2026-43500).
-   * In `pcache_pks=off`, page-cache corruption succeeds in interrupt context.
-   * In `pcache_pks=on`, the unauthorized write in softirq context triggers a hardware `#PF (0x0023)`, resulting in an immediate fail-closed kernel panic (`Fatal exception in interrupt`) that guarantees memory containment.
-3. **Fragnesia (`make test-sec-fragnesia`)**:
-   * Evaluates IPsec XFRM ESPINTCP TCP ULP page cache corruption (CVE-2026-46300).
-   * In `pcache_pks=off`, splice and crypto transform operations modify target cache pages.
-   * In `pcache_pks=on`, the crypto transform write is intercepted by Key 1 access restriction, triggering an immediate fail-closed panic in softirq context.
-4. **Consolidated Analysis (`make analyze-sec`)**:
-   * `scripts/analyze_sec.py` parses individual and monolithic logs, validating pre and post MD5 hashes, `#PF` error codes, and interrupt panic signatures to output a side-by-side 3-way neutralization report.
-
-### 4. A/B Performance Benchmarking & Publication Pipeline (`make bench`)
-
-Executing `make bench` orchestrates the complete experimental performance workflow:
-1. **Control Run (`make bench-control`)**: Boots the baseline upstream kernel and executes the in-guest benchmark suite in batch mode, writing raw JSONs to `/mnt/protected/bench_results/raw/`.
-2. **Mitigated Run (`make bench-mitigated`)**: Boots the performance kernel with `pcache_pks=on` and runs the identical suite.
-3. **Multi-Phase Benchmark Workloads**:
-   * **Phase 1 (Warm Sweep)**: Evaluates `write()`, `read()`, and `ftruncate()` across block sizes from 512 B to 1 MiB using standard fio (including `ioengine=ftruncate`) on warm cache pages.
-   * **Phase 2 (Cold Sweep)**: Evaluates first-touch allocation across block sizes with cache dropping between iterations, isolating static pool allocation costs.
-   * **Phase 3 (Concurrency Scaling)**: Evaluates multi-threaded throughput and lock contention across 1, 2, and 4 concurrent workers on thread-private files.
-   * **Phase 4 (SQLite Macrobenchmark)**: Evaluates 5,000 real-world database transactions in rollback journal mode under `synchronous=FULL` and `synchronous=OFF`.
-   * **Phase 5 (Provenance Logging)**: Captures CPU topology, kernel command line, mount options, memory footprint, and virtualization steal time.
-4. **Host-Side Extraction & Parsing (`make parse-results`)**:
-   * Extracts raw JSONs from the guest disk image via `scripts/fetch_results.sh`.
-   * Ingests raw JSON data with `scripts/parse_results.py`, formatting metrics into canonical tidy CSV format (`results/processed/benchmark_summary.csv`).
-5. **Publication Figure Generation (`make plot-bench`)**:
-   * Executes `tools/plotting/plot_thesis_figures.py` to produce publication-grade vector graphics (PDF and PNG):
-     - **Figure 1**: Multi-Syscall Amortization Curves (`write`, `read`, `ftruncate`).
-     - **Figure 2**: Cold vs Warm Cache Scaling overhead deltas.
-     - **Figure 3**: 3-Way Kernel Ablation Comparison (`baseline_control`, `mitigated_off`, `mitigated_on`).
-     - **Figure 4**: Multi-Core Concurrency Scaling throughput and speedup.
-     - **Figure 5**: SQLite Macrobenchmark TPS and Latency distributions.
-     - **Table 1**: Two One-Sided Tests (TOST) statistical equivalence table demonstrating read-path parity within a 1% equivalence margin.
-
-### 5. Interactive Debugging
-
-To manually explore the guest environment, inspect DebugFS counters, or run custom experiments:
 ```bash
-make run-sec-on
+cd tools/plotting
+make deps       # Install pandas, matplotlib, scipy
+make all        # Generate Figures 1-5 and Table 1 (TOST)
 ```
-The VM boots directly to a serial login prompt (`testuser` / `testuser`, or passwordless sudo).
+
+Generated publication artifacts are placed into `tools/plotting/figures/`:
+- `fig1_warm_latency_sweep.pdf` & `.png`
+- `fig2_cold_latency_sweep.pdf` & `.png`
+- `fig3_throughput_comparison.pdf` & `.png`
+- `fig4_concurrency_scaling.pdf` & `.png`
+- `fig5_sqlite_macrobenchmark.pdf` & `.png`
+- `table1_tost_equivalence.tex`
