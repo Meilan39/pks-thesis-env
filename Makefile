@@ -95,9 +95,9 @@ build:
 		echo "======================================================================"; \
 		echo " [build] Build Pipeline Summary & Artifact Verification"; \
 		echo "----------------------------------------------------------------------"; \
-		echo "  Security Kernel:     $$(ls -lh build_sec/arch/x86/boot/bzImage 2>/dev/null | awk '{print $$5}')  [READY]"; \
-		echo "  Performance Kernel:  $$(ls -lh build_perf/arch/x86/boot/bzImage 2>/dev/null | awk '{print $$5}') [READY]"; \
-		echo "  Control Kernel:      $$(ls -lh build_control/arch/x86/boot/bzImage 2>/dev/null | awk '{print $$5}') [READY]"; \
+		echo "  Security Kernel:     $$(ls -lh "$$DEV_KERNEL_DIR/build_sec/arch/x86/boot/bzImage" 2>/dev/null | awk '{print $$5}')  [READY]"; \
+		echo "  Performance Kernel:  $$(ls -lh "$$DEV_KERNEL_DIR/build_perf/arch/x86/boot/bzImage" 2>/dev/null | awk '{print $$5}') [READY]"; \
+		echo "  Control Kernel:      $$(ls -lh "$$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage" 2>/dev/null | awk '{print $$5}') [READY]"; \
 		echo "  Disk Image:          $$(ls -lh images/disk.img 2>/dev/null | awk '{print $$5}') [READY]"; \
 		echo "  Overall Status:      ALL 6 BUILD TARGETS COMPILED SUCCESSFULLY"; \
 		echo "======================================================================"; \
@@ -141,19 +141,19 @@ perf:
 # Group 2: Kernel Compilation & Disk Lifecycle
 # ==============================================================================
 build-sec:
-	@./scripts/build/build_sec.sh > results/raw/build-sec.log 2>&1 || (cat results/raw/build-sec.log && exit 1)
+	@./scripts/build/build_sec.sh $(DEV_KERNEL_DIR) > results/raw/build-sec.log 2>&1 || (cat results/raw/build-sec.log && exit 1)
 
 build-perf:
-	@./scripts/build/build_perf.sh > results/raw/build-perf.log 2>&1 || (cat results/raw/build-perf.log && exit 1)
+	@./scripts/build/build_perf.sh $(DEV_KERNEL_DIR) > results/raw/build-perf.log 2>&1 || (cat results/raw/build-perf.log && exit 1)
 
 build-control:
-	@./scripts/build/build_control.sh > results/raw/build-control.log 2>&1 || (cat results/raw/build-control.log && exit 1)
+	@./scripts/build/build_control.sh $(CONTROL_KERNEL_DIR) > results/raw/build-control.log 2>&1 || (cat results/raw/build-control.log && exit 1)
 
 disk-provision:
-	@./scripts/disk/disk_provision.sh > results/raw/disk-provision.log 2>&1 || (cat results/raw/disk-provision.log && exit 1)
+	@./scripts/disk/disk_provision.sh $(DISK_IMG) > results/raw/disk-provision.log 2>&1 || (cat results/raw/disk-provision.log && exit 1)
 
 disk-update:
-	@./scripts/disk/disk_update.sh > results/raw/disk-update.log 2>&1 || (cat results/raw/disk-update.log && exit 1)
+	@./scripts/disk/disk_update.sh $(DISK_IMG) > results/raw/disk-update.log 2>&1 || (cat results/raw/disk-update.log && exit 1)
 
 compile:
 	@./scripts/compile-all.sh > results/raw/compile.log 2>&1 || (cat results/raw/compile.log && exit 1)

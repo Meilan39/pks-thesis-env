@@ -12,7 +12,16 @@ RUN_TARGET="${3:-${RUN_TARGET:-shell}}"
 LOG_FILE="${4:-}"
 
 DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
-KERNEL_IMG="${KERNEL_IMG:-$ENV_DIR/build_${KERNEL_VARIANT}/arch/x86/boot/bzImage}"
+
+DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}"
+CONTROL_KERNEL_DIR="${CONTROL_KERNEL_DIR:-$HOME/src/linux-pks-thesis-control}"
+
+if [ "$KERNEL_VARIANT" = "control" ]; then
+    KERNEL_IMG="${KERNEL_IMG:-$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage}"
+else
+    KERNEL_IMG="${KERNEL_IMG:-$DEV_KERNEL_DIR/build_${KERNEL_VARIANT}/arch/x86/boot/bzImage}"
+fi
+
 QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
 SMP="${SMP:-4}"
 MEM="${MEM:-4096}"
@@ -21,8 +30,11 @@ mkdir -p "$ENV_DIR/results/raw" "$ENV_DIR/results/data"
 [ -n "$LOG_FILE" ] && mkdir -p "$(dirname "$LOG_FILE")"
 
 # Configure hardware acceleration & 9p virtfs
-ACCEL_ARGS=("-cpu" "qemu64,+pks" "-accel" "tcg")
-[ -e /dev/kvm ] && [ -w /dev/kvm ] && ACCEL_ARGS=("-cpu" "host" "-enable-kvm")
+ACCEL_ARGS=("-cpu" "max,vendor=GenuineIntel,pks=on")
+if [ -e /dev/kvm ] && [ -w /dev/kvm ] && grep -qw pks /proc/cpuinfo 2>/dev/null; then
+    ACCEL_ARGS=("-cpu" "host" "-enable-kvm")
+fi
+
 VIRTFS_ARGS=("-virtfs" "local,path=${ENV_DIR},mount_tag=pks_env,security_model=none")
 
 # Build kernel commandline
@@ -42,7 +54,7 @@ if [ "$RUN_TARGET" = "shell" ] || [ -z "$RUN_TARGET" ]; then
 fi
 
 # Automated headless execution
-CMDLINE="$CMDLINE pks_run=${RUN_TARGET} panic=-1"
+CMDLINE="$CMDLINE pks_run=${RUN_TARGET} pks_auto=${RUN_TARGET} panic=-1"
 TIMEOUT_CMD=()
 command -v timeout >/dev/null 2>&1 && TIMEOUT_CMD=("timeout" "--kill-after=10s" "300s")
 

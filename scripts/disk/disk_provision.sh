@@ -5,9 +5,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ENV_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ENV_DIR/scripts/common.sh"
--include "$ENV_DIR/config.mk" 2>/dev/null || true
 
-DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
+DISK_IMG="${1:-${DISK_IMG:-$ENV_DIR/images/disk.img}}"
 DISK_SIZE="${DISK_SIZE:-8G}"
 ROOTFS_SIZE="${ROOTFS_SIZE:-6G}"
 SUITE="${DEBIAN_SUITE:-bookworm}"
