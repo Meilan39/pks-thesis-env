@@ -1,0 +1,5 @@
+[sec-off] Starting exploit suite under unmitigated baseline (pcache_pks=off)...
+[copy-fail-off]  AF_ALG splice out-of-bounds corruption... VULNERABLE (Corrupted)
+[dirty-frag-off] IPv4 packet fragment softirq injection... VULNERABLE (Corrupted)
+[fragnesia-off]  IPSec ESPINTCP crypto workqueue overwrite... VULNERABLE (Corrupted)
+[sec-off] Exploit suite execution completed. [DONE]

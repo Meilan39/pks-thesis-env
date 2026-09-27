@@ -1,0 +1,6 @@
+[perf-on] Running benchmark VM for mitigated performance (pcache_pks=on)...
+[fio-on-warm]         Amortized warm block sweep (512B - 1MB)... [DONE] (4KB Lat: 28.1 us)
+[fio-on-cold]         Amortized cold block sweep (512B - 1MB)... [DONE] (4KB Lat: 395.7 us)
+[concurrency-on]      Multithreaded scaling (1, 2, 4 threads)... [DONE] (402.1 MB/s @ 4T)
+[sqlite-on]           Rollback journal macrobenchmark... [DONE] (1305.1 tx/sec @ sync=OFF)
+[perf-on] Mitigated performance benchmark completed. [DONE]

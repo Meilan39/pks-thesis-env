@@ -1,0 +1,5 @@
+[sec-on] Starting exploit suite under active mitigation (pcache_pks=on)...
+[copy-fail-on]   AF_ALG splice out-of-bounds corruption... NEUTRALIZED (Trapped -EFAULT)
+[dirty-frag-on]  IPv4 packet fragment softirq injection... NEUTRALIZED (Fail-Closed Panic)
+[fragnesia-on]   IPSec ESPINTCP crypto workqueue overwrite... NEUTRALIZED (Fail-Closed Panic)
+[sec-on] Exploit suite execution completed. [DONE]

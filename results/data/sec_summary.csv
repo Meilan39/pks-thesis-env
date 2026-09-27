@@ -1,0 +1,4 @@
+Vulnerability,Context,Mitigated_Off,Mitigated_On,Verdict
+Copy Fail,Syscall Splice,EXPLOITED (Corrupted),NEUTRALIZED (Trapped -EFAULT),NEUTRALIZED
+Dirty Frag,Softirq Network,EXPLOITED (Corrupted),NEUTRALIZED (Fail-Closed Panic),NEUTRALIZED
+Fragnesia,Crypto Worker,EXPLOITED (Corrupted),NEUTRALIZED (Fail-Closed Panic),NEUTRALIZED
