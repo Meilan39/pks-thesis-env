@@ -160,7 +160,7 @@ compile:
 	@./scripts/compile-all.sh > results/raw/compile.log 2>&1 || (cat results/raw/compile.log && exit 1)
 
 run-qemu:
-	@./scripts/run/run_qemu.sh $(or $(VARIANT),perf) $(or $(MODE),on) shell
+	@./scripts/run_qemu.sh $(or $(VARIANT),perf) $(or $(MODE),on) shell
 
 end-qemu:
 	@killall -9 qemu-system-x86_64 2>/dev/null || true
@@ -171,42 +171,42 @@ end-qemu:
 # Group 3: Unit and Compliance Testing
 # ==============================================================================
 pks-unit-off:
-	@./scripts/run/run_test.sh pks-unit off
+	@./scripts/run_qemu.sh sec off /pks-thesis-env/tests/pks-unit/run.sh results/raw/pks-unit-off.log
 
 pks-unit-on:
-	@./scripts/run/run_test.sh pks-unit on
+	@./scripts/run_qemu.sh sec on /pks-thesis-env/tests/pks-unit/run.sh results/raw/pks-unit-on.log
 
 pks-unit: pks-unit-on
 
 sanity-off:
-	@./scripts/run/run_test.sh sanity off
+	@./scripts/run_qemu.sh sec off /pks-thesis-env/tests/sanity/run.sh results/raw/sanity-off.log
 
 sanity-on:
-	@./scripts/run/run_test.sh sanity on
+	@./scripts/run_qemu.sh sec on /pks-thesis-env/tests/sanity/run.sh results/raw/sanity-on.log
 
 sanity: sanity-on
 
 fsx-off:
-	@./scripts/run/run_test.sh fsx off
+	@./scripts/run_qemu.sh sec off /pks-thesis-env/tests/fsx/run.sh results/raw/fsx-off.log
 
 fsx-on:
-	@./scripts/run/run_test.sh fsx on
+	@./scripts/run_qemu.sh sec on /pks-thesis-env/tests/fsx/run.sh results/raw/fsx-on.log
 
 fsx: fsx-on
 
 pjd-off:
-	@./scripts/run/run_test.sh pjd off
+	@./scripts/run_qemu.sh sec off /pks-thesis-env/tests/pjd/run.sh results/raw/pjd-off.log
 
 pjd-on:
-	@./scripts/run/run_test.sh pjd on
+	@./scripts/run_qemu.sh sec on /pks-thesis-env/tests/pjd/run.sh results/raw/pjd-on.log
 
 pjd: pjd-on
 
 test-off:
-	@./scripts/run/run_test.sh all off
+	@./scripts/run_qemu.sh sec off test results/raw/test-off.log
 
 test-on:
-	@./scripts/run/run_test.sh all on
+	@./scripts/run_qemu.sh sec on test results/raw/test-on.log
 
 analyze-test:
 	@python3 scripts/data/analyze_test.py
@@ -215,34 +215,34 @@ analyze-test:
 # Group 4: Security Benchmarks
 # ==============================================================================
 copy-fail-off:
-	@./scripts/run/run_sec.sh copy-fail off
+	@./scripts/run_qemu.sh sec off /pks-thesis-env/sec/copy-fail/run.sh results/raw/copy-fail-off.log
 
 copy-fail-on:
-	@./scripts/run/run_sec.sh copy-fail on
+	@./scripts/run_qemu.sh sec on /pks-thesis-env/sec/copy-fail/run.sh results/raw/copy-fail-on.log
 
 copy-fail: copy-fail-on
 
 dirty-frag-off:
-	@./scripts/run/run_sec.sh dirty-frag off
+	@./scripts/run_qemu.sh sec off /pks-thesis-env/sec/dirty-frag/run.sh results/raw/dirty-frag-off.log
 
 dirty-frag-on:
-	@./scripts/run/run_sec.sh dirty-frag on
+	@./scripts/run_qemu.sh sec on /pks-thesis-env/sec/dirty-frag/run.sh results/raw/dirty-frag-on.log
 
 dirty-frag: dirty-frag-on
 
 fragnesia-off:
-	@./scripts/run/run_sec.sh fragnesia off
+	@./scripts/run_qemu.sh sec off /pks-thesis-env/sec/fragnesia/run.sh results/raw/fragnesia-off.log
 
 fragnesia-on:
-	@./scripts/run/run_sec.sh fragnesia on
+	@./scripts/run_qemu.sh sec on /pks-thesis-env/sec/fragnesia/run.sh results/raw/fragnesia-on.log
 
 fragnesia: fragnesia-on
 
 sec-off:
-	@./scripts/run/run_sec.sh all off
+	@./scripts/run_qemu.sh sec off sec results/raw/sec-off.log
 
 sec-on:
-	@./scripts/run/run_sec.sh all on
+	@./scripts/run_qemu.sh sec on sec results/raw/sec-on.log
 
 analyze-sec:
 	@python3 scripts/data/analyze_sec.py
@@ -251,57 +251,57 @@ analyze-sec:
 # Group 5: Performance Benchmarks
 # ==============================================================================
 fio-control-warm:
-	@./scripts/run/run_perf.sh fio control warm
+	@./scripts/run_qemu.sh control off /pks-thesis-env/perf/fio/run_warm.sh results/raw/fio-control-warm.log
 
 fio-control-cold:
-	@./scripts/run/run_perf.sh fio control cold
+	@./scripts/run_qemu.sh control off /pks-thesis-env/perf/fio/run_cold.sh results/raw/fio-control-cold.log
 
 fio-off-warm:
-	@./scripts/run/run_perf.sh fio off warm
+	@./scripts/run_qemu.sh perf off /pks-thesis-env/perf/fio/run_warm.sh results/raw/fio-off-warm.log
 
 fio-off-cold:
-	@./scripts/run/run_perf.sh fio off cold
+	@./scripts/run_qemu.sh perf off /pks-thesis-env/perf/fio/run_cold.sh results/raw/fio-off-cold.log
 
 fio-on-warm:
-	@./scripts/run/run_perf.sh fio on warm
+	@./scripts/run_qemu.sh perf on /pks-thesis-env/perf/fio/run_warm.sh results/raw/fio-on-warm.log
 
 fio-on-cold:
-	@./scripts/run/run_perf.sh fio on cold
+	@./scripts/run_qemu.sh perf on /pks-thesis-env/perf/fio/run_cold.sh results/raw/fio-on-cold.log
 
 fio-warm: fio-control-warm fio-off-warm fio-on-warm
 fio-cold: fio-control-cold fio-off-cold fio-on-cold
 fio: fio-warm fio-cold
 
 concurrency-control:
-	@./scripts/run/run_perf.sh concurrency control
+	@./scripts/run_qemu.sh control off /pks-thesis-env/perf/concurrency/run.sh results/raw/concurrency-control.log
 
 concurrency-off:
-	@./scripts/run/run_perf.sh concurrency off
+	@./scripts/run_qemu.sh perf off /pks-thesis-env/perf/concurrency/run.sh results/raw/concurrency-off.log
 
 concurrency-on:
-	@./scripts/run/run_perf.sh concurrency on
+	@./scripts/run_qemu.sh perf on /pks-thesis-env/perf/concurrency/run.sh results/raw/concurrency-on.log
 
 concurrency: concurrency-control concurrency-off concurrency-on
 
 sqlite-control:
-	@./scripts/run/run_perf.sh sqlite control
+	@./scripts/run_qemu.sh control off /pks-thesis-env/perf/sqlite/run.sh results/raw/sqlite-control.log
 
 sqlite-off:
-	@./scripts/run/run_perf.sh sqlite off
+	@./scripts/run_qemu.sh perf off /pks-thesis-env/perf/sqlite/run.sh results/raw/sqlite-off.log
 
 sqlite-on:
-	@./scripts/run/run_perf.sh sqlite on
+	@./scripts/run_qemu.sh perf on /pks-thesis-env/perf/sqlite/run.sh results/raw/sqlite-on.log
 
 sqlite: sqlite-control sqlite-off sqlite-on
 
 perf-control:
-	@./scripts/run/run_perf.sh all control
+	@./scripts/run_qemu.sh control off perf results/raw/perf-control.log
 
 perf-off:
-	@./scripts/run/run_perf.sh all off
+	@./scripts/run_qemu.sh perf off perf results/raw/perf-off.log
 
 perf-on:
-	@./scripts/run/run_perf.sh all on
+	@./scripts/run_qemu.sh perf on perf results/raw/perf-on.log
 
 analyze-perf:
 	@./scripts/data/fetch_results.sh

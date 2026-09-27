@@ -1,1 +1,2 @@
-images/disk.img
+build_*/
+images/*.img

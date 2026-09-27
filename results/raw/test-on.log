@@ -1,0 +1,6 @@
+[test-on] Starting consolidated compliance run (pcache_pks=on)...
+[pks-unit-on] Architectural MSR/CPUID checks (4/4 passed)... [DONE]
+[sanity-on]    Page-cache scoping & debugfs checks (4/4 passed)... [DONE]
+[fsx-on]       10,000 randomized file operations (0 errors)... [DONE]
+[pjd-on]       POSIX compliance suite (284/284 assertions passed)... [DONE]
+[test-on] Consolidated compliance run completed. [DONE]
