@@ -13,27 +13,31 @@ SUITE="${DEBIAN_SUITE:-bookworm}"
 ARCH="${DEBIAN_ARCH:-amd64}"
 MIRROR="${DEBIAN_MIRROR:-http://deb.debian.org/debian}"
 
+RAW_LOG="${RAW_LOG:-$ENV_DIR/results/raw/disk-provision.log}"
+mkdir -p "$(dirname "$RAW_LOG")"
+
 if [ -f "$DISK_IMG" ]; then
     echo "[disk-provision] Base disk image verified (images/disk.img)... [DONE]"
     echo ""
     exit 0
 fi
 
+echo "[disk-provision] Bootstrapping Debian Bookworm and partitioning 8GB image..."
 START_TIME=$(date +%s)
 require_cmds qemu-img debootstrap sfdisk losetup mkfs.ext4 sudo
 
 mkdir -p "$(dirname "$DISK_IMG")"
-qemu-img create -f raw "$DISK_IMG" "$DISK_SIZE" >/dev/null
+qemu-img create -f raw "$DISK_IMG" "$DISK_SIZE" > "$RAW_LOG" 2>&1
 
-cat <<EOF | sfdisk "$DISK_IMG" >/dev/null 2>&1
+cat <<EOF | sfdisk "$DISK_IMG" >> "$RAW_LOG" 2>&1
 ,${ROOTFS_SIZE},L,*
 ,,L
 EOF
 
 LOOP=$(sudo losetup --find --show --partscan "$DISK_IMG")
 sleep 1
-sudo mkfs.ext4 -F -q "${LOOP}p1"
-sudo mkfs.ext4 -F -q -O ^inline_data,^encrypt "${LOOP}p2"
+sudo mkfs.ext4 -F -q "${LOOP}p1" >> "$RAW_LOG" 2>&1
+sudo mkfs.ext4 -F -q -O ^inline_data,^encrypt "${LOOP}p2" >> "$RAW_LOG" 2>&1
 
 MOUNT_POINT="$(mktemp -d)"
 cleanup() {
@@ -44,7 +48,7 @@ cleanup() {
 trap cleanup EXIT
 
 sudo mount "${LOOP}p1" "$MOUNT_POINT"
-sudo debootstrap --arch "$ARCH" "$SUITE" "$MOUNT_POINT" "$MIRROR" >/dev/null 2>&1 || true
+sudo debootstrap --arch "$ARCH" "$SUITE" "$MOUNT_POINT" "$MIRROR" >> "$RAW_LOG" 2>&1 || true
 
 for d in dev proc sys; do sudo mount --bind "/$d" "$MOUNT_POINT/$d" 2>/dev/null || true; done
 sudo cp /etc/resolv.conf "$MOUNT_POINT/etc/resolv.conf" 2>/dev/null || true
@@ -62,11 +66,11 @@ sudo chroot "$MOUNT_POINT" /bin/bash -c "
     export DEBIAN_FRONTEND=noninteractive
     apt-get update -qq
     apt-get install -y -qq --no-install-recommends \
-        build-essential python3 fio sqlite3 libsqlite3-dev libcap-dev libc6-dev sudo coreutils procps >/dev/null 2>&1 || true
+        build-essential python3 fio sqlite3 libsqlite3-dev libcap-dev libc6-dev sudo coreutils procps
     useradd -m -s /bin/bash -u 1000 testuser 2>/dev/null || true
     echo 'testuser:testuser' | chpasswd 2>/dev/null || true
     echo 'testuser ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/testuser 2>/dev/null || true
-" 2>/dev/null || true
+" >> "$RAW_LOG" 2>&1 || true
 
 # Install autorun service
 if [ -f "$ENV_DIR/scripts/guest-autorun/pks-autorun.sh" ]; then
@@ -80,5 +84,7 @@ if [ -f "$ENV_DIR/scripts/guest-autorun/pks-autorun.service" ]; then
 fi
 
 ELAPSED=$(( $(date +%s) - START_TIME ))
-echo "[disk-provision] Bootstrapped Debian Bookworm and partitioned 8GB image... [DONE] ($(( ELAPSED / 60 ))m $(( ELAPSED % 60 ))s)"
+MINS=$(( ELAPSED / 60 ))
+SECS=$(( ELAPSED % 60 ))
+echo "[disk-provision] Bootstrapped Debian Bookworm and partitioned 8GB image... [DONE] (${MINS}m ${SECS}s)"
 echo ""

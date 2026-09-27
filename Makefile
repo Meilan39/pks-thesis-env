@@ -141,22 +141,22 @@ perf:
 # Group 2: Kernel Compilation & Disk Lifecycle
 # ==============================================================================
 build-sec:
-	@./scripts/build/build_sec.sh $(DEV_KERNEL_DIR) > results/raw/build-sec.log 2>&1 || (cat results/raw/build-sec.log && exit 1)
+	@./scripts/build/build_sec.sh $(DEV_KERNEL_DIR)
 
 build-perf:
-	@./scripts/build/build_perf.sh $(DEV_KERNEL_DIR) > results/raw/build-perf.log 2>&1 || (cat results/raw/build-perf.log && exit 1)
+	@./scripts/build/build_perf.sh $(DEV_KERNEL_DIR)
 
 build-control:
-	@./scripts/build/build_control.sh $(CONTROL_KERNEL_DIR) > results/raw/build-control.log 2>&1 || (cat results/raw/build-control.log && exit 1)
+	@./scripts/build/build_control.sh $(CONTROL_KERNEL_DIR)
 
 disk-provision:
-	@./scripts/disk/disk_provision.sh $(DISK_IMG) > results/raw/disk-provision.log 2>&1 || (cat results/raw/disk-provision.log && exit 1)
+	@./scripts/disk/disk_provision.sh $(DISK_IMG)
 
 disk-update:
-	@./scripts/disk/disk_update.sh $(DISK_IMG) > results/raw/disk-update.log 2>&1 || (cat results/raw/disk-update.log && exit 1)
+	@./scripts/disk/disk_update.sh $(DISK_IMG)
 
 compile:
-	@./scripts/compile-all.sh > results/raw/compile.log 2>&1 || (cat results/raw/compile.log && exit 1)
+	@./scripts/compile-all.sh
 
 run-qemu:
 	@./scripts/run_qemu.sh $(or $(VARIANT),perf) $(or $(MODE),on) shell

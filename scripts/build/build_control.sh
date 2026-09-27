@@ -14,12 +14,16 @@ JOBS="${BUILD_JOBS:-$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null
 require_cmds make gcc bc flex bison
 
 START_TIME=$(date +%s)
+RAW_LOG="${RAW_LOG:-$ENV_DIR/results/raw/build-control.log}"
+mkdir -p "$(dirname "$RAW_LOG")"
+
+echo "[build-control] Compiling Control Baseline Kernel..."
 
 cd "$KERNEL_DIR"
 mkdir -p "$OUTPUT_DIR"
 
-make O="$OUTPUT_DIR" defconfig >/dev/null
-make O="$OUTPUT_DIR" kvm_guest.config >/dev/null 2>&1 || true
+make O="$OUTPUT_DIR" defconfig > "$RAW_LOG" 2>&1
+make O="$OUTPUT_DIR" kvm_guest.config >> "$RAW_LOG" 2>&1 || true
 
 # Storage, VirtIO & 9P virtfs
 scripts/config --file "$OUTPUT_DIR"/.config --enable CONFIG_EXT4_FS
@@ -59,11 +63,11 @@ scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_DEBUG_INFO
 scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_PROVE_LOCKING
 scripts/config --file "$OUTPUT_DIR"/.config --disable CONFIG_KASAN
 
-make O="$OUTPUT_DIR" olddefconfig >/dev/null
-make O="$OUTPUT_DIR" -j"$JOBS" bzImage >/dev/null
+make O="$OUTPUT_DIR" olddefconfig >> "$RAW_LOG" 2>&1
+make O="$OUTPUT_DIR" -j"$JOBS" bzImage >> "$RAW_LOG" 2>&1
 
 BZIMAGE="$OUTPUT_DIR/arch/x86/boot/bzImage"
-[ -f "$BZIMAGE" ] || die "Build finished but bzImage was not generated at $BZIMAGE"
+[ -f "$BZIMAGE" ] || die "Build finished but bzImage was not generated at $BZIMAGE. Check $RAW_LOG"
 
 ELAPSED=$(( $(date +%s) - START_TIME ))
 MINS=$(( ELAPSED / 60 ))

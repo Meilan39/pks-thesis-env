@@ -7,6 +7,10 @@ ENV_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ENV_DIR/scripts/common.sh"
 
 DISK_IMG="${1:-${DISK_IMG:-$ENV_DIR/images/disk.img}}"
+RAW_LOG="${RAW_LOG:-$ENV_DIR/results/raw/disk-update.log}"
+mkdir -p "$(dirname "$RAW_LOG")"
+
+echo "[disk-update] Synchronizing /pks-thesis-env into disk image..."
 
 if [ -f "$DISK_IMG" ] && command -v losetup >/dev/null 2>&1 && [ "$(id -u)" -eq 0 ]; then
     LOOP=$(losetup --find --show --partscan "$DISK_IMG" 2>/dev/null || true)
@@ -17,12 +21,12 @@ if [ -f "$DISK_IMG" ] && command -v losetup >/dev/null 2>&1 && [ "$(id -u)" -eq 
         
         # Sync workspace into image
         mkdir -p "$MOUNT_POINT/pks-thesis-env"
-        rsync -a --exclude='.git' --exclude='results' --exclude='images' \
-            "$ENV_DIR/." "$MOUNT_POINT/pks-thesis-env/" 2>/dev/null || true
+        rsync -av --exclude='.git' --exclude='results' --exclude='images' \
+            "$ENV_DIR/." "$MOUNT_POINT/pks-thesis-env/" > "$RAW_LOG" 2>&1 || true
             
         # Update autorun
         if [ -f "$ENV_DIR/scripts/guest-autorun/pks-autorun.sh" ]; then
-            cp "$ENV_DIR/scripts/guest-autorun/pks-autorun.sh" "$MOUNT_POINT/usr/local/bin/pks-autorun.sh" 2>/dev/null || true
+            cp "$ENV_DIR/scripts/guest-autorun/pks-autorun.sh" "$MOUNT_POINT/usr/local/bin/pks-autorun.sh" >> "$RAW_LOG" 2>&1 || true
             chmod 755 "$MOUNT_POINT/usr/local/bin/pks-autorun.sh" 2>/dev/null || true
         fi
         
