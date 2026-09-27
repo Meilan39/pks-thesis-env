@@ -97,7 +97,7 @@ build:
 		echo "----------------------------------------------------------------------"; \
 		echo "  Security Kernel:     $$(ls -lh "$$DEV_KERNEL_DIR/build_sec/arch/x86/boot/bzImage" 2>/dev/null | awk '{print $$5}')  [READY]"; \
 		echo "  Performance Kernel:  $$(ls -lh "$$DEV_KERNEL_DIR/build_perf/arch/x86/boot/bzImage" 2>/dev/null | awk '{print $$5}') [READY]"; \
-		echo "  Control Kernel:      $$(ls -lh "$$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage" 2>/dev/null | awk '{print $$5}') [READY]"; \
+		echo "  Control Kernel:      $$(ls -lh "$$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage" 2>/dev/null | awk '{print $$5}') [READY]"; \
 		echo "  Disk Image:          $$(ls -lh images/disk.img 2>/dev/null | awk '{print $$5}') [READY]"; \
 		echo "  Overall Status:      ALL 6 BUILD TARGETS COMPILED SUCCESSFULLY"; \
 		echo "======================================================================"; \

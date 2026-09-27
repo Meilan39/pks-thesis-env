@@ -17,7 +17,13 @@ DEV_KERNEL_DIR="${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}"
 CONTROL_KERNEL_DIR="${CONTROL_KERNEL_DIR:-$HOME/src/linux-pks-thesis-control}"
 
 if [ "$KERNEL_VARIANT" = "control" ]; then
-    KERNEL_IMG="${KERNEL_IMG:-$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage}"
+    if [ -f "$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage" ]; then
+        KERNEL_IMG="${KERNEL_IMG:-$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage}"
+    elif [ -f "$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage" ]; then
+        KERNEL_IMG="${KERNEL_IMG:-$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage}"
+    else
+        KERNEL_IMG="${KERNEL_IMG:-$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage}"
+    fi
 else
     KERNEL_IMG="${KERNEL_IMG:-$DEV_KERNEL_DIR/build_${KERNEL_VARIANT}/arch/x86/boot/bzImage}"
 fi

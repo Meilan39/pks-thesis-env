@@ -1,12 +1,12 @@
 ======================================================================
  [build] PKS Kernel Compilation & Disk Environment Pipeline
 ======================================================================
-./scripts/build/build_sec.sh > results/raw/build-sec.log 2>&1 || (cat results/raw/build-sec.log && exit 1)
-./scripts/build/build_perf.sh > results/raw/build-perf.log 2>&1 || (cat results/raw/build-perf.log && exit 1)
-./scripts/build/build_control.sh > results/raw/build-control.log 2>&1 || (cat results/raw/build-control.log && exit 1)
-./scripts/disk/disk_provision.sh > results/raw/disk-provision.log 2>&1 || (cat results/raw/disk-provision.log && exit 1)
-./scripts/disk/disk_update.sh > results/raw/disk-update.log 2>&1 || (cat results/raw/disk-update.log && exit 1)
-./scripts/compile-all.sh > results/raw/compile.log 2>&1 || (cat results/raw/compile.log && exit 1)
+./scripts/build/build_sec.sh /Users/meilan/src/linux-pks-thesis
+./scripts/build/build_perf.sh /Users/meilan/src/linux-pks-thesis
+./scripts/build/build_control.sh /Users/meilan/src/linux-pks-thesis-control
+./scripts/disk/disk_provision.sh /Users/meilan/Documents/大学/3年前期/研究/卒論/pks-thesis-env/images/disk.img
+./scripts/disk/disk_update.sh /Users/meilan/Documents/大学/3年前期/研究/卒論/pks-thesis-env/images/disk.img
+./scripts/compile-all.sh
 ======================================================================
  [build] Build Pipeline Summary & Artifact Verification
 ----------------------------------------------------------------------

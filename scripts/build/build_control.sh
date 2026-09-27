@@ -7,7 +7,7 @@ ENV_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 source "$ENV_DIR/scripts/common.sh"
 
 KERNEL_DIR="${1:-${CONTROL_KERNEL_DIR:-$HOME/src/linux-pks-thesis-control}}"
-OUTPUT_DIR="${OUTPUT_DIR:-$KERNEL_DIR/build_control}"
+OUTPUT_DIR="${OUTPUT_DIR:-$KERNEL_DIR/build_perf}"
 JOBS="${BUILD_JOBS:-$(nproc 2>/dev/null || getconf _NPROCESSORS_ONLN 2>/dev/null || echo 4)}"
 
 [ -d "$KERNEL_DIR" ] || die "Kernel source directory not found: $KERNEL_DIR"
