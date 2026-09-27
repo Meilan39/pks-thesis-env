@@ -10,26 +10,23 @@ DISK_IMG="${DISK_IMG:-$ENV_DIR/images/disk.img}"
 DEST_DIR="${RESULTS_DIR:-$ENV_DIR/results}/raw"
 mkdir -p "$DEST_DIR"
 
-# If running directly inside VM or if /mnt/protected is mounted on host
-if [ -d "/mnt/protected/bench_results" ]; then
-    cp -a /mnt/protected/bench_results/. "$DEST_DIR/" 2>/dev/null || true
-fi
-if [ -d "/mnt/protected/exploit_results" ]; then
-    cp -a /mnt/protected/exploit_results/. "$DEST_DIR/" 2>/dev/null || true
-fi
-if [ -d "/mnt/protected/unit_results" ]; then
-    cp -a /mnt/protected/unit_results/. "$DEST_DIR/" 2>/dev/null || true
-fi
+copy_results() {
+    local src="$1"
+    for dir in bench_results exploit_results unit_results; do
+        [ -d "$src/$dir" ] && cp -a "$src/$dir/." "$DEST_DIR/" 2>/dev/null || true
+    done
+}
 
-# If disk image exists and losetup/mount available with permissions
+# 1. From guest mount
+copy_results "/mnt/protected"
+
+# 2. From raw disk image loopback mount if running on host with root
 if [ -f "$DISK_IMG" ] && command -v losetup >/dev/null 2>&1 && [ "${EUID:-$(id -u)}" -eq 0 ]; then
     LOOP=$(losetup --find --show --partscan "$DISK_IMG" 2>/dev/null || true)
     if [ -n "$LOOP" ]; then
         MOUNT_PT="$(mktemp -d)"
         if mount -o ro "${LOOP}p2" "$MOUNT_PT" 2>/dev/null; then
-            [ -d "$MOUNT_PT/bench_results" ] && cp -a "$MOUNT_PT/bench_results/." "$DEST_DIR/" 2>/dev/null || true
-            [ -d "$MOUNT_PT/exploit_results" ] && cp -a "$MOUNT_PT/exploit_results/." "$DEST_DIR/" 2>/dev/null || true
-            [ -d "$MOUNT_PT/unit_results" ] && cp -a "$MOUNT_PT/unit_results/." "$DEST_DIR/" 2>/dev/null || true
+            copy_results "$MOUNT_PT"
             umount "$MOUNT_PT" 2>/dev/null || true
         fi
         losetup -d "$LOOP" 2>/dev/null || true

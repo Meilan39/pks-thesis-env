@@ -32,38 +32,31 @@ cat <<EOF | sfdisk "$DISK_IMG" >/dev/null 2>&1
 EOF
 
 LOOP=$(sudo losetup --find --show --partscan "$DISK_IMG")
-ROOT_PART="${LOOP}p1"
-PROT_PART="${LOOP}p2"
 sleep 1
-
-sudo mkfs.ext4 -F -q "$ROOT_PART"
-sudo mkfs.ext4 -F -q -O ^inline_data,^encrypt "$PROT_PART"
+sudo mkfs.ext4 -F -q "${LOOP}p1"
+sudo mkfs.ext4 -F -q -O ^inline_data,^encrypt "${LOOP}p2"
 
 MOUNT_POINT="$(mktemp -d)"
-
 cleanup() {
-    sudo umount "$MOUNT_POINT/dev" 2>/dev/null || true
-    sudo umount "$MOUNT_POINT/proc" 2>/dev/null || true
-    sudo umount "$MOUNT_POINT/sys" 2>/dev/null || true
-    sudo umount "$MOUNT_POINT" 2>/dev/null || true
+    for d in dev proc sys ""; do sudo umount "$MOUNT_POINT/$d" 2>/dev/null || true; done
     sudo losetup -d "$LOOP" 2>/dev/null || true
     rmdir "$MOUNT_POINT" 2>/dev/null || true
 }
 trap cleanup EXIT
 
-sudo mount "$ROOT_PART" "$MOUNT_POINT"
+sudo mount "${LOOP}p1" "$MOUNT_POINT"
 sudo debootstrap --arch "$ARCH" "$SUITE" "$MOUNT_POINT" "$MIRROR" >/dev/null 2>&1 || true
 
-sudo mount --bind /dev "$MOUNT_POINT/dev" 2>/dev/null || true
-sudo mount --bind /proc "$MOUNT_POINT/proc" 2>/dev/null || true
-sudo mount --bind /sys "$MOUNT_POINT/sys" 2>/dev/null || true
+for d in dev proc sys; do sudo mount --bind "/$d" "$MOUNT_POINT/$d" 2>/dev/null || true; done
 sudo cp /etc/resolv.conf "$MOUNT_POINT/etc/resolv.conf" 2>/dev/null || true
 
-# Setup /etc/fstab
+# Setup /etc/fstab and directories
 sudo mkdir -p "$MOUNT_POINT/mnt/protected" "$MOUNT_POINT/pks-thesis-env"
-echo "/dev/vda1 / ext4 errors=remount-ro 0 1" | sudo tee "$MOUNT_POINT/etc/fstab" >/dev/null
-echo "/dev/vda2 /mnt/protected ext4 defaults,nofail 0 2" | sudo tee -a "$MOUNT_POINT/etc/fstab" >/dev/null
-echo "pks_env /pks-thesis-env 9p trans=virtio,version=9p2000.L,nofail 0 0" | sudo tee -a "$MOUNT_POINT/etc/fstab" >/dev/null
+sudo tee "$MOUNT_POINT/etc/fstab" >/dev/null <<EOF
+/dev/vda1 / ext4 errors=remount-ro 0 1
+/dev/vda2 /mnt/protected ext4 defaults,nofail 0 2
+pks_env /pks-thesis-env 9p trans=virtio,version=9p2000.L,nofail 0 0
+EOF
 
 # Install runtime packages
 sudo chroot "$MOUNT_POINT" /bin/bash -c "
@@ -88,8 +81,5 @@ if [ -f "$ENV_DIR/scripts/guest-autorun/pks-autorun.service" ]; then
 fi
 
 ELAPSED=$(( $(date +%s) - START_TIME ))
-MINS=$(( ELAPSED / 60 ))
-SECS=$(( ELAPSED % 60 ))
-
-echo "[disk-provision] Bootstrapped Debian Bookworm and partitioned 8GB image... [DONE] (${MINS}m ${SECS}s)"
+echo "[disk-provision] Bootstrapped Debian Bookworm and partitioned 8GB image... [DONE] ($(( ELAPSED / 60 ))m $(( ELAPSED % 60 ))s)"
 echo ""
