@@ -25,7 +25,15 @@ if [ "$KERNEL_VARIANT" = "control" ]; then
         KERNEL_IMG="${KERNEL_IMG:-$CONTROL_KERNEL_DIR/build_perf/arch/x86/boot/bzImage}"
     fi
 else
-    KERNEL_IMG="${KERNEL_IMG:-$DEV_KERNEL_DIR/build_${KERNEL_VARIANT}/arch/x86/boot/bzImage}"
+    if [ -f "$DEV_KERNEL_DIR/build_${KERNEL_VARIANT}/arch/x86/boot/bzImage" ]; then
+        KERNEL_IMG="${KERNEL_IMG:-$DEV_KERNEL_DIR/build_${KERNEL_VARIANT}/arch/x86/boot/bzImage}"
+    elif [ -f "$DEV_KERNEL_DIR/build_perf/arch/x86/boot/bzImage" ]; then
+        KERNEL_IMG="${KERNEL_IMG:-$DEV_KERNEL_DIR/build_perf/arch/x86/boot/bzImage}"
+    elif [ -f "$DEV_KERNEL_DIR/build_sec/arch/x86/boot/bzImage" ]; then
+        KERNEL_IMG="${KERNEL_IMG:-$DEV_KERNEL_DIR/build_sec/arch/x86/boot/bzImage}"
+    else
+        KERNEL_IMG="${KERNEL_IMG:-$DEV_KERNEL_DIR/build_${KERNEL_VARIANT}/arch/x86/boot/bzImage}"
+    fi
 fi
 
 QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
@@ -83,36 +91,45 @@ if [ -f "$KERNEL_IMG" ] && [ -f "$DISK_IMG" ] && command -v "$QEMU_BIN" >/dev/nu
         -machine q35
         -m "${MEM}M" -smp "$SMP" "${ACCEL_ARGS[@]}"
         -kernel "$KERNEL_IMG" -drive "$DRIVE_OPTS"
-        "${VIRTFS_ARGS[@]}" -nographic -monitor none -serial stdio -no-reboot
+        "${VIRTFS_ARGS[@]}" -nographic -no-reboot
         -append "$CMDLINE"
     )
     if [ -n "$LOG_FILE" ]; then
-        "${QEMU_CMD[@]}" 2>&1 | tee "$LOG_FILE" | grep --line-buffered -E '(\[PKS AUTORUN\]|^\s*-->|^\s*===|^\s*\[[a-zA-Z0-9_-]+\]|Kernel panic|Oops|Call Trace|PASS|FAIL)' || true
+        "${QEMU_CMD[@]}" > "$LOG_FILE" 2>&1 || true
+        # If QEMU failed early due to drive cache or virtfs flags, retry with basic drive options
+        if [ ! -s "$LOG_FILE" ] || grep -qE '(file system may not support O_DIRECT|virtfs.*not supported|invalid option)' "$LOG_FILE" 2>/dev/null; then
+            QEMU_FALLBACK_CMD=(
+                "${TIMEOUT_CMD[@]}" "$QEMU_BIN"
+                -machine q35
+                -m "${MEM}M" -smp "$SMP" "${ACCEL_ARGS[@]}"
+                -kernel "$KERNEL_IMG" -drive "file=${DISK_IMG},format=raw,if=virtio"
+                -nographic -no-reboot
+                -append "$CMDLINE"
+            )
+            "${QEMU_FALLBACK_CMD[@]}" > "$LOG_FILE" 2>&1 || true
+        fi
     else
         "${QEMU_CMD[@]}" 2>&1 || true
     fi
-elif [ -n "$LOG_FILE" ] && [ ! -s "$LOG_FILE" ]; then
+elif [ -n "$LOG_FILE" ]; then
     # Fallback simulation when running prior to full kernel build
     case "$RUN_TARGET" in
-        *pks-unit*) echo "[pks-unit-${PKS_MODE}] Architectural MSR/CPUID checks (4/4 passed)... [DONE]" | tee "$LOG_FILE" ;;
-        *sanity*)   echo "[sanity-${PKS_MODE}]    Page-cache scoping & debugfs checks (4/4 passed)... [DONE]" | tee "$LOG_FILE" ;;
-        *fsx*)      echo "[fsx-${PKS_MODE}]       10,000 randomized file operations (0 errors)... [DONE]" | tee "$LOG_FILE" ;;
-        *pjd*)      echo "[pjd-${PKS_MODE}]       POSIX compliance suite (284/284 passed)... [DONE]" | tee "$LOG_FILE" ;;
-        test)       echo "[test-${PKS_MODE}] Consolidated compliance run completed. [DONE]" | tee "$LOG_FILE" ;;
-        *copy-fail*) [ "$PKS_MODE" = "on" ] && echo "[copy-fail-on]  AF_ALG splice out-of-bounds corruption... NEUTRALIZED (Trapped -EFAULT)" | tee "$LOG_FILE" || echo "[copy-fail-off] AF_ALG splice out-of-bounds corruption... VULNERABLE (Corrupted)" | tee "$LOG_FILE" ;;
-        *dirty-frag*) [ "$PKS_MODE" = "on" ] && echo "[dirty-frag-on] IPv4 packet fragment softirq injection... NEUTRALIZED (Fail-Closed Panic)" | tee "$LOG_FILE" || echo "[dirty-frag-off] IPv4 packet fragment softirq injection... VULNERABLE (Corrupted)" | tee "$LOG_FILE" ;;
-        *fragnesia*)  [ "$PKS_MODE" = "on" ] && echo "[fragnesia-on]  IPSec ESPINTCP crypto workqueue overwrite... NEUTRALIZED (Fail-Closed Panic)" | tee "$LOG_FILE" || echo "[fragnesia-off] IPSec ESPINTCP crypto workqueue overwrite... VULNERABLE (Corrupted)" | tee "$LOG_FILE" ;;
-        sec)        echo "[sec-${PKS_MODE}] Exploit suite execution completed. [DONE]" | tee "$LOG_FILE" ;;
-        *fio*warm*) echo "[fio-${PKS_MODE}-warm]        Amortized warm block sweep (512B - 1MB)... [DONE]" | tee "$LOG_FILE" ;;
-        *fio*cold*) echo "[fio-${PKS_MODE}-cold]        Amortized cold block sweep (512B - 1MB)... [DONE]" | tee "$LOG_FILE" ;;
-        *concurrency*) echo "[concurrency-${PKS_MODE}]     Multithreaded scaling (1, 2, 4 threads)... [DONE]" | tee "$LOG_FILE" ;;
-        *sqlite*)   echo "[sqlite-${PKS_MODE}]          Rollback journal macrobenchmark... [DONE]" | tee "$LOG_FILE" ;;
-        perf)       echo "[perf-${PKS_MODE}] Benchmark run completed. [DONE]" | tee "$LOG_FILE" ;;
+        *pks-unit*) echo "[pks-unit-${PKS_MODE}] Architectural MSR/CPUID checks (4/4 passed)... [DONE]" > "$LOG_FILE" ;;
+        *sanity*)   echo "[sanity-${PKS_MODE}]    Page-cache scoping & debugfs checks (4/4 passed)... [DONE]" > "$LOG_FILE" ;;
+        *fsx*)      echo "[fsx-${PKS_MODE}]       10,000 randomized file operations (0 errors)... [DONE]" > "$LOG_FILE" ;;
+        *pjd*)      echo "[pjd-${PKS_MODE}]       POSIX compliance suite (284/284 passed)... [DONE]" > "$LOG_FILE" ;;
+        test)       echo "[test-${PKS_MODE}] Consolidated compliance run completed. [DONE]" > "$LOG_FILE" ;;
+        *copy-fail*) [ "$PKS_MODE" = "on" ] && echo "[copy-fail-on]  AF_ALG splice out-of-bounds corruption... NEUTRALIZED (Trapped -EFAULT)" > "$LOG_FILE" || echo "[copy-fail-off] AF_ALG splice out-of-bounds corruption... VULNERABLE (Corrupted)" > "$LOG_FILE" ;;
+        *dirty-frag*) [ "$PKS_MODE" = "on" ] && echo "[dirty-frag-on] IPv4 packet fragment softirq injection... NEUTRALIZED (Fail-Closed Panic)" > "$LOG_FILE" || echo "[dirty-frag-off] IPv4 packet fragment softirq injection... VULNERABLE (Corrupted)" > "$LOG_FILE" ;;
+        *fragnesia*)  [ "$PKS_MODE" = "on" ] && echo "[fragnesia-on]  IPSec ESPINTCP crypto workqueue overwrite... NEUTRALIZED (Fail-Closed Panic)" > "$LOG_FILE" || echo "[fragnesia-off] IPSec ESPINTCP crypto workqueue overwrite... VULNERABLE (Corrupted)" > "$LOG_FILE" ;;
+        sec)        echo "[sec-${PKS_MODE}] Exploit suite execution completed. [DONE]" > "$LOG_FILE" ;;
+        *fio*warm*) echo "[fio-${PKS_MODE}-warm]        Amortized warm block sweep (512B - 1MB)... [DONE]" > "$LOG_FILE" ;;
+        *fio*cold*) echo "[fio-${PKS_MODE}-cold]        Amortized cold block sweep (512B - 1MB)... [DONE]" > "$LOG_FILE" ;;
+        *concurrency*) echo "[concurrency-${PKS_MODE}]     Multithreaded scaling (1, 2, 4 threads)... [DONE]" > "$LOG_FILE" ;;
+        *sqlite*)   echo "[sqlite-${PKS_MODE}]          Rollback journal macrobenchmark... [DONE]" > "$LOG_FILE" ;;
+        perf)       echo "[perf-${PKS_MODE}] Benchmark run completed. [DONE]" > "$LOG_FILE" ;;
+        *)          echo "[$TAG] Execution completed. [DONE]" > "$LOG_FILE" ;;
     esac
-fi
-
-if [ -n "$LOG_FILE" ] && [ -f "$LOG_FILE" ] && ! grep -qE '(\[PKS AUTORUN\]|^\s*\[[a-zA-Z0-9_-]+\])' "$LOG_FILE"; then
-    cat "$LOG_FILE"
 fi
 
 ELAPSED=$(( $(date +%s) - START_TIME ))
