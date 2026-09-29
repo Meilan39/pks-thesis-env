@@ -25,4 +25,7 @@ EXECUTOR           ?= qemu
 QEMU_BIN           ?= qemu-system-x86_64
 SMP                ?= 4
 MEM                ?= 4096
-BATCH_TIMEOUT_SEC  ?= 300
+# TCG (no KVM on this host) boots and runs several times slower than native, so
+# a full guest boot + suite needs a generous cap. Raise it if a run ends in a
+# 124 timeout mid-suite; lower it (or drop SMP) once you know the real duration.
+BATCH_TIMEOUT_SEC  ?= 900

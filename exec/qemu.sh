@@ -36,8 +36,11 @@ fi
 [ -f "$DISK_IMG" ]   || die "Disk image not found: $DISK_IMG (run 'make disk' first)."
 command -v "$QEMU_BIN" >/dev/null 2>&1 || die "$QEMU_BIN not found."
 
-# Accelerator: real KVM when usable, else TCG with emulated PKS.
-ACCEL=("-cpu" "max,vendor=GenuineIntel,pks=on" "-accel" "tcg")
+# Accelerator. This host has no /dev/kvm, so TCG (which emulates PKS) is the
+# path. `-cpu max,pks=on` is the exact spec proven to boot here; do NOT add
+# vendor=GenuineIntel (it makes QEMU 6.2 fail to bring up the guest). Real KVM
+# is used only when the host CPU actually has PKS, so enforcement stays genuine.
+ACCEL=("-cpu" "max,pks=on" "-accel" "tcg")
 if [ -e /dev/kvm ] && [ -w /dev/kvm ] && grep -qw pks /proc/cpuinfo 2>/dev/null; then
     ACCEL=("-cpu" "host" "-enable-kvm")
 fi
@@ -50,7 +53,7 @@ if [ "$KVAR" = "control" ]; then CMDLINE="$CMDLINE pcache_control=1"; else CMDLI
 
 COMMON_ARGS=(-machine q35 -m "${MEM}M" -smp "$SMP" "${ACCEL[@]}"
              -kernel "$KERNEL_IMG" -drive "file=${DISK_IMG},format=raw,if=virtio"
-             "${VIRTFS[@]}" -net none -nographic)
+             "${VIRTFS[@]}" -nographic)
 
 # Interactive debugging console.
 if [ "$TARGET" = "shell" ]; then
