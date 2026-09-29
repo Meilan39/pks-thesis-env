@@ -66,17 +66,22 @@ CMDLINE="$CMDLINE pks_run=${TARGET} pks_auto=${TARGET} panic=1 systemd.mask=seri
 TIMEOUT=(); command -v timeout >/dev/null 2>&1 && TIMEOUT=(timeout --kill-after=10s "${BATCH_TIMEOUT_SEC}s")
 
 log_info "[exec/qemu] boot kernel=$KVAR mode=$MODE target=$TARGET -> $(basename "$TRANSCRIPT")"
-"${TIMEOUT[@]}" "$QEMU_BIN" "${COMMON_ARGS[@]}" -no-reboot -serial stdio -monitor none \
-    -append "$CMDLINE" > "$TRANSCRIPT" 2>&1 || true
+QEMU_ARGV=("$QEMU_BIN" "${COMMON_ARGS[@]}" -no-reboot -serial stdio -monitor none -append "$CMDLINE")
+# Record the exact command so a silent run can be reproduced by hand.
+{ printf '### exec/qemu argv:\n'; printf '%q ' "${QEMU_ARGV[@]}"; printf '\n\n'; } > "$TRANSCRIPT"
+start=$(date +%s)
+"${TIMEOUT[@]}" "${QEMU_ARGV[@]}" >> "$TRANSCRIPT" 2>&1; rc=$?
+elapsed=$(( $(date +%s) - start ))
+echo "### exec/qemu exit=$rc elapsed=${elapsed}s" >> "$TRANSCRIPT"
 
 if ! grep -q '^STATUS ' "$TRANSCRIPT" 2>/dev/null; then
-    sz=$(wc -c < "$TRANSCRIPT" 2>/dev/null || echo 0)
-    log_warn "[exec/qemu] no STATUS lines in transcript (${sz} bytes: $(basename "$TRANSCRIPT"))."
-    if [ "$sz" -lt 200 ]; then
-        log_warn "[exec/qemu] transcript nearly empty -> QEMU likely failed to start. Contents:"
-        sed 's/^/    | /' "$TRANSCRIPT" >&2
-    else
-        log_warn "[exec/qemu] guest booted but emitted no result. Last 20 transcript lines:"
-        tail -n 20 "$TRANSCRIPT" | sed 's/^/    | /' >&2
-    fi
+    guest_bytes=$(grep -vE '^### ' "$TRANSCRIPT" | wc -c | tr -d ' ')
+    log_warn "[exec/qemu] no STATUS (exit=$rc elapsed=${elapsed}s, ${guest_bytes} bytes of guest output)."
+    case "$rc" in
+        124|137) log_warn "[exec/qemu] QEMU hit the ${BATCH_TIMEOUT_SEC}s timeout -> it ran but produced no serial output (console not wired to stdio, or guest hung).";;
+        0)       [ "$guest_bytes" -eq 0 ] && log_warn "[exec/qemu] QEMU exited 0 with no output -> likely never launched the guest.";;
+        *)       log_warn "[exec/qemu] QEMU exited $rc before/at startup -> flag or environment rejection.";;
+    esac
+    log_warn "[exec/qemu] full transcript ($(basename "$TRANSCRIPT")):"
+    sed 's/^/    | /' "$TRANSCRIPT" >&2
 fi
