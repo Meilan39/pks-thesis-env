@@ -1,21 +1,5 @@
-======================================================================
- [test] PKS Compliance & Functional Integrity Suite
-======================================================================
-
-
-======================================================================
- [test] Compliance Evaluation Summary (make analyze-test)
-----------------------------------------------------------------------
- Suite        Variant         Passed   Failed   Total   Verdict
-----------------------------------------------------------------------
- pks-unit     pcache_pks=off       4        0       4   PASSED
- pks-unit     pcache_pks=on        4        0       4   PASSED
- sanity       pcache_pks=off       3        0       3   PASSED
- sanity       pcache_pks=on        4        0       4   PASSED
- fsx (10K)    pcache_pks=off   10000        0   10000   PASSED
- fsx (10K)    pcache_pks=on    10000        0   10000   PASSED
- pjd (POSIX)  pcache_pks=off     284        0     284   PASSED
- pjd (POSIX)  pcache_pks=on      284        0     284   PASSED
-----------------------------------------------------------------------
- Overall Verdict: ALL COMPLIANCE CHECKS PASSED (0 regressions detected)
-======================================================================
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=off target=test -> test-off-20260929T122030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=on target=test -> test-on-20260929T122030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [test] rollup: 0 passing, 4 failing (verdict=FAIL)

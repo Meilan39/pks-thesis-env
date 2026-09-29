@@ -1,0 +1,13 @@
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=off target=sec/copy-fail -> sec-copy-fail-off-20260929T123030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=on target=sec/copy-fail -> sec-copy-fail-on-20260929T123030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=off target=sec/dirty-frag -> sec-dirty-frag-off-20260929T123030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=on target=sec/dirty-frag -> sec-dirty-frag-on-20260929T123030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=off target=sec/fragnesia -> sec-fragnesia-off-20260929T123030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=on target=sec/fragnesia -> sec-fragnesia-on-20260929T123030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [sec] rollup: 0 passing, 6 failing (verdict=FAIL)

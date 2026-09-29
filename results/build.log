@@ -1,39 +1,10 @@
-======================================================================
- [build] PKS Kernel Compilation & Disk Environment Pipeline
-======================================================================
-[build-sec] Compiling Security Kernel...
-[build-sec] Compiling Security Kernel (/home/vmuser/src/linux-pks-thesis/build_sec/arch/x86/boot/bzImage)... [DONE] (0m 39s)
-
-[build-perf] Compiling Performance Kernel...
-[build-perf] Compiling Performance Kernel (/home/vmuser/src/linux-pks-thesis/build_perf/arch/x86/boot/bzImage)... [DONE] (0m 32s)
-
-[build-control] Compiling Control Baseline Kernel...
-[build-control] Compiling Control Baseline Kernel (/home/vmuser/src/linux-pks-thesis-control/build_perf/arch/x86/boot/bzImage)... [DONE] (1m 2s)
-
-[disk-provision] Bootstrapping Debian Bookworm and partitioning 8GB image...
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-sudo: unable to resolve host ubuntu: Temporary failure in name resolution
-[disk-provision] Bootstrapped Debian Bookworm and partitioned 8GB image... [DONE] (23m 32s)
-
-[disk-update] Synchronizing /pks-thesis-env into disk image...
-[disk-update] Synchronized /pks-thesis-env into disk image... [DONE]
-
-[compile] Compiling evaluation binaries across tests, sec, perf...
-[compile] Compiled all evaluation binaries across tests, sec, perf... [DONE]
-
-======================================================================
- [build] Build Pipeline Summary & Artifact Verification
-----------------------------------------------------------------------
-  Security Kernel:     11M  [READY]
-  Performance Kernel:  11M [READY]
-  Control Kernel:      11M [READY]
-  Disk Image:          8.0G [READY]
-  Overall Status:      ALL 6 BUILD TARGETS COMPILED SUCCESSFULLY
-======================================================================
+[34m[INFO][0m [build-control] configure + compile (/home/vmuser/src/linux-pks-thesis-control) -> /home/vmuser/src/env/results/raw/build-control.log
+STATUS node=build-control variant=control verdict=PASS bytes=10909504 secs=1374
+[32m[DONE][0m [build-control] bzImage ready (1374s)
+[34m[INFO][0m [build-sec] configure + compile (/home/vmuser/src/linux-pks-thesis) -> /home/vmuser/src/env/results/raw/build-sec.log
+STATUS node=build-sec variant=sec verdict=PASS bytes=11124992 secs=72
+[32m[DONE][0m [build-sec] bzImage ready (72s)
+[34m[INFO][0m [build-perf] configure + compile (/home/vmuser/src/linux-pks-thesis) -> /home/vmuser/src/env/results/raw/build-perf.log
+STATUS node=build-perf variant=perf verdict=PASS bytes=10883744 secs=1361
+[32m[DONE][0m [build-perf] bzImage ready (1361s)
+[34m[INFO][0m [build] rollup: 3 passing, 0 failing (verdict=PASS)

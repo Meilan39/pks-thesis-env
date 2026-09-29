@@ -1,0 +1,13 @@
+[34m[INFO][0m [exec/qemu] boot kernel=control mode=off target=perf -> perf-control-20260929T130030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=perf mode=off target=perf -> perf-off-20260929T130030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=perf mode=on target=perf -> perf-on-20260929T130030Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [perf] rollup: 0 passing, 3 failing (verdict=FAIL)
+[analyze-perf] wrote /home/vmuser/src/env/results/data/perf_summary.csv
+  fio 4KB warm   Write Lat (us)   control=           off=           on=           
+  fio 4KB warm   Read Lat (us)    control=           off=           on=           
+  fio 4KB cold   Write Lat (us)   control=           off=           on=           
+  sqlite         Tx/s (sync=OFF)  control=           off=           on=           
+  sqlite         Tx/s (sync=FULL) control=           off=           on=           

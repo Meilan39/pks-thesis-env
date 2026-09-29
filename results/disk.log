@@ -1,0 +1,4 @@
+[32m[DONE][0m [disk] image present; refreshing autorun only.
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+sudo: unable to resolve host ubuntu: Temporary failure in name resolution
+STATUS node=disk variant=all verdict=PASS image=1.2G
