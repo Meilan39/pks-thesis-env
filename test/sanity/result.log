@@ -1,1 +1,2 @@
-STATUS node=sanity variant=all verdict=FAIL note=no_status
+STATUS node=sanity variant=off verdict=PASS note=not_applicable_when_off
+STATUS node=sanity variant=on verdict=FAIL passed=3 failed=2

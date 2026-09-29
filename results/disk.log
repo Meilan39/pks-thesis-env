@@ -1,2 +1,2 @@
-[32m[DONE][0m [disk] image present; refreshing autorun only.
-STATUS node=disk variant=all verdict=PASS refreshed=yes image=1.2G
+[32m[DONE][0m [disk] image present; refreshing packages + autorun.
+STATUS node=disk variant=all verdict=PASS refreshed=yes image=1.3G

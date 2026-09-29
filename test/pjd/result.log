@@ -1,1 +1,2 @@
-STATUS node=pjd variant=all verdict=FAIL note=no_status
+STATUS node=pjd variant=off verdict=FAIL failed=0
+STATUS node=pjd variant=on verdict=FAIL failed=0

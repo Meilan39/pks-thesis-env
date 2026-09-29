@@ -2,7 +2,7 @@
   "workload": "sqlite_macro",
   "sync_mode": "FULL",
   "transactions": 500,
-  "elapsed_ns": 231372524380,
-  "tps": 2.16,
-  "latency_ns": 462745048.76
+  "elapsed_ns": 113323648400,
+  "tps": 4.41,
+  "latency_ns": 226647296.8
 }

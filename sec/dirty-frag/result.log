@@ -1,2 +1,2 @@
-STATUS node=dirty-frag variant=off verdict=FAIL note=no_verdict_no_panic
-STATUS node=dirty-frag variant=on verdict=FAIL note=no_verdict_no_panic
+STATUS node=dirty-frag variant=off verdict=FAIL marker=intact note=baseline_not_corrupted
+STATUS node=dirty-frag variant=on verdict=NEUTRALIZED marker=intact signal=trapped

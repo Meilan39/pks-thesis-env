@@ -1,2 +1,2 @@
-STATUS node=copy-fail variant=off verdict=FAIL note=no_verdict_no_panic
-STATUS node=copy-fail variant=on verdict=NEUTRALIZED signal=fail_closed_panic marker=intact
+STATUS node=copy-fail variant=off verdict=VULNERABLE marker=altered rc=0
+STATUS node=copy-fail variant=on verdict=NEUTRALIZED marker=intact rc=137 signal=trapped

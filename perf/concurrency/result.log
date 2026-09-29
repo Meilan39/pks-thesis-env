@@ -1,1 +1,3 @@
-STATUS node=concurrency variant=all verdict=FAIL note=no_status
+STATUS node=concurrency variant=control verdict=PASS bw_4t_mbps=35.3
+STATUS node=concurrency variant=off verdict=PASS bw_4t_mbps=34.9
+STATUS node=concurrency variant=on verdict=PASS bw_4t_mbps=9.7
