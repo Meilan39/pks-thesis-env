@@ -66,11 +66,16 @@ CMDLINE="$CMDLINE pks_run=${TARGET} pks_auto=${TARGET} panic=1 systemd.mask=seri
 TIMEOUT=(); command -v timeout >/dev/null 2>&1 && TIMEOUT=(timeout --kill-after=10s "${BATCH_TIMEOUT_SEC}s")
 
 log_info "[exec/qemu] boot kernel=$KVAR mode=$MODE target=$TARGET -> $(basename "$TRANSCRIPT")"
-QEMU_ARGV=("$QEMU_BIN" "${COMMON_ARGS[@]}" -no-reboot -serial stdio -monitor none -append "$CMDLINE")
+# -nographic (in COMMON_ARGS) already muxes the guest serial onto stdio, which
+# is the exact form proven to boot on this host. Adding an explicit -serial
+# stdio on top of it makes QEMU 6.2 abort ("cannot use stdio by multiple
+# character devices"), so we do NOT add one here.
+QEMU_ARGV=("$QEMU_BIN" "${COMMON_ARGS[@]}" -no-reboot -append "$CMDLINE")
 # Record the exact command so a silent run can be reproduced by hand.
 { printf '### exec/qemu argv:\n'; printf '%q ' "${QEMU_ARGV[@]}"; printf '\n\n'; } > "$TRANSCRIPT"
 start=$(date +%s)
-"${TIMEOUT[@]}" "${QEMU_ARGV[@]}" >> "$TRANSCRIPT" 2>&1; rc=$?
+# NB: never let a nonzero QEMU exit trip `set -e` before we log it.
+if "${TIMEOUT[@]}" "${QEMU_ARGV[@]}" >> "$TRANSCRIPT" 2>&1; then rc=0; else rc=$?; fi
 elapsed=$(( $(date +%s) - start ))
 echo "### exec/qemu exit=$rc elapsed=${elapsed}s" >> "$TRANSCRIPT"
 
