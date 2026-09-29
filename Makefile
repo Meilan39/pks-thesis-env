@@ -66,7 +66,7 @@ clean:
 	@echo "[clean] removed compiled evaluation binaries."
 
 clean-results:
-	@rm -rf results/*.log results/*.json results/.substrate results/data/* 2>/dev/null || true
+	@rm -rf results/*.log results/*.json results/.substrate results/data/* results/raw 2>/dev/null || true
 	@find build disk test sec perf \( -name 'result.log' -o -name 'raw.log' -o -name 'raw-*.log' -o -name raw \) \
 	        -exec rm -rf {} + 2>/dev/null || true
 	@echo "[clean-results] removed summaries, result.logs, raw transcripts, and per-leaf raw/ dirs."

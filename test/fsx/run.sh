@@ -8,8 +8,11 @@ VAR="${1:-on}"; BIN="$DIR/fsx"
 TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
 OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true
 LOG="$OUT/fsx.log"; F="$TGT/fsx_${VAR}.dat"; rm -f "$F"
+# This fsx has no -q. Under PKS (on) the protected mount rejects shared writable
+# mmap, so MAPWRITE must be disabled with -W or fsx aborts spuriously.
+WFLAG=""; [ "$VAR" = on ] && WFLAG="-W"
 rc=0
-if [ -x "$BIN" ]; then "$BIN" -N 10000 -q "$F" > "$LOG" 2>&1; rc=$?; else rc=127; fi
+if [ -x "$BIN" ]; then "$BIN" -N 10000 $WFLAG "$F" > "$LOG" 2>&1; rc=$?; else rc=127; fi
 rm -f "$F"
 if [ "$rc" -eq 0 ] && ! grep -qiE 'error|bad data|mismatch|failed' "$LOG" 2>/dev/null; then
     emit_status fsx "$VAR" PASS ops=10000 errors=0

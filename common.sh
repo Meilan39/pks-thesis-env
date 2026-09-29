@@ -54,6 +54,14 @@ status_field() { printf '%s\n' "$1" | tr ' ' '\n' | sed -n "s/^$2=//p" | head -n
 # verdict_is_pass <verdict> -> exit 0 if passing
 verdict_is_pass() { case "$1" in PASS|NEUTRALIZED) return 0;; *) return 1;; esac; }
 
+# _status_lines <file> -> clean "STATUS node=..." lines on stdout.
+#   Leaves emit STATUS via the systemd journal, so serial transcripts carry a
+#   "[   t.tt] pks-autorun.sh[pid]: " prefix before it. This extracts the STATUS
+#   substring wherever it appears (anchored matches would miss the prefixed
+#   lines), and also matches the already-clean lines in a result.log. The -a
+#   keeps it working on transcripts that contain terminal control bytes.
+_status_lines() { grep -aoE 'STATUS node=.*' "$1" 2>/dev/null; }
+
 # ----------------------------------------------------------------------------
 # Harvesting (host side)
 # ----------------------------------------------------------------------------
@@ -62,7 +70,7 @@ verdict_is_pass() { case "$1" in PASS|NEUTRALIZED) return 0;; *) return 1;; esac
 #   to a leaf result.log. Used for the consolidated test/perf axes.
 harvest_node() {
     local t="$1" node="$2" out="$3" line
-    line=$(grep '^STATUS ' "$t" 2>/dev/null | grep -F "node=$node " | grep -v 'verdict=PENDING' | tail -n1 || true)
+    line=$(_status_lines "$t" | grep -F "node=$node " | grep -v 'verdict=PENDING' | tail -n1 || true)
     [ -n "$line" ] && printf '%s\n' "$line" >> "$out"
 }
 
@@ -72,7 +80,7 @@ harvest_node() {
 #   neutralization; anything else is an inconclusive FAIL. Pure observation.
 classify_sec() {
     local t="$1" node="$2" variant="$3" out="$4" resolved
-    resolved=$(grep '^STATUS ' "$t" 2>/dev/null | grep -F "node=$node " | grep -v 'verdict=PENDING' | tail -n1 || true)
+    resolved=$(_status_lines "$t" | grep -F "node=$node " | grep -v 'verdict=PENDING' | tail -n1 || true)
     if [ -n "$resolved" ]; then printf '%s\n' "$resolved" >> "$out"; return; fi
     if grep -qE "$PKS_PANIC_REGEX" "$t" 2>/dev/null; then
         if grep -qE "$PKS_ACTIVE_REGEX" "$t" 2>/dev/null; then
@@ -95,12 +103,12 @@ rollup() {
     local self="$1" label="$2"; shift 2
     : > "$self"
     local child
-    for child in "$@"; do [ -f "$child" ] && { grep '^STATUS ' "$child" >> "$self" 2>/dev/null || true; }; done
+    for child in "$@"; do [ -f "$child" ] && { _status_lines "$child" >> "$self" || true; }; done
     local pass=0 fail=0 line verdict
     while IFS= read -r line; do
         verdict=$(status_field "$line" verdict)
         if verdict_is_pass "$verdict"; then pass=$((pass+1)); else fail=$((fail+1)); fi
-    done < <(grep '^STATUS ' "$self" 2>/dev/null || true)
+    done < <(_status_lines "$self" || true)
     # No results harvested is a failure, never a vacuous pass.
     local overall=PASS
     [ "$fail" -gt 0 ] && overall=FAIL
@@ -118,7 +126,7 @@ mark_empty_leaves() {
     local variant="$1"; shift
     local leaf node
     for leaf in "$@"; do
-        if ! grep -q '^STATUS ' "$leaf" 2>/dev/null; then
+        if ! _status_lines "$leaf" | grep -q .; then
             node="$(basename "$(dirname "$leaf")")"
             emit_status "$node" "$variant" FAIL note=no_status >> "$leaf"
         fi

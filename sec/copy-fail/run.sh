@@ -13,7 +13,9 @@ printf '%s\n' "$MARK" > "$VICTIM"; sync; echo 3 > /proc/sys/vm/drop_caches 2>/de
 emit_status copy-fail "$VAR" PENDING phase=pre_trigger   # safety net should it panic
 erc=0
 if [ -f "$EXP" ]; then python3 "$EXP" "$VICTIM" > "$LOG" 2>&1; erc=$?; else erc=127; fi
-sync; echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+# Read back WITHOUT dropping caches: the exploit corrupts the in-memory
+# page-cache page, which may never be written to disk. Dropping caches here
+# would evict the corruption and re-read the clean on-disk marker (false PASS).
 after="$(head -c 256 "$VICTIM" 2>/dev/null)"
 
 if printf '%s' "$after" | grep -qF "$MARK"; then

@@ -15,7 +15,7 @@ OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true; LOG="$OUT/dirty-frag.l
 printf '%s\n' "$MARK" > "$VICTIM"; sync; echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
 emit_status dirty-frag "$VAR" PENDING phase=pre_trigger   # panic under 'on' -> host resolves
 if [ -x "$BIN" ]; then "$BIN" > "$LOG" 2>&1 || true; fi   # may never return
-sync; echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+# Read back WITHOUT dropping caches (page-cache corruption lives in memory).
 after="$(head -c 256 "$VICTIM" 2>/dev/null)"
 
 if printf '%s' "$after" | grep -qF "$MARK"; then
