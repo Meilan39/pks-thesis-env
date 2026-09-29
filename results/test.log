@@ -1,5 +1,7 @@
-[34m[INFO][0m [exec/qemu] boot kernel=sec mode=off target=test -> test-off-20260929T122030Z.log
-[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
-[34m[INFO][0m [exec/qemu] boot kernel=sec mode=on target=test -> test-on-20260929T122030Z.log
-[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (boot failure or panic before first result).
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=off target=test -> test-off-20260929T140810Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (0 bytes: test-off-20260929T140810Z.log).
+[33m[WARN][0m [exec/qemu] transcript nearly empty -> QEMU likely failed to start. Contents:
+[34m[INFO][0m [exec/qemu] boot kernel=sec mode=on target=test -> test-on-20260929T140810Z.log
+[33m[WARN][0m [exec/qemu] no STATUS lines in transcript (0 bytes: test-on-20260929T140810Z.log).
+[33m[WARN][0m [exec/qemu] transcript nearly empty -> QEMU likely failed to start. Contents:
 [34m[INFO][0m [test] rollup: 0 passing, 4 failing (verdict=FAIL)

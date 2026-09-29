@@ -1,10 +1,10 @@
 [34m[INFO][0m [build-control] configure + compile (/home/vmuser/src/linux-pks-thesis-control) -> /home/vmuser/src/env/results/raw/build-control.log
-STATUS node=build-control variant=control verdict=PASS bytes=10909504 secs=1374
-[32m[DONE][0m [build-control] bzImage ready (1374s)
+STATUS node=build-control variant=control verdict=PASS bytes=10909504 secs=38
+[32m[DONE][0m [build-control] bzImage ready (38s)
 [34m[INFO][0m [build-sec] configure + compile (/home/vmuser/src/linux-pks-thesis) -> /home/vmuser/src/env/results/raw/build-sec.log
-STATUS node=build-sec variant=sec verdict=PASS bytes=11124992 secs=72
-[32m[DONE][0m [build-sec] bzImage ready (72s)
+STATUS node=build-sec variant=sec verdict=PASS bytes=11124992 secs=37
+[32m[DONE][0m [build-sec] bzImage ready (37s)
 [34m[INFO][0m [build-perf] configure + compile (/home/vmuser/src/linux-pks-thesis) -> /home/vmuser/src/env/results/raw/build-perf.log
-STATUS node=build-perf variant=perf verdict=PASS bytes=10883744 secs=1361
-[32m[DONE][0m [build-perf] bzImage ready (1361s)
+STATUS node=build-perf variant=perf verdict=PASS bytes=10883744 secs=39
+[32m[DONE][0m [build-perf] bzImage ready (39s)
 [34m[INFO][0m [build] rollup: 3 passing, 0 failing (verdict=PASS)
