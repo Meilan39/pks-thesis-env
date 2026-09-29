@@ -1,0 +1,8 @@
+node,variant,verdict,note,signal,marker,passed,failed
+copy-fail,off,FAIL,no_verdict_no_panic,,,,
+copy-fail,on,NEUTRALIZED,,fail_closed_panic,intact,,
+dirty-frag,off,FAIL,no_verdict_no_panic,,,,
+dirty-frag,on,FAIL,no_verdict_no_panic,,,,
+fragnesia,off,FAIL,no_verdict_no_panic,,,,
+fragnesia,on,FAIL,no_verdict_no_panic,,,,
+sec,all,FAIL,,,,1,5

@@ -1,0 +1,4 @@
+STATUS node=build-control variant=control verdict=PASS bytes=10909504 secs=37
+STATUS node=build-sec variant=sec verdict=PASS bytes=11124992 secs=38
+STATUS node=build-perf variant=perf verdict=PASS bytes=10883744 secs=37
+STATUS node=build variant=all verdict=PASS passed=3 failed=0

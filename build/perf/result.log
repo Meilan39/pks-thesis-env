@@ -1,0 +1,3 @@
+[34m[INFO][0m [build-perf] configure + compile (/home/vmuser/src/linux-pks-thesis) -> /home/vmuser/src/env/build/perf/raw.log
+STATUS node=build-perf variant=perf verdict=PASS bytes=10883744 secs=37
+[32m[DONE][0m [build-perf] bzImage ready (37s)

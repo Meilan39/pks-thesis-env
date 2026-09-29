@@ -1,0 +1,11 @@
+/pks-thesis-env/test/fsx/fsx: invalid option -- 'q'
+Usage: /pks-thesis-env/test/fsx/fsx [options] <testfile>
+Options:
+  -l <size>       Maximum file size in bytes (default: 67108864 [64MB])
+  -o <size>       Maximum operation size in bytes (default: 65536 [64KB])
+  -N <num>        Number of random operations to execute (default: 10000)
+  -s <seed>       PRNG random seed (default: current time)
+  -W              Disable MAPWRITE operations (required for PKS protected mounts)
+  -b              Verify that MAPWRITE fails with -EOPNOTSUPP (Commit 06 test)
+  -v              Verbose output for every operation
+  -h              Show this help message

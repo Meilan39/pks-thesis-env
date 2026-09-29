@@ -1,0 +1,18 @@
+================================================================
+ PKS Page-Cache Sanity & Subsystem Scoping Test Harness
+================================================================
+[INFO] Connected to DebugFS: pool [0x0, 0x0), scopes=0
+
+==> [Suite 1] Supported VFS System-Call Scoping Verification
+    [FAIL] write(2) scope count mismatch: begin 0 -> 0, end 0 -> 0
+
+==> [Suite 2] Static Pool Page-Cache Allocation Verification
+    [SKIP] Pool boundaries not available from DebugFS
+
+==> [Suite 3] Fail-Closed Policy & Rejection Verification
+    [FAIL] mmap(PROT_WRITE) did not return EOPNOTSUPP (ret=0x7f56c7f94000, errno=0: Success)
+    [FAIL] open(O_DIRECT) did not return EOPNOTSUPP (ret=4, errno=0: Success)
+
+================================================================
+ [FAIL] One or more sanity assertions failed
+================================================================

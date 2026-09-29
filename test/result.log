@@ -1,0 +1,5 @@
+STATUS node=fsx variant=all verdict=FAIL note=no_status
+STATUS node=pjd variant=all verdict=FAIL note=no_status
+STATUS node=pks-unit variant=all verdict=FAIL note=no_status
+STATUS node=sanity variant=all verdict=FAIL note=no_status
+STATUS node=test variant=all verdict=FAIL passed=0 failed=4

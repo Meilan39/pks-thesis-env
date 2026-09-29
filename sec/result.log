@@ -1,0 +1,7 @@
+STATUS node=copy-fail variant=off verdict=FAIL note=no_verdict_no_panic
+STATUS node=copy-fail variant=on verdict=NEUTRALIZED signal=fail_closed_panic marker=intact
+STATUS node=dirty-frag variant=off verdict=FAIL note=no_verdict_no_panic
+STATUS node=dirty-frag variant=on verdict=FAIL note=no_verdict_no_panic
+STATUS node=fragnesia variant=off verdict=FAIL note=no_verdict_no_panic
+STATUS node=fragnesia variant=on verdict=FAIL note=no_verdict_no_panic
+STATUS node=sec variant=all verdict=FAIL passed=1 failed=5

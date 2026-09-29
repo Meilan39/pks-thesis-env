@@ -1,0 +1,9 @@
+{
+  "timestamp_utc": "2026-09-29T14:08:10Z",
+  "host_kernel": "Linux 7.1.0-rc3-00174-g7d260c5d2d89-dirty",
+  "cpu_model": "Intel(R) Xeon(R) Gold 5218 CPU @ 2.30GHz",
+  "substrate": "tcg",
+  "qemu": "QEMU emulator version 6.2.0 (Debian 1:6.2+dfsg-2ubuntu6.31)",
+  "smp": 4,
+  "mem_mb": 4096
+}

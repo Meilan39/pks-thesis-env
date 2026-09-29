@@ -1,0 +1,3 @@
+[34m[INFO][0m [build-control] configure + compile (/home/vmuser/src/linux-pks-thesis-control) -> /home/vmuser/src/env/build/control/raw.log
+STATUS node=build-control variant=control verdict=PASS bytes=10909504 secs=37
+[32m[DONE][0m [build-control] bzImage ready (37s)
