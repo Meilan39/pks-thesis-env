@@ -53,12 +53,12 @@ if [ "$KVAR" = "control" ]; then CMDLINE="$CMDLINE pcache_control=1"; else CMDLI
 
 COMMON_ARGS=(-machine q35 -m "${MEM}M" -smp "$SMP" "${ACCEL[@]}"
              -kernel "$KERNEL_IMG" -drive "file=${DISK_IMG},format=raw,if=virtio"
-             "${VIRTFS[@]}" -nographic)
+             "${VIRTFS[@]}")
 
-# Interactive debugging console.
+# Interactive debugging console: -nographic muxes serial+monitor onto the tty.
 if [ "$TARGET" = "shell" ]; then
     log_info "Interactive console (kernel=$KVAR mode=$MODE). Ctrl-A X to quit."
-    exec "$QEMU_BIN" "${COMMON_ARGS[@]}" -serial mon:stdio -append "$CMDLINE quiet"
+    exec "$QEMU_BIN" "${COMMON_ARGS[@]}" -nographic -serial mon:stdio -append "$CMDLINE quiet"
 fi
 
 # Headless automated run.
@@ -69,16 +69,17 @@ CMDLINE="$CMDLINE pks_run=${TARGET} pks_auto=${TARGET} panic=1 systemd.mask=seri
 TIMEOUT=(); command -v timeout >/dev/null 2>&1 && TIMEOUT=(timeout --kill-after=10s "${BATCH_TIMEOUT_SEC}s")
 
 log_info "[exec/qemu] boot kernel=$KVAR mode=$MODE target=$TARGET -> $(basename "$TRANSCRIPT")"
-# -nographic (in COMMON_ARGS) already muxes the guest serial onto stdio, which
-# is the exact form proven to boot on this host. Adding an explicit -serial
-# stdio on top of it makes QEMU 6.2 abort ("cannot use stdio by multiple
-# character devices"), so we do NOT add one here.
-QEMU_ARGV=("$QEMU_BIN" "${COMMON_ARGS[@]}" -no-reboot -append "$CMDLINE")
+# Headless capture: DO NOT use -nographic here. -nographic is built for an
+# interactive tty and does not reliably deliver serial output when stdout is a
+# plain file (it boots, but the transcript stays empty). The portable headless
+# pattern is -display none + an explicit serial on stdio + no monitor, with
+# stdin from /dev/null so the stdio chardev never blocks on a tty.
+QEMU_ARGV=("$QEMU_BIN" "${COMMON_ARGS[@]}" -display none -serial stdio -monitor none -no-reboot -append "$CMDLINE")
 # Record the exact command so a silent run can be reproduced by hand.
 { printf '### exec/qemu argv:\n'; printf '%q ' "${QEMU_ARGV[@]}"; printf '\n\n'; } > "$TRANSCRIPT"
 start=$(date +%s)
 # NB: never let a nonzero QEMU exit trip `set -e` before we log it.
-if "${TIMEOUT[@]}" "${QEMU_ARGV[@]}" >> "$TRANSCRIPT" 2>&1; then rc=0; else rc=$?; fi
+if "${TIMEOUT[@]}" "${QEMU_ARGV[@]}" </dev/null >> "$TRANSCRIPT" 2>&1; then rc=0; else rc=$?; fi
 elapsed=$(( $(date +%s) - start ))
 echo "### exec/qemu exit=$rc elapsed=${elapsed}s" >> "$TRANSCRIPT"
 
