@@ -64,19 +64,38 @@ FSTAB
     install_autorun "$mp"
 }
 
+# Reinstall autorun into an existing image and VERIFY the new copy landed
+# (grep a marker unique to the current autorun.sh, so a failed/stale refresh is
+# caught rather than silently reported as success). Returns nonzero on failure.
+refresh_autorun() {
+    command -v losetup >/dev/null 2>&1 || { echo "losetup missing"; return 1; }
+    local loop mp rc=0
+    loop=$(sudo losetup --find --show --partscan "$DISK_IMG") || return 1
+    sleep 1; mp="$(mktemp -d)"
+    if sudo mount "${loop}p1" "$mp"; then
+        install_autorun "$mp" || rc=1
+        sudo grep -q 'HB autorun:' "$mp/usr/local/bin/pks-autorun.sh" 2>/dev/null || { echo "autorun marker not found after install"; rc=1; }
+        sudo umount "$mp" 2>/dev/null || true
+    else
+        rc=1
+    fi
+    sudo losetup -d "$loop" 2>/dev/null || true; rmdir "$mp" 2>/dev/null || true
+    return $rc
+}
+
+IMG_SZ="$(du -h "$DISK_IMG" 2>/dev/null | cut -f1)"
 if [ ! -f "$DISK_IMG" ]; then
     log_info "[disk] provisioning $SUITE image (one-time, slow)..."
     start=$(date +%s)
-    provision >> "$RAW" 2>&1
+    provision >> "$RAW" 2>&1            # set -e aborts loudly on real failure
     log_done "[disk] provisioned in $(( $(date +%s) - start ))s"
+    emit_status disk all PASS provisioned=yes image="$(du -h "$DISK_IMG" 2>/dev/null | cut -f1)" | tee "$DIR/result.log"
 else
     log_done "[disk] image present; refreshing autorun only."
-    if command -v losetup >/dev/null 2>&1; then
-        loop=$(sudo losetup --find --show --partscan "$DISK_IMG"); sleep 1
-        mp="$(mktemp -d)"; sudo mount "${loop}p1" "$mp"
-        install_autorun "$mp" >> "$RAW" 2>&1 || true
-        sudo umount "$mp" 2>/dev/null || true; sudo losetup -d "$loop" 2>/dev/null || true; rmdir "$mp" 2>/dev/null || true
+    if refresh_autorun >> "$RAW" 2>&1; then
+        emit_status disk all PASS refreshed=yes image="$IMG_SZ" | tee "$DIR/result.log"
+    else
+        emit_status disk all FAIL note=autorun_refresh_failed image="$IMG_SZ" | tee "$DIR/result.log"
+        die "autorun refresh failed; see $RAW"
     fi
 fi
-
-emit_status disk all PASS image="$(du -h "$DISK_IMG" 2>/dev/null | cut -f1)" | tee "$DIR/result.log"

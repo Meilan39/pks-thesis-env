@@ -69,5 +69,14 @@ log_info "[exec/qemu] boot kernel=$KVAR mode=$MODE target=$TARGET -> $(basename 
 "${TIMEOUT[@]}" "$QEMU_BIN" "${COMMON_ARGS[@]}" -no-reboot -serial stdio -monitor none \
     -append "$CMDLINE" > "$TRANSCRIPT" 2>&1 || true
 
-grep -q '^STATUS ' "$TRANSCRIPT" 2>/dev/null \
-    || log_warn "[exec/qemu] no STATUS lines in transcript (boot failure or panic before first result)."
+if ! grep -q '^STATUS ' "$TRANSCRIPT" 2>/dev/null; then
+    sz=$(wc -c < "$TRANSCRIPT" 2>/dev/null || echo 0)
+    log_warn "[exec/qemu] no STATUS lines in transcript (${sz} bytes: $(basename "$TRANSCRIPT"))."
+    if [ "$sz" -lt 200 ]; then
+        log_warn "[exec/qemu] transcript nearly empty -> QEMU likely failed to start. Contents:"
+        sed 's/^/    | /' "$TRANSCRIPT" >&2
+    else
+        log_warn "[exec/qemu] guest booted but emitted no result. Last 20 transcript lines:"
+        tail -n 20 "$TRANSCRIPT" | sed 's/^/    | /' >&2
+    fi
+fi
