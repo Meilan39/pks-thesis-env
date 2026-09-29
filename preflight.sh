@@ -6,7 +6,8 @@ set -euo pipefail
 ENV_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$ENV_DIR/common.sh"
 
-RAW_DIR="$ENV_DIR/results/raw"
+# Top-level summaries/provenance live directly under results/ (no raw/ tree).
+RAW_DIR="$ENV_DIR/results"
 mkdir -p "$RAW_DIR"
 
 # 1. Host dependencies (hard requirement).
@@ -43,4 +44,4 @@ EOF
 
 # Export the substrate so downstream STATUS lines can stamp it.
 echo "$substrate" > "$RAW_DIR/.substrate"
-log_done "Preflight recorded ($substrate) -> results/raw/preflight.json"
+log_done "Preflight recorded ($substrate) -> results/preflight.json"

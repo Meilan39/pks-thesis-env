@@ -3,9 +3,16 @@ build_*/
 images/*.img
 
 # Generated evaluation artifacts.
-results/raw/*
+# Top-level summaries + provenance.
+results/*.log
+results/*.json
+results/.substrate
 results/data/*
+# In-tree raw + rolled-up results (raw next to producers; result.log per node).
 **/result.log
+**/raw.log
+**/raw-*.log
+**/raw/
 
 # Compiled in-guest binaries (rebuilt lazily by each leaf run.sh).
 test/fsx/fsx

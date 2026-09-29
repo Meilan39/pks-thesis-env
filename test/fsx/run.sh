@@ -6,7 +6,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/../.." && pwd)"; source "
 VAR="${1:-on}"; BIN="$DIR/fsx"
 [ -x "$BIN" ] || { [ -f "$DIR/fsx.c" ] && gcc -O2 -Wall -D_GNU_SOURCE -o "$BIN" "$DIR/fsx.c" 2>/dev/null || true; }
 TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
-OUT="$ROOT/results/raw/json/$VAR"; mkdir -p "$OUT" 2>/dev/null || true
+OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true
 LOG="$OUT/fsx.log"; F="$TGT/fsx_${VAR}.dat"; rm -f "$F"
 rc=0
 if [ -x "$BIN" ]; then "$BIN" -N 10000 -q "$F" > "$LOG" 2>&1; rc=$?; else rc=127; fi

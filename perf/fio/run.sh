@@ -6,7 +6,7 @@ set -u
 DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/../.." && pwd)"; source "$ROOT/common.sh"
 VAR="${1:-on}"
 TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
-OUT="$ROOT/results/raw/json/$VAR/fio"; mkdir -p "$OUT" 2>/dev/null || true
+OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true
 if ! command -v fio >/dev/null 2>&1; then emit_status fio "$VAR" FAIL note=fio_missing; exit 0; fi
 SIZES="512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576"
 

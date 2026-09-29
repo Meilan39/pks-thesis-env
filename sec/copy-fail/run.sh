@@ -7,7 +7,7 @@ DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/../.." && pwd)"; source "
 VAR="${1:-on}"; EXP="$DIR/exp"
 TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
 VICTIM="$TGT/victim_file"; MARK="PKS_CLEAN_MARKER_31431_DO_NOT_OVERWRITE"
-OUT="$ROOT/results/raw/json/$VAR"; mkdir -p "$OUT" 2>/dev/null || true; LOG="$OUT/copy-fail.log"
+OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true; LOG="$OUT/copy-fail.log"
 
 printf '%s\n' "$MARK" > "$VICTIM"; sync; echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
 emit_status copy-fail "$VAR" PENDING phase=pre_trigger   # safety net should it panic

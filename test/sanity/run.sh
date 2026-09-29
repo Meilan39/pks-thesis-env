@@ -5,7 +5,7 @@ set -u
 DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/../.." && pwd)"; source "$ROOT/common.sh"
 VAR="${1:-on}"; BIN="$DIR/pks_sanity_test"
 [ -x "$BIN" ] || { [ -f "$DIR/pks_sanity_test.c" ] && gcc -O2 -Wall -o "$BIN" "$DIR/pks_sanity_test.c" 2>/dev/null || true; }
-OUT="$ROOT/results/raw/json/$VAR"; mkdir -p "$OUT" 2>/dev/null || true
+OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true
 LOG="$OUT/sanity.log"
 if [ -x "$BIN" ]; then "$BIN" > "$LOG" 2>&1 || true; fi
 p=$(grep -c '\[PASS\]' "$LOG" 2>/dev/null || echo 0)

@@ -9,12 +9,12 @@ DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/.." && pwd)"
 source "$ROOT/common.sh"
 EXEC="$ROOT/exec/${EXECUTOR:-qemu}.sh"
 LEAVES=(pks-unit sanity fsx pjd)
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 
 for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; done
 
+# One consolidated boot per mode; its transcript is axis-level (all leaves share it).
 for mode in off on; do
-    T="$ROOT/results/raw/test-${mode}-${STAMP}.log"
+    T="$DIR/raw-${mode}.log"
     "$EXEC" sec "$mode" test "$T"
     for l in "${LEAVES[@]}"; do harvest_node "$T" "$l" "$DIR/$l/result.log"; done
 done

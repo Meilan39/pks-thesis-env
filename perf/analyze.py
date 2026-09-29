@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """perf/analyze.py - Synthesize the performance summary from HARVESTED JSON.
 
-Reads results/raw/json/<variant>/... produced by the perf leaves and computes
-relative overhead of the mitigated kernel (on) against the baseline (control),
-with the ablation (off) shown alongside. No values are hardcoded; a metric with
-no data is written as empty. Usage: analyze.py <json_root> <out_csv>
+Reads leaf-local JSON at perf/<leaf>/raw/<variant>/... produced by the perf
+leaves and computes relative overhead of the mitigated kernel (on) against the
+baseline (control), with the ablation (off) shown alongside. No values are
+hardcoded; a metric with no data is written as empty.
+Usage: analyze.py <perf_dir> <out_csv>
 """
 import csv
 import json
@@ -21,16 +22,16 @@ def load(path):
         return None
 
 
-def fio_lat_us(root, variant, name, op):
-    d = load(root / variant / "fio" / f"{name}.json")
+def fio_lat_us(perf_dir, variant, name, op):
+    d = load(perf_dir / "fio" / "raw" / variant / f"{name}.json")
     try:
         return d["jobs"][0][op]["lat_ns"]["mean"] / 1000.0
     except Exception:
         return None
 
 
-def sqlite_tps(root, variant, mode):
-    d = load(root / variant / f"sqlite_{mode}.json")
+def sqlite_tps(perf_dir, variant, mode):
+    d = load(perf_dir / "sqlite" / "raw" / variant / f"sqlite_{mode}.json")
     try:
         return float(d["tps"])
     except Exception:
@@ -44,16 +45,16 @@ def overhead(base, on):
 
 
 def main():
-    root = Path(sys.argv[1] if len(sys.argv) > 1 else "results/raw/json")
+    perf_dir = Path(sys.argv[1] if len(sys.argv) > 1 else ".")
     out = Path(sys.argv[2] if len(sys.argv) > 2 else "results/data/perf_summary.csv")
     out.parent.mkdir(parents=True, exist_ok=True)
 
     metrics = [
-        ("fio 4KB warm", "Write Lat (us)", lambda v: fio_lat_us(root, v, "write_warm_4096", "write")),
-        ("fio 4KB warm", "Read Lat (us)",  lambda v: fio_lat_us(root, v, "read_warm_4096", "read")),
-        ("fio 4KB cold", "Write Lat (us)", lambda v: fio_lat_us(root, v, "write_cold_4096", "write")),
-        ("sqlite",       "Tx/s (sync=OFF)",  lambda v: sqlite_tps(root, v, "OFF")),
-        ("sqlite",       "Tx/s (sync=FULL)", lambda v: sqlite_tps(root, v, "FULL")),
+        ("fio 4KB warm", "Write Lat (us)", lambda v: fio_lat_us(perf_dir, v, "write_warm_4096", "write")),
+        ("fio 4KB warm", "Read Lat (us)",  lambda v: fio_lat_us(perf_dir, v, "read_warm_4096", "read")),
+        ("fio 4KB cold", "Write Lat (us)", lambda v: fio_lat_us(perf_dir, v, "write_cold_4096", "write")),
+        ("sqlite",       "Tx/s (sync=OFF)",  lambda v: sqlite_tps(perf_dir, v, "OFF")),
+        ("sqlite",       "Tx/s (sync=FULL)", lambda v: sqlite_tps(perf_dir, v, "FULL")),
     ]
 
     rows = []

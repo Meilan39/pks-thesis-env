@@ -4,7 +4,7 @@ set -euo pipefail
 
 TARGET_DIR="${1:-/mnt/protected}"
 SYNC_MODE="${2:-FULL}"
-OUTPUT_JSON="${3:-/mnt/protected/bench_results/raw/sqlite_${SYNC_MODE}.json}"
+OUTPUT_JSON="${3:-/tmp/sqlite_${SYNC_MODE}.json}"  # always overridden by run.sh
 TX_COUNT="${4:-5000}"
 
 command -v sqlite3 >/dev/null 2>&1 || { echo "[WARN] sqlite3 not found, skipping."; exit 0; }

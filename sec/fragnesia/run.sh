@@ -10,7 +10,7 @@ VAR="${1:-on}"; BIN="$DIR/exp"
 [ -x "$BIN" ] || { [ -f "$DIR/exp.c" ] && gcc -O2 -Wall -pthread -o "$BIN" "$DIR/exp.c" 2>/dev/null || true; }
 TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
 VICTIM="$TGT/victim_file"; MARK="PKS_CLEAN_MARKER_fragnesia_DO_NOT_OVERWRITE"
-OUT="$ROOT/results/raw/json/$VAR"; mkdir -p "$OUT" 2>/dev/null || true; LOG="$OUT/fragnesia.log"
+OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true; LOG="$OUT/fragnesia.log"
 
 printf '%s\n' "$MARK" > "$VICTIM"; sync; echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
 emit_status fragnesia "$VAR" PENDING phase=pre_trigger   # panic under 'on' -> host resolves

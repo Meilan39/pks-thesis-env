@@ -12,7 +12,7 @@ SHELL := /bin/bash
 export DEV_KERNEL_DIR CONTROL_KERNEL_DIR DISK_IMG DISK_SIZE ROOTFS_SIZE
 export DEBIAN_SUITE DEBIAN_ARCH DEBIAN_MIRROR EXECUTOR QEMU_BIN SMP MEM BATCH_TIMEOUT_SEC
 
-$(shell mkdir -p results/raw/json results/data images)
+$(shell mkdir -p results/data images)
 
 .PHONY: help preflight build disk test sec perf run-qemu end-qemu \
         clean clean-results clean-image clean-all
@@ -66,10 +66,10 @@ clean:
 	@echo "[clean] removed compiled evaluation binaries."
 
 clean-results:
-	@rm -rf results/build.log results/disk.log results/test.log results/sec.log results/perf.log \
-	        results/raw/* results/data/* build/result.log disk/result.log \
-	        {test,sec,perf,build}/*/result.log {test,sec,perf,build}/result.log 2>/dev/null || true
-	@echo "[clean-results] removed logs, result.logs, raw transcripts, and CSVs."
+	@rm -rf results/*.log results/*.json results/.substrate results/data/* 2>/dev/null || true
+	@find build disk test sec perf \( -name 'result.log' -o -name 'raw.log' -o -name 'raw-*.log' -o -name raw \) \
+	        -exec rm -rf {} + 2>/dev/null || true
+	@echo "[clean-results] removed summaries, result.logs, raw transcripts, and per-leaf raw/ dirs."
 
 clean-image:
 	@rm -f images/disk.img

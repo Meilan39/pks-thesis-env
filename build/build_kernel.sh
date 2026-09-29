@@ -15,7 +15,7 @@ build_kernel() {
 
     local out="$kdir/build_${variant}"
     local jobs="${BUILD_JOBS:-$(nproc 2>/dev/null || echo 4)}"
-    local rawlog="$root/results/raw/build-${variant}.log"
+    local rawlog="$root/build/${variant}/raw.log"
     mkdir -p "$(dirname "$rawlog")"
 
     require_cmds make gcc bc flex bison

@@ -9,14 +9,14 @@ DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/.." && pwd)"
 source "$ROOT/common.sh"
 EXEC="$ROOT/exec/${EXECUTOR:-qemu}.sh"
 LEAVES=(fio concurrency sqlite)
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 
 for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; done
 
+# One consolidated boot per variant; its transcript is axis-level.
 # variant  kernel_variant  pks_mode
 run_variant() {
     local label="$1" kvar="$2" mode="$3"
-    local T="$ROOT/results/raw/perf-${label}-${STAMP}.log"
+    local T="$DIR/raw-${label}.log"
     "$EXEC" "$kvar" "$mode" perf "$T"
     local l; for l in "${LEAVES[@]}"; do harvest_node "$T" "$l" "$DIR/$l/result.log"; done
 }
@@ -27,5 +27,6 @@ run_variant on      perf    on
 for l in "${LEAVES[@]}"; do mark_empty_leaves all "$DIR/$l/result.log"; done
 rollup "$DIR/result.log" perf "$DIR"/*/result.log
 rc=$?
-python3 "$DIR/analyze.py" "$ROOT/results/raw/json" "$ROOT/results/data/perf_summary.csv" || true
+# JSON now lives leaf-local at perf/<leaf>/raw/<variant>/; analyze reads from there.
+python3 "$DIR/analyze.py" "$DIR" "$ROOT/results/data/perf_summary.csv" || true
 exit $rc

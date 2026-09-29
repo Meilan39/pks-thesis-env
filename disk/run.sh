@@ -13,7 +13,7 @@ DISK_IMG="${DISK_IMG:-$ROOT/images/disk.img}"
 DISK_SIZE="${DISK_SIZE:-8G}"; ROOTFS_SIZE="${ROOTFS_SIZE:-6G}"
 SUITE="${DEBIAN_SUITE:-bookworm}"; ARCH="${DEBIAN_ARCH:-amd64}"
 MIRROR="${DEBIAN_MIRROR:-http://deb.debian.org/debian}"
-RAW="$ROOT/results/raw/disk.log"; mkdir -p "$(dirname "$RAW")" "$ROOT/images"
+RAW="$DIR/raw.log"; mkdir -p "$ROOT/images"
 
 install_autorun() {  # $1 = mounted root
     sudo cp "$ROOT/guest/autorun.sh" "$1/usr/local/bin/pks-autorun.sh"

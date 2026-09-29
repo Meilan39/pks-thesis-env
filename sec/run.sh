@@ -11,13 +11,13 @@ DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/.." && pwd)"
 source "$ROOT/common.sh"
 EXEC="$ROOT/exec/${EXECUTOR:-qemu}.sh"
 LEAVES=(copy-fail dirty-frag fragnesia)
-STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 
 for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; done
 
+# One boot per (leaf, mode); the transcript is leaf-local (panic isolation).
 for l in "${LEAVES[@]}"; do
     for mode in off on; do
-        T="$ROOT/results/raw/sec-${l}-${mode}-${STAMP}.log"
+        T="$DIR/$l/raw-${mode}.log"
         "$EXEC" sec "$mode" "sec/$l" "$T"
         classify_sec "$T" "$l" "$mode" "$DIR/$l/result.log"
     done
