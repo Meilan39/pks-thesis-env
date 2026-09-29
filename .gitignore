@@ -1,2 +1,18 @@
+# Kernel build trees live in the external source dirs, never committed.
 build_*/
 images/*.img
+
+# Generated evaluation artifacts.
+results/raw/*
+results/data/*
+**/result.log
+
+# Compiled in-guest binaries (rebuilt lazily by each leaf run.sh).
+test/fsx/fsx
+test/pjd/pjdfstest
+test/sanity/pks_sanity_test
+test/pks-unit/test_pks
+sec/dirty-frag/exp
+sec/fragnesia/exp
+
+__pycache__/

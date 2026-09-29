@@ -1,123 +1,96 @@
 # PKS Page-Cache Protection Evaluation Testbed (`pks-thesis-env`)
 
-This repository provides a modular, reproducible evaluation testbed for Supervisor Protection Keys (PKS) page-cache isolation in the Linux kernel (`v5.18-rc3`).
+A reproducible, modular testbed for evaluating Supervisor Protection Keys (PKS)
+page-cache isolation in the Linux kernel. It builds three guest kernels,
+provisions a persistent Debian image, and runs three evaluation axes
+(compliance, security, performance) headlessly under QEMU, **harvesting every
+verdict from observed guest behaviour — nothing is hardcoded or simulated.**
 
-The workflow is orchestrated from the top-level [Makefile](file:///Users/meilan/Documents/大学/3年前期/研究/卒論/pks-thesis-env/Makefile), featuring headless batch execution, direct 9p workspace mounting, automatic result harvesting, interactive debugging consoles, unified logging with `tee`, and decoupled publication figure generation.
+## Layout: a self-similar tree
 
----
+Every node is a directory with a `run.sh` and a generated `result.log`.
 
-## Directory Layout
-
-```text
+```
 pks-thesis-env/
-├── Makefile                        # Unified command orchestrator matching environment-2.tex
-├── config.mk                       # Static paths, VM memory sizing, and CPU allocation
-│
-├── tests/                          # Unit and compliance validation workloads
-│   ├── Makefile                    # Sub-directory aggregator (make all, make clean)
-│   ├── pks-unit/                   # Upstream x86 PKS architectural selftest
-│   ├── sanity/                     # PKS page-cache scoping & debugfs integrity test
-│   ├── fsx/                        # Filesystem exerciser stress harness (10K ops)
-│   └── pjd/                        # POSIX filesystem compliance test suite
-│
-├── sec/                            # Security vulnerability exploit harnesses
-│   ├── Makefile                    # Sub-directory aggregator (make all, make clean)
-│   ├── copy-fail/                  # CVE-2026-31431 exploit harness (AF_ALG splice)
-│   ├── dirty-frag/                 # CVE-2026-43284 exploit harness (IPv4 fragment assembly)
-│   └── fragnesia/                  # CVE-2026-46300 exploit harness (IPSec ESPINTCP)
-│
-├── perf/                           # Performance evaluation benchmarks
-│   ├── Makefile                    # Sub-directory aggregator (make all, make clean)
-│   ├── fio/                        # Micro-benchmark: block-size latency/throughput sweeps
-│   ├── concurrency/                # Micro-benchmark: multithreaded scalability sweeps
-│   └── sqlite/                     # Macro-benchmark: transactional database workload
-│
-├── scripts/                        # Lean, single-purpose host automation scripts
-│   ├── common.sh                   # Shared console formatting and status print helpers
-│   ├── compile-all.sh              # Single loop calling 'make all' across tests/, sec/, perf/
-│   ├── clean-all.sh                # Single loop calling 'make clean' across tests/, sec/, perf/
-│   ├── build/                      # Kernel build automation (sec, perf, control)
-│   ├── disk/                       # Virtual disk lifecycle (provision, update, compile)
-│   ├── run/                        # Virtual machine runners and test dispatchers
-│   ├── data/                       # Telemetry extraction and report synthesis
-│   └── guest-autorun/              # Headless in-guest systemd autorun service
-│
-├── results/                        # Clean, structured evaluation artifacts
-│   ├── build.log                   # Full log for make build
-│   ├── test.log                    # Full log for make test
-│   ├── sec.log                     # Full log for make sec
-│   ├── perf.log                    # Full log for make perf
-│   ├── raw/                        # Granular per-target execution logs and JSONs
-│   └── data/                       # Canonical summarized deliverables
-│       ├── test_summary.csv        # Compliance and sanity test verdict summary
-│       ├── sec_summary.csv         # Neutralization verdict matrix across all 3 exploits
-│       └── perf_summary.csv        # Normalized tidy metrics dataset for all sweeps
-│
-└── tools/                          # Decoupled offline analysis and publication graphics
-    └── plotting/
-        ├── Makefile                # Standalone figure rendering makefile
-        ├── plot_thesis_figures.py  # Generates Figures 1-5 and Table 1 TOST
-        ├── requirements.txt        # Python dependencies (matplotlib, pandas, scipy)
-        └── figures/                # Output PDF and PNG vector graphics
+├── Makefile          # 5 verbs: build, disk, test, sec, perf
+├── config.mk         # kernel paths, disk sizes, SMP/MEM, EXECUTOR
+├── common.sh         # logging + the STATUS contract + harvest/rollup helpers
+├── preflight.sh      # deps + substrate detection + provenance
+├── configs/          # kconfig fragments: common, sec, perf, control
+├── exec/             # substrate adapters: qemu.sh (now), baremetal.sh (stub)
+├── guest/            # in-guest autorun.sh + autorun.service
+├── build/  run.sh  result.log   {control,sec,perf}/run.sh   # 3 kernels
+├── disk/   run.sh  result.log                               # provision + autorun
+├── test/   run.sh  result.log   {pks-unit,sanity,fsx,pjd}/  # compliance
+├── sec/    run.sh  result.log   {copy-fail,dirty-frag,fragnesia}/  # exploits
+├── perf/   run.sh  result.log   {fio,concurrency,sqlite}/ + analyze.py
+├── results/  raw/ (timestamped transcripts + JSON) + data/ (CSVs) + <verb>.log
+└── tools/plotting/   # offline figures/TOST, consumes results/data/perf_summary.csv
 ```
 
----
+Note the deliberate, documented name reuse: `build/sec/` **builds the diagnostic
+kernel**; top-level `sec/` **runs the exploits**.
 
-## Quick Reference: `make help`
-
-Run `make help` to inspect all available targets:
-
-| Category | Command | Description |
-| :--- | :--- | :--- |
-| **Primary Workflow** | `make build` | Compile kernels, provision disk, compile test harnesses |
-| | `make test` | Execute compliance & integrity test suite (off & on) |
-| | `make sec` | Execute 3-way exploit neutralization evaluation |
-| | `make perf` | Execute full A/B performance benchmark sweeps |
-| **Granular Build** | `make build-sec` | Compile security diagnostic kernel |
-| | `make build-perf` | Compile performance mitigated kernel |
-| | `make build-control` | Compile baseline pristine upstream Linux v5.18-rc3 |
-| | `make disk-provision`| Bootstrap Debian Bookworm and partition `images/disk.img` |
-| | `make disk-update` | Synchronize `/pks-thesis-env` into virtual disk image |
-| | `make compile` | Compile all in-guest evaluation binaries |
-| | `make run-qemu` | Launch interactive serial debugging console |
-| | `make end-qemu` | Terminate all active QEMU instances |
-| **Granular Compliance** | `make pks-unit-[off\|on]` | Architectural MSR/CPUID PKS unit selftest |
-| | `make sanity-[off\|on]` | PKS page-cache scoping & debugfs test |
-| | `make fsx-[off\|on]` | Filesystem exerciser (10,000 random operations) |
-| | `make pjd-[off\|on]` | POSIX filesystem compliance suite |
-| | `make test-[off\|on]` | Consolidated single-boot compliance suite |
-| | `make analyze-test` | Synthesize compliance evaluation report (`results/data/test_summary.csv`) |
-| **Granular Security** | `make copy-fail-[off\|on]` | CVE-2026-31431 AF_ALG splice exploit |
-| | `make dirty-frag-[off\|on]` | CVE-2026-43284 IPv4 fragment reassembly exploit |
-| | `make fragnesia-[off\|on]` | CVE-2026-46300 IPSec ESPINTCP workqueue exploit |
-| | `make sec-[off\|on]` | Execute all 3 exploit vectors under specified mode |
-| | `make analyze-sec` | Synthesize 3-way exploit neutralization matrix (`results/data/sec_summary.csv`) |
-| **Benchmarking** | `make fio-[control\|off\|on]-[warm\|cold]` | Amortized block sweep (512B - 1MB) |
-| | `make concurrency-[control\|off\|on]` | Multithreaded scaling (1, 2, 4 threads) |
-| | `make sqlite-[control\|off\|on]` | SQLite rollback journal macrobenchmark |
-| | `make perf-[control\|off\|on]` | Execute complete benchmark suite on specified variant |
-| | `make analyze-perf` | Synthesize normalized A/B performance summary (`results/data/perf_summary.csv`) |
-| **Housekeeping** | `make clean` | Remove compiled test binaries across `tests/`, `sec/`, `perf/` |
-| | `make clean-results` | Remove execution logs and generated CSV datasets |
-| | `make clean-image` | Remove `images/disk.img` container |
-| | `make clean-all` | Reset workspace to pristine state (kernel images preserved) |
-
----
-
-## Decoupled Offline Plotting
-
-Figure and table generation is completely decoupled from the testbed evaluation environment. It consumes `results/data/perf_summary.csv` purely as input data:
+## Quick start
 
 ```bash
-cd tools/plotting
-make deps       # Install pandas, matplotlib, scipy
-make all        # Generate Figures 1-5 and Table 1 (TOST)
+make build      # compile control, sec, perf kernels (external trees; see config.mk)
+make disk       # provision images/disk.img ONCE (skipped if it exists) + install autorun
+make test       # compliance suite, off & on
+make sec        # exploit neutralization, off & on
+make perf       # fio / concurrency / sqlite across control, off, on
+
+make run-qemu VARIANT=perf MODE=on   # interactive serial console for debugging
 ```
 
-Generated publication artifacts are placed into `tools/plotting/figures/`:
-- `fig1_warm_latency_sweep.pdf` & `.png`
-- `fig2_cold_latency_sweep.pdf` & `.png`
-- `fig3_throughput_comparison.pdf` & `.png`
-- `fig4_concurrency_scaling.pdf` & `.png`
-- `fig5_sqlite_macrobenchmark.pdf` & `.png`
-- `table1_tost_equivalence.tex`
+Granular runs: call any subtree's `run.sh` directly, e.g. `./sec/copy-fail/run.sh`,
+`./perf/fio/run.sh`, `./build/sec/run.sh`. This replaces the old flat list of
+per-target Makefile rules.
+
+## The node contract (how results flow up)
+
+A **leaf** `run.sh` performs its work and prints, on stdout, one line per result:
+
+```
+STATUS node=<name> variant=<control|off|on> verdict=<PASS|FAIL|NEUTRALIZED|VULNERABLE|PENDING> [k=v]...
+```
+
+`PASS`/`NEUTRALIZED` are passing; `FAIL`/`VULNERABLE` are failing; `PENDING` is
+emitted just before a possibly-fatal step and resolved later by the host.
+
+An **aggregator** `run.sh` boots the guest via `exec/$(EXECUTOR).sh`, captures the
+serial transcript, harvests the leaf STATUS lines from it, writes each leaf's
+`result.log`, and appends a rollup line to its own `result.log` — exiting nonzero
+if any child failed. Two artifacts are kept, never conflated: `result.log`
+(parsed, latest, rolled up) and `results/raw/**` (timestamped transcripts + JSON).
+
+Because the transport is the **live serial stream**, a fail-closed kernel panic
+(the intended `on` outcome for the softirq/workqueue exploits) is captured before
+the VM dies. `classify_sec()` resolves a security leaf as: a final STATUS wins;
+otherwise a PKS-attributable panic (`PKS_PANIC_REGEX` + `PKS_ACTIVE_REGEX`, both
+overridable in `config.mk`) is a neutralization; anything else is an inconclusive
+`FAIL`. Verdicts are always observations, never functions of the input flag.
+
+## Security causality
+
+Each exploit leaf writes a unique marker to the victim file, drops caches to force
+a real page-cache re-fault, runs the PoC, and compares the marker back:
+- `off` → marker altered → `VULNERABLE` (proves the exploit is real);
+- `on`, syscall context (copy-fail) → write trapped as `-EFAULT`, marker intact → `NEUTRALIZED`;
+- `on`, softirq/workqueue context (dirty-frag, fragnesia) → unhandled supervisor
+  fault → **kernel panic**; the faulting store never lands, so the panic itself
+  (with PKS active) is the neutralization, harvested from the serial transcript.
+
+## Substrate & provenance
+
+`preflight.sh` detects `kvm-pks` / `kvm-nopks` / `tcg` and records host kernel,
+CPU, QEMU version and substrate to `results/raw/preflight.json`. The workload tree
+and the STATUS contract are substrate-agnostic: moving to a PKS-capable server is a
+one-line `EXECUTOR` change (implement `exec/baremetal.sh` against the same
+contract) with zero changes to `build/ test/ sec/ perf/`.
+
+## Kernel builds are deterministic and preserved
+
+Each kernel is `defconfig` + `kvm_guest.config` + the checked-in fragments in
+`configs/` merged via `scripts/kconfig/merge_config.sh`. Cleanup targets never
+touch the external kernel build trees (the preservation invariant).

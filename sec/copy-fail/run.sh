@@ -1,36 +1,24 @@
 #!/usr/bin/env bash
-# sec/copy-fail/run.sh - In-guest CVE-2026-31431 AF_ALG splice exploit runner
+# sec/copy-fail/run.sh - CVE-2026-31431 AF_ALG splice. Syscall context, so under
+# PKS the stray write is trapped as -EFAULT and the VM survives to self-report.
+# Verdict is the CAUSAL comparison of the victim marker before vs after.
 set -u
+DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/../.." && pwd)"; source "$ROOT/common.sh"
+VAR="${1:-on}"; EXP="$DIR/exp"
+TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
+VICTIM="$TGT/victim_file"; MARK="PKS_CLEAN_MARKER_31431_DO_NOT_OVERWRITE"
+OUT="$ROOT/results/raw/json/$VAR"; mkdir -p "$OUT" 2>/dev/null || true; LOG="$OUT/copy-fail.log"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-EXP_BIN="$SCRIPT_DIR/exp"
+printf '%s\n' "$MARK" > "$VICTIM"; sync; echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+emit_status copy-fail "$VAR" PENDING phase=pre_trigger   # safety net should it panic
+erc=0
+if [ -f "$EXP" ]; then python3 "$EXP" "$VICTIM" > "$LOG" 2>&1; erc=$?; else erc=127; fi
+sync; echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+after="$(head -c 256 "$VICTIM" 2>/dev/null)"
 
-MODE="${1:-}"
-if [ -z "$MODE" ]; then
-    if grep -q "pcache_pks=off" /proc/cmdline 2>/dev/null; then
-        MODE="off"
-    else
-        MODE="on"
-    fi
-fi
-
-TARGET_DIR="/mnt/protected"
-[ -d "$TARGET_DIR" ] || TARGET_DIR="/tmp"
-VICTIM="$TARGET_DIR/victim_file"
-
-LOG_DIR="/mnt/protected/exploit_results"
-mkdir -p "$LOG_DIR" 2>/dev/null || true
-
-# Setup victim file
-echo "PKS_ORIGINAL_CLEAN_PAGE_CACHE_PAYLOAD" > "$VICTIM"
-
-if [ -x "$EXP_BIN" ]; then
-    python3 "$EXP_BIN" "$VICTIM" > "$LOG_DIR/copy-fail-${MODE}.log" 2>&1 || true
-fi
-
-if [ "$MODE" = "on" ]; then
-    echo "[copy-fail-on]   AF_ALG splice out-of-bounds corruption... NEUTRALIZED (Trapped -EFAULT)"
+if printf '%s' "$after" | grep -qF "$MARK"; then
+    if [ "$VAR" = on ]; then emit_status copy-fail "$VAR" NEUTRALIZED marker=intact rc="$erc" signal=trapped
+    else                     emit_status copy-fail "$VAR" FAIL marker=intact note=baseline_not_corrupted rc="$erc"; fi
 else
-    echo "[copy-fail-off]  AF_ALG splice out-of-bounds corruption... VULNERABLE (Corrupted)"
+    emit_status copy-fail "$VAR" VULNERABLE marker=altered rc="$erc"
 fi
-echo ""

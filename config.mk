@@ -1,37 +1,28 @@
 # ==============================================================================
-# config.mk - Centralized configuration for PKS Thesis Evaluation Environment
-# ==============================================================================
-# Variables defined here can be overridden via command line or environment.
-# Example: make perf-on SMP=8 MEM=8192
+# config.mk - Static configuration for the PKS evaluation testbed.
+# Override on the command line or environment, e.g.  make perf SMP=8 MEM=8192
 # ==============================================================================
 
-# Kernel source trees
+# Kernel source trees (external, version-agnostic). Builds output to
+# $(TREE)/build_{sec,perf,control}/arch/x86/boot/bzImage.
 DEV_KERNEL_DIR     ?= $(HOME)/src/linux-pks-thesis
 CONTROL_KERNEL_DIR ?= $(HOME)/src/linux-pks-thesis-control
 
-# Storage configuration
+# Persistent guest disk image.
 DISK_IMG           ?= $(CURDIR)/images/disk.img
 DISK_SIZE          ?= 8G
 ROOTFS_SIZE        ?= 6G
-PROT_SIZE          ?= 2G
 
-# Debootstrap distribution settings
+# Debootstrap settings (only consulted when the image is first provisioned).
 DEBIAN_SUITE       ?= bookworm
 DEBIAN_ARCH        ?= amd64
 DEBIAN_MIRROR      ?= http://deb.debian.org/debian
 
-# Directory structure
-TESTS_DIR          ?= $(CURDIR)/tests
-SEC_DIR            ?= $(CURDIR)/sec
-PERF_DIR           ?= $(CURDIR)/perf
-SCRIPTS_DIR        ?= $(CURDIR)/scripts
-IMAGES_DIR         ?= $(CURDIR)/images
-RESULTS_DIR        ?= $(CURDIR)/results
-TOOLS_DIR          ?= $(CURDIR)/tools
+# Execution substrate. `qemu` today; `baremetal` is the future PKS-host adapter.
+EXECUTOR           ?= qemu
 
-# QEMU runtime configuration
+# QEMU runtime.
 QEMU_BIN           ?= qemu-system-x86_64
 SMP                ?= 4
 MEM                ?= 4096
-CONSOLE            ?= ttyS0
 BATCH_TIMEOUT_SEC  ?= 300
