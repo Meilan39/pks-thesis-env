@@ -19,7 +19,7 @@ if [ -f "$EXP" ]; then python3 "$EXP" "$VICTIM" > "$LOG" 2>&1; erc=$?; else erc=
 after="$(head -c 256 "$VICTIM" 2>/dev/null)"
 
 if printf '%s' "$after" | grep -qF "$MARK"; then
-    if [ "$VAR" = on ]; then emit_status copy-fail "$VAR" NEUTRALIZED marker=intact rc="$erc" signal=trapped
+    if [ "$VAR" = on ]; then emit_status copy-fail "$VAR" NEUTRALIZED marker=intact rc="$erc" note=trapped
     else                     emit_status copy-fail "$VAR" FAIL marker=intact note=baseline_not_corrupted rc="$erc"; fi
 else
     emit_status copy-fail "$VAR" VULNERABLE marker=altered rc="$erc"

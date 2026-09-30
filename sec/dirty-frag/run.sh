@@ -19,7 +19,7 @@ if [ -x "$BIN" ]; then "$BIN" > "$LOG" 2>&1 || true; fi   # may never return
 after="$(head -c 256 "$VICTIM" 2>/dev/null)"
 
 if printf '%s' "$after" | grep -qF "$MARK"; then
-    if [ "$VAR" = on ]; then emit_status dirty-frag "$VAR" NEUTRALIZED marker=intact signal=trapped
+    if [ "$VAR" = on ]; then emit_status dirty-frag "$VAR" NEUTRALIZED marker=intact note=trapped
     else                     emit_status dirty-frag "$VAR" FAIL marker=intact note=baseline_not_corrupted; fi
 else
     emit_status dirty-frag "$VAR" VULNERABLE marker=altered

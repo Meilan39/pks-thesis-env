@@ -12,7 +12,9 @@ source "$ROOT/common.sh"
 EXEC="$ROOT/exec/${EXECUTOR:-qemu}.sh"
 LEAVES=(copy-fail dirty-frag fragnesia)
 
-for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; done
+# Start clean: truncate each leaf's result.log and drop any stale raw/ from a
+# previous run so nothing lingers that this run will not overwrite.
+for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; rm -rf "$DIR/$l/raw"; done
 
 # One boot per (leaf, mode); the transcript is leaf-local (panic isolation).
 for l in "${LEAVES[@]}"; do

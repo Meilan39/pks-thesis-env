@@ -14,8 +14,13 @@ WFLAG=""; [ "$VAR" = on ] && WFLAG="-W"
 rc=0
 if [ -x "$BIN" ]; then "$BIN" -N 10000 $WFLAG "$F" > "$LOG" 2>&1; rc=$?; else rc=127; fi
 rm -f "$F"
-if [ "$rc" -eq 0 ] && ! grep -qiE 'error|bad data|mismatch|failed' "$LOG" 2>/dev/null; then
+# fsx aborts nonzero on any data-integrity mismatch, so its exit code is
+# authoritative. We do NOT fail on the bare word "error" (fsx prints benign
+# progress text); a narrow data-corruption signature is the only text backstop.
+if [ "$rc" -eq 127 ]; then
+    emit_status fsx "$VAR" FAIL note=harness_absent
+elif [ "$rc" -eq 0 ] && ! grep -qiE 'bad data|OP mismatch|verify failed' "$LOG" 2>/dev/null; then
     emit_status fsx "$VAR" PASS ops=10000 errors=0
 else
-    emit_status fsx "$VAR" FAIL rc="$rc" errors="$(grep -ciE 'error|bad data|mismatch' "$LOG" 2>/dev/null || echo 1)"
+    emit_status fsx "$VAR" FAIL rc="$rc"
 fi

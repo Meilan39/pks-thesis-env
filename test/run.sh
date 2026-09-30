@@ -10,7 +10,9 @@ source "$ROOT/common.sh"
 EXEC="$ROOT/exec/${EXECUTOR:-qemu}.sh"
 LEAVES=(pks-unit sanity fsx pjd)
 
-for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; done
+# Start clean: truncate each leaf's result.log and drop any stale raw/ from a
+# previous run so nothing lingers that this run will not overwrite.
+for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; rm -rf "$DIR/$l/raw"; done
 
 # One consolidated boot per mode; its transcript is axis-level (all leaves share it).
 for mode in off on; do

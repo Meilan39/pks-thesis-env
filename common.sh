@@ -20,7 +20,14 @@
 # ----------------------------------------------------------------------------
 # Logging
 # ----------------------------------------------------------------------------
-C_RESET='\033[0m'; C_RED='\033[31m'; C_GREEN='\033[32m'; C_YELLOW='\033[33m'; C_BLUE='\033[34m'
+# Colour only when stdout is an interactive terminal. When output is piped,
+# tee'd, redirected, or emitted through the guest's systemd journal, the escapes
+# are suppressed so no control bytes ever land in a result.log or transcript.
+if [ -t 1 ]; then
+    C_RESET='\033[0m'; C_RED='\033[31m'; C_GREEN='\033[32m'; C_YELLOW='\033[33m'; C_BLUE='\033[34m'
+else
+    C_RESET=''; C_RED=''; C_GREEN=''; C_YELLOW=''; C_BLUE=''
+fi
 log_info() { printf '%b[INFO]%b %s\n' "$C_BLUE"   "$C_RESET" "$1"; }
 log_done() { printf '%b[DONE]%b %s\n' "$C_GREEN"  "$C_RESET" "$1"; }
 log_warn() { printf '%b[WARN]%b %s\n' "$C_YELLOW" "$C_RESET" "$1"; }
@@ -84,9 +91,9 @@ classify_sec() {
     if [ -n "$resolved" ]; then printf '%s\n' "$resolved" >> "$out"; return; fi
     if grep -qE "$PKS_PANIC_REGEX" "$t" 2>/dev/null; then
         if grep -qE "$PKS_ACTIVE_REGEX" "$t" 2>/dev/null; then
-            emit_status "$node" "$variant" NEUTRALIZED signal=fail_closed_panic marker=intact >> "$out"
+            emit_status "$node" "$variant" NEUTRALIZED marker=intact note=fail_closed_panic >> "$out"
         else
-            emit_status "$node" "$variant" FAIL signal=panic_without_pks_active >> "$out"
+            emit_status "$node" "$variant" FAIL note=panic_without_pks_active >> "$out"
         fi
     else
         emit_status "$node" "$variant" FAIL note=no_verdict_no_panic >> "$out"

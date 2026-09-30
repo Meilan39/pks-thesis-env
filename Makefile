@@ -12,6 +12,9 @@ SHELL := /bin/bash
 export DEV_KERNEL_DIR CONTROL_KERNEL_DIR DISK_IMG DISK_SIZE ROOTFS_SIZE
 export DEBIAN_SUITE DEBIAN_ARCH DEBIAN_MIRROR EXECUTOR QEMU_BIN SMP MEM BATCH_TIMEOUT_SEC
 
+# Top-level results/ holds ONLY summaries: results/data/*.csv and preflight.json.
+# Raw transcripts + JSON live next to their producers (leaf raw/ and axis raw-*.log);
+# rolled-up STATUS lives in each node's result.log. Nothing else belongs here.
 $(shell mkdir -p results/data images)
 
 .PHONY: help preflight build disk test sec perf run-qemu end-qemu \
@@ -34,20 +37,22 @@ help:
 preflight:
 	@./preflight.sh
 
+# Verbs stream to the console; persistence is in-tree (result.log + raw next to
+# each producer). We deliberately do NOT duplicate a full transcript into results/.
 build:
-	@set -o pipefail; ./build/run.sh 2>&1 | tee results/build.log
+	@./build/run.sh
 
 disk:
-	@set -o pipefail; ./disk/run.sh 2>&1 | tee results/disk.log
+	@./disk/run.sh
 
 test: preflight
-	@set -o pipefail; ./test/run.sh 2>&1 | tee results/test.log
+	@./test/run.sh
 
 sec: preflight
-	@set -o pipefail; ./sec/run.sh 2>&1 | tee results/sec.log
+	@./sec/run.sh
 
 perf: preflight
-	@set -o pipefail; ./perf/run.sh 2>&1 | tee results/perf.log
+	@./perf/run.sh
 
 run-qemu:
 	@./exec/$(or $(EXECUTOR),qemu).sh $(or $(VARIANT),perf) $(or $(MODE),on) shell
@@ -69,7 +74,8 @@ clean-results:
 	@rm -rf results/*.log results/*.json results/.substrate results/data/* results/raw 2>/dev/null || true
 	@find build disk test sec perf \( -name 'result.log' -o -name 'raw.log' -o -name 'raw-*.log' -o -name raw \) \
 	        -exec rm -rf {} + 2>/dev/null || true
-	@echo "[clean-results] removed summaries, result.logs, raw transcripts, and per-leaf raw/ dirs."
+	@find . -path ./images -prune -o -name '*.img' -prune -o -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
+	@echo "[clean-results] removed summaries, result.logs, raw transcripts, per-leaf raw/ dirs, and __pycache__."
 
 clean-image:
 	@rm -f images/disk.img

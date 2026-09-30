@@ -10,7 +10,9 @@ source "$ROOT/common.sh"
 EXEC="$ROOT/exec/${EXECUTOR:-qemu}.sh"
 LEAVES=(fio concurrency sqlite)
 
-for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; done
+# Start clean: truncate each leaf's result.log and drop any stale raw/ JSON from
+# a previous run so analyze.py only ever sees this run's data.
+for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; rm -rf "$DIR/$l/raw"; done
 
 # One consolidated boot per variant; its transcript is axis-level.
 # variant  kernel_variant  pks_mode

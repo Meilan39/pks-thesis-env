@@ -42,6 +42,4 @@ cat > "$RAW_DIR/preflight.json" <<EOF
 }
 EOF
 
-# Export the substrate so downstream STATUS lines can stamp it.
-echo "$substrate" > "$RAW_DIR/.substrate"
 log_done "Preflight recorded ($substrate) -> results/preflight.json"
