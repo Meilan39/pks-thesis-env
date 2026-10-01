@@ -12,9 +12,22 @@ TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
 VICTIM="$TGT/victim_file"; MARK="PKS_CLEAN_MARKER_dirty-frag_DO_NOT_OVERWRITE"
 OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true; LOG="$OUT/dirty-frag.log"
 
-printf '%s\n' "$MARK" > "$VICTIM"; sync; echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+printf '%s\n' "$MARK" > "$VICTIM"
+head -c 4096 /dev/zero >> "$VICTIM" 2>/dev/null || true
+chmod 644 "$VICTIM"
+sync
+echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+cat "$VICTIM" > /dev/null 2>&1 || true
+
 emit_status dirty-frag "$VAR" PENDING phase=pre_trigger   # panic under 'on' -> host resolves
-if [ -x "$BIN" ]; then "$BIN" > "$LOG" 2>&1 || true; fi   # may never return
+if [ -x "$BIN" ]; then
+    if [ "$(id -u)" -eq 0 ] && id testuser &>/dev/null; then
+        su -s /bin/bash testuser -c "export TARGET_PATH='$VICTIM'; cd '$DIR' && '$BIN' '$VICTIM'" > "$LOG" 2>&1 || true
+    else
+        export TARGET_PATH="$VICTIM"
+        "$BIN" "$VICTIM" > "$LOG" 2>&1 || true
+    fi
+fi
 # Read back WITHOUT dropping caches (page-cache corruption lives in memory).
 after="$(head -c 256 "$VICTIM" 2>/dev/null)"
 

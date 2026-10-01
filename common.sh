@@ -58,8 +58,15 @@ emit_status() {
 # status_field <line> <key> -> value on stdout
 status_field() { printf '%s\n' "$1" | tr ' ' '\n' | sed -n "s/^$2=//p" | head -n1; }
 
-# verdict_is_pass <verdict> -> exit 0 if passing
-verdict_is_pass() { case "$1" in PASS|NEUTRALIZED) return 0;; *) return 1;; esac; }
+# verdict_is_pass <verdict> [variant] -> exit 0 if passing
+verdict_is_pass() {
+    local v="$1" var="${2:-}"
+    case "$v" in
+        PASS|NEUTRALIZED) return 0;;
+        VULNERABLE) [ "$var" = "off" ] && return 0 || return 1;;
+        *) return 1;;
+    esac
+}
 
 # _status_lines <file> -> clean "STATUS node=..." lines on stdout.
 #   Leaves emit STATUS via the systemd journal, so serial transcripts carry a
@@ -111,10 +118,11 @@ rollup() {
     : > "$self"
     local child
     for child in "$@"; do [ -f "$child" ] && { _status_lines "$child" >> "$self" || true; }; done
-    local pass=0 fail=0 line verdict
+    local pass=0 fail=0 line verdict variant
     while IFS= read -r line; do
         verdict=$(status_field "$line" verdict)
-        if verdict_is_pass "$verdict"; then pass=$((pass+1)); else fail=$((fail+1)); fi
+        variant=$(status_field "$line" variant)
+        if verdict_is_pass "$verdict" "$variant"; then pass=$((pass+1)); else fail=$((fail+1)); fi
     done < <(_status_lines "$self" || true)
     # No results harvested is a failure, never a vacuous pass.
     local overall=PASS

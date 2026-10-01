@@ -31,6 +31,11 @@ static bool g_has_debugfs = false;
 
 static bool read_debugfs_status(uint64_t *begin_cnt, uint64_t *end_cnt)
 {
+	if (begin_cnt)
+		*begin_cnt = 0;
+	if (end_cnt)
+		*end_cnt = 0;
+
 	FILE *fp = fopen(STATUS_PATH, "r");
 	if (!fp)
 		return false;
@@ -41,10 +46,20 @@ static bool read_debugfs_status(uint64_t *begin_cnt, uint64_t *end_cnt)
 			sscanf(line + 15, " 0x%lx", &g_pool_start_pfn);
 		else if (strncmp(line, "pool_end_pfn:", 13) == 0)
 			sscanf(line + 13, " 0x%lx", &g_pool_end_pfn);
-		else if (strncmp(line, "scope_begin_count:", 18) == 0)
-			sscanf(line + 18, " %" SCNu64, begin_cnt);
-		else if (strncmp(line, "scope_end_count:", 16) == 0)
-			sscanf(line + 16, " %" SCNu64, end_cnt);
+		else if (strncmp(line, "scope_begin_count:", 18) == 0) {
+			if (begin_cnt)
+				sscanf(line + 18, " %" SCNu64, begin_cnt);
+		} else if (strncmp(line, "scope_end_count:", 16) == 0) {
+			if (end_cnt)
+				sscanf(line + 16, " %" SCNu64, end_cnt);
+		} else if (strncmp(line, "scope_count:", 12) == 0) {
+			uint64_t sc = 0;
+			sscanf(line + 12, " %" SCNu64, &sc);
+			if (begin_cnt)
+				*begin_cnt = sc;
+			if (end_cnt)
+				*end_cnt = sc;
+		}
 	}
 	fclose(fp);
 	return true;

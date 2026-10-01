@@ -37,11 +37,21 @@ LABEL=$MODE; printf '%s' "$CMDLINE" | grep -q pcache_control=1 && LABEL=control
 # Mount the protected evaluation volume (with the PKS option when enabled).
 if [ -b /dev/vda2 ]; then
     mkdir -p /mnt/protected
-    mountpoint -q /mnt/protected && umount /mnt/protected 2>/dev/null || true
-    OPT=""; [ "$MODE" = on ] && OPT="-o pks_pagecache"
-    mount $OPT /dev/vda2 /mnt/protected 2>/dev/null || true
+    if [ "$MODE" = on ]; then
+        if ! grep -q '/mnt/protected.*pks_pagecache' /proc/mounts 2>/dev/null; then
+            umount -l /mnt/protected 2>/dev/null || true
+            mount -o pks_pagecache /dev/vda2 /mnt/protected 2>/dev/null || true
+        fi
+    else
+        if grep -q '/mnt/protected.*pks_pagecache' /proc/mounts 2>/dev/null; then
+            umount -l /mnt/protected 2>/dev/null || true
+            mount /dev/vda2 /mnt/protected 2>/dev/null || true
+        elif ! mountpoint -q /mnt/protected 2>/dev/null; then
+            mount /dev/vda2 /mnt/protected 2>/dev/null || true
+        fi
+    fi
 fi
-hb "protected_mounted=$(mountpoint -q /mnt/protected && echo yes || echo no) mode=$MODE label=$LABEL"
+hb "protected_mounted=$(mountpoint -q /mnt/protected && echo yes || echo no) mode=$MODE label=$LABEL pks_opt=$(grep -q '/mnt/protected.*pks_pagecache' /proc/mounts 2>/dev/null && echo yes || echo no)"
 
 # Ensure debugfs is available for the diagnostic (sec) kernel.
 mountpoint -q /sys/kernel/debug 2>/dev/null || mount -t debugfs none /sys/kernel/debug 2>/dev/null || true

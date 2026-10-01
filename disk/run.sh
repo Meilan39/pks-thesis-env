@@ -17,7 +17,7 @@ MIRROR="${DEBIAN_MIRROR:-http://deb.debian.org/debian}"
 RAW="$DIR/raw.log"; mkdir -p "$ROOT/images"
 
 # perl provides prove (pjd); the rest are compilers + benchmark tools.
-PACKAGES="build-essential python3 perl fio sqlite3 libsqlite3-dev libcap-dev libc6-dev sudo coreutils procps"
+PACKAGES="build-essential python3 perl libtest-harness-perl fio sqlite3 libsqlite3-dev libcap-dev libc6-dev sudo coreutils procps"
 
 # install_packages <mounted-root> - idempotent apt install inside the image.
 # Needs dev/proc/sys binds + resolv.conf for the chroot's apt to work.
@@ -67,7 +67,7 @@ provision() {
     sudo mkdir -p "$mp/mnt/protected" "$mp/pks-thesis-env"
     sudo tee "$mp/etc/fstab" >/dev/null <<FSTAB
 /dev/vda1 / ext4 errors=remount-ro 0 1
-/dev/vda2 /mnt/protected ext4 defaults,nofail 0 2
+/dev/vda2 /mnt/protected ext4 noauto,nofail 0 2
 pks_env /pks-thesis-env 9p trans=virtio,version=9p2000.L,nofail 0 0
 FSTAB
     install_packages "$mp"
