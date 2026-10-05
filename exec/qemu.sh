@@ -34,7 +34,7 @@ QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
 
 SMP="${SMP:-4}"
 MEM="${MEM:-4096}"
-BATCH_TIMEOUT_SEC="${BATCH_TIMEOUT_SEC:-300}"
+BATCH_TIMEOUT_SEC="${BATCH_TIMEOUT_SEC:-1800}"
 
 # ==============================================================================
 # 2. Kernel & Artifact Validation
@@ -103,7 +103,7 @@ mkdir -p "$(dirname "$TRANSCRIPT_PATH")"
 CMDLINE="$CMDLINE pks_run=${TARGET} pks_auto=${TARGET} panic=1 systemd.mask=serial-getty@ttyS0.service"
 
 TIMEOUT=()
-if command -v timeout >/dev/null 2>&1; then
+if [ -n "${BATCH_TIMEOUT_SEC:-}" ] && [ "$BATCH_TIMEOUT_SEC" -gt 0 ] 2>/dev/null && command -v timeout >/dev/null 2>&1; then
     TIMEOUT=(timeout --kill-after=10s "${BATCH_TIMEOUT_SEC}s")
 fi
 
@@ -147,7 +147,7 @@ if ! grep -q '^STATUS ' "$TRANSCRIPT_PATH" 2>/dev/null; then
 
     case "$qemu_rc" in
         124|137)
-            log_warn "[exec/qemu] QEMU hit the ${BATCH_TIMEOUT_SEC}s timeout -> serial output stalled or guest hung."
+            log_warn "[exec/qemu] QEMU terminated by timeout (exit $qemu_rc) -> serial output stalled or guest hung."
             ;;
         0)
             if [ "$guest_bytes" -eq 0 ]; then

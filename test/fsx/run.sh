@@ -17,8 +17,8 @@ source "$REPO_ROOT/common.sh"
 VARIANT="${1:-on}"
 FSX_BIN="$SCRIPT_DIR/fsx"
 
-# Ensure fsx binary is compiled
-if [ ! -x "$FSX_BIN" ] && [ -f "$SCRIPT_DIR/fsx.c" ]; then
+# Ensure fsx binary is compiled (or recompiled if source was modified)
+if [ ! -x "$FSX_BIN" ] || [ "$SCRIPT_DIR/fsx.c" -nt "$FSX_BIN" ]; then
     gcc -O2 -Wall -D_GNU_SOURCE -o "$FSX_BIN" "$SCRIPT_DIR/fsx.c" 2>/dev/null || true
 fi
 
@@ -32,6 +32,9 @@ LOG_FILE="/tmp/fsx_${VARIANT}.log"
 TEST_FILE="$TARGET_DIR/fsx_${VARIANT}.dat"
 rm -f "$TEST_FILE"
 
+# Number of randomized operations (default 10,000; overrideable via FSX_NUM_OPS)
+NUM_OPS="${FSX_NUM_OPS:-10000}"
+
 # Pass -W to disable MAPWRITE operations when running against PKS protected mounts
 EXTRA_FLAGS=""
 if [ "$VARIANT" = "on" ]; then
@@ -43,7 +46,7 @@ fi
 # ------------------------------------------------------------------------------
 fsx_rc=0
 if [ -x "$FSX_BIN" ]; then
-    "$FSX_BIN" -N 10000 $EXTRA_FLAGS "$TEST_FILE" > "$LOG_FILE" 2>&1 || fsx_rc=$?
+    "$FSX_BIN" -N "$NUM_OPS" $EXTRA_FLAGS "$TEST_FILE" > "$LOG_FILE" 2>&1 || fsx_rc=$?
 else
     fsx_rc=127
 fi
@@ -56,7 +59,9 @@ rm -f "$TEST_FILE"
 if [ "$fsx_rc" -eq 127 ]; then
     emit_status fsx "$VARIANT" FAIL note=harness_absent
 elif [ "$fsx_rc" -eq 0 ] && ! grep -qiE 'FATAL CORRUPTION|CORRUPTION DETECTED' "$LOG_FILE" 2>/dev/null; then
-    emit_status fsx "$VARIANT" PASS ops=10000 errors=0
+    emit_status fsx "$VARIANT" PASS ops="$NUM_OPS" errors=0
 else
     emit_status fsx "$VARIANT" FAIL rc="$fsx_rc"
 fi
+
+rm -f "$LOG_FILE"
