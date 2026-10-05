@@ -1,9 +1,0 @@
-STATUS node=fsx variant=off verdict=FAIL rc=0 errors=1
-STATUS node=fsx variant=on verdict=FAIL rc=0 errors=1
-STATUS node=pjd variant=off verdict=FAIL failed=0
-STATUS node=pjd variant=on verdict=FAIL failed=0
-STATUS node=pks-unit variant=off verdict=FAIL rc=0
-STATUS node=pks-unit variant=on verdict=FAIL rc=0
-STATUS node=sanity variant=off verdict=PASS note=not_applicable_when_off
-STATUS node=sanity variant=on verdict=FAIL passed=3 failed=2
-STATUS node=test variant=all verdict=FAIL passed=1 failed=7

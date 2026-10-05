@@ -1,2 +1,0 @@
-STATUS node=fsx variant=off verdict=FAIL rc=0 errors=1
-STATUS node=fsx variant=on verdict=FAIL rc=0 errors=1

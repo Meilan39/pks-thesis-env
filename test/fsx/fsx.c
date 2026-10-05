@@ -43,12 +43,15 @@ static const char *op_names[] = {
 
 /* Configuration options */
 static char *target_fname = "fsx_test.bin";
+// PATCH - pool bounds: default 64MB max file size to prevent pool exhaustion
 static size_t max_file_size = 64 * 1024 * 1024; /* 64MB default */
 static size_t max_op_size = 64 * 1024;          /* 64KB max per operation */
 static unsigned long num_ops = 10000;           /* 10,000 operations */
 static unsigned int seed = 0;
 static bool verbose = false;
+// PATCH - disable MAPWRITE on PKS protected mount (-W)
 static bool allow_mapwrite = true;
+// PATCH - verify MAPWRITE fails with -EOPNOTSUPP (-b)
 static bool expect_mapwrite_fail = false;
 
 /* State */
@@ -65,6 +68,7 @@ static void print_usage(const char *prog) {
     printf("  -o <size>       Maximum operation size in bytes (default: 65536 [64KB])\n");
     printf("  -N <num>        Number of random operations to execute (default: 10000)\n");
     printf("  -s <seed>       PRNG random seed (default: current time)\n");
+    // PATCH - CLI options for PKS compliance and negative testing
     printf("  -W              Disable MAPWRITE operations (required for PKS protected mounts)\n");
     printf("  -b              Verify that MAPWRITE fails with -EOPNOTSUPP (Commit 06 test)\n");
     printf("  -v              Verbose output for every operation\n");
@@ -306,9 +310,11 @@ int main(int argc, char **argv) {
             case 's':
                 seed = (unsigned int)strtoul(optarg, NULL, 0);
                 break;
+            // PATCH - disable MAPWRITE on PKS protected mount (-W)
             case 'W':
                 allow_mapwrite = false;
                 break;
+            // PATCH - verify MAPWRITE fails with -EOPNOTSUPP (-b)
             case 'b':
                 expect_mapwrite_fail = true;
                 break;
@@ -359,6 +365,7 @@ int main(int argc, char **argv) {
     }
 
     if (expect_mapwrite_fail) {
+        // PATCH - verify MAPWRITE fails with -EOPNOTSUPP
         /*
          * Negative test mode (-b): verify that MAP_SHARED writable mmap
          * is rejected with -EOPNOTSUPP under Commit 06 policy.

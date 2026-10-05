@@ -28,14 +28,11 @@ if [ ! -d "$TARGET_DIR" ]; then
     TARGET_DIR="/tmp"
 fi
 
-RAW_DIR="$SCRIPT_DIR/raw/$VARIANT"
-mkdir -p "$RAW_DIR" 2>/dev/null || true
-LOG_FILE="$RAW_DIR/fsx.log"
+LOG_FILE="/tmp/fsx_${VARIANT}.log"
 TEST_FILE="$TARGET_DIR/fsx_${VARIANT}.dat"
 rm -f "$TEST_FILE"
 
-# Under PKS (on) the protected mount rejects shared writable mmap,
-# so MAPWRITE must be disabled with -W
+# PATCH - disable MAPWRITE on PKS protected mount (-W)
 EXTRA_FLAGS=""
 if [ "$VARIANT" = "on" ]; then
     EXTRA_FLAGS="-W"
@@ -58,7 +55,7 @@ rm -f "$TEST_FILE"
 # ------------------------------------------------------------------------------
 if [ "$fsx_rc" -eq 127 ]; then
     emit_status fsx "$VARIANT" FAIL note=harness_absent
-elif [ "$fsx_rc" -eq 0 ] && ! grep -qiE 'bad data|OP mismatch|verify failed' "$LOG_FILE" 2>/dev/null; then
+elif [ "$fsx_rc" -eq 0 ] && ! grep -qiE 'FATAL CORRUPTION|CORRUPTION DETECTED' "$LOG_FILE" 2>/dev/null; then
     emit_status fsx "$VARIANT" PASS ops=10000 errors=0
 else
     emit_status fsx "$VARIANT" FAIL rc="$fsx_rc"

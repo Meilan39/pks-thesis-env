@@ -30,9 +30,7 @@ if [ ! -x "$SANITY_BIN" ] && [ -f "$SCRIPT_DIR/pks_sanity_test.c" ]; then
     gcc -O2 -Wall -o "$SANITY_BIN" "$SCRIPT_DIR/pks_sanity_test.c" 2>/dev/null || true
 fi
 
-RAW_DIR="$SCRIPT_DIR/raw/$VARIANT"
-mkdir -p "$RAW_DIR" 2>/dev/null || true
-LOG_FILE="$RAW_DIR/sanity.log"
+LOG_FILE="/tmp/sanity_${VARIANT}.log"
 
 # ------------------------------------------------------------------------------
 # 1. Execute Sanity Test Suite

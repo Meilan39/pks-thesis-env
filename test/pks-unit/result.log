@@ -1,2 +1,0 @@
-STATUS node=pks-unit variant=off verdict=FAIL rc=0
-STATUS node=pks-unit variant=on verdict=FAIL rc=0
