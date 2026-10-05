@@ -1,2 +1,0 @@
-STATUS node=fragnesia variant=off verdict=FAIL marker=intact note=baseline_not_corrupted
-STATUS node=fragnesia variant=on verdict=NEUTRALIZED marker=intact signal=trapped

@@ -1,0 +1,8 @@
+node,variant,verdict,outcome
+copy-fail,off,PASS,altered
+copy-fail,on,PASS,fail_closed_panic
+dirty-frag,off,FAIL,intact
+dirty-frag,on,PASS,intact
+fragnesia,off,FAIL,intact
+fragnesia,on,PASS,intact
+sec,all,FAIL,passed=4_failed=2

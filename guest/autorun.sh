@@ -1,43 +1,83 @@
 #!/usr/bin/env bash
-# guest/autorun.sh - In-guest dispatcher. Runs once at boot (via autorun.service),
-# figures out what to run and in which mode, executes the workload leaves, and
-# powers off. Leaves emit STATUS lines to stdout -> serial; the host harvests
-# them from the transcript. This script writes NO canonical result files (a
-# security panic would destroy them) - the serial stream is the transport.
+# guest/autorun.sh - In-guest workload dispatcher.
+# Executed once at boot via systemd (pks-autorun.service).
 #
-# It also prints greppable "HB autorun:" breadcrumbs so a transcript that ends
-# without STATUS still shows exactly how far boot/dispatch got.
+# Determines the execution target and experimental variant from /proc/cmdline,
+# mounts required filesystems (9p workspace, protected ext4 volume, debugfs),
+# invokes the appropriate workload leaves, and powers down the virtual machine.
+# All results are streamed over serial as STATUS lines; no persistent result files
+# are written in-guest to ensure crash resilience.
 set -u
 
-hb() { echo "HB autorun: $*"; }
+# ==============================================================================
+# 1. Heartbeat & Helper Functions
+# ==============================================================================
+hb() {
+    echo "HB autorun: $*"
+}
 
 CMDLINE="$(cat /proc/cmdline 2>/dev/null || true)"
-cmd_val() { printf '%s\n' "$CMDLINE" | tr ' ' '\n' | sed -n "s/^$1=//p" | tail -n1; }
+
+cmd_val() {
+    local key="$1"
+    printf '%s\n' "$CMDLINE" | tr ' ' '\n' | sed -n "s/^${key}=//p" | tail -n1
+}
 
 hb "reached (cmdline: $CMDLINE)"
 
-# Target: kernel cmdline (QEMU), overridden by /mnt/protected/.pks-run (bare-metal).
-TARGET="$(cmd_val pks_run)"; [ -n "$TARGET" ] || TARGET="$(cmd_val pks_auto)"
-[ -f /mnt/protected/.pks-run ] && TARGET="$(cat /mnt/protected/.pks-run 2>/dev/null || true)"
-if [ -z "$TARGET" ] || [ "$TARGET" = shell ]; then hb "no run target; exiting"; exit 0; fi
+# ==============================================================================
+# 2. Target Resolution
+# ==============================================================================
+# Target is specified via kernel cmdline (QEMU), or overridden by /mnt/protected/.pks-run (baremetal).
+TARGET="$(cmd_val pks_run)"
+if [ -z "$TARGET" ]; then
+    TARGET="$(cmd_val pks_auto)"
+fi
+
+if [ -f /mnt/protected/.pks-run ]; then
+    TARGET="$(cat /mnt/protected/.pks-run 2>/dev/null || true)"
+fi
+
+if [ -z "$TARGET" ] || [ "$TARGET" = "shell" ]; then
+    hb "no run target; exiting"
+    exit 0
+fi
 hb "target=$TARGET"
 
-# Mount the 9p host workspace.
+# ==============================================================================
+# 3. Mount 9p Workspace
+# ==============================================================================
 if ! mountpoint -q /pks-thesis-env 2>/dev/null; then
     mkdir -p /pks-thesis-env
     mount -t 9p -o trans=virtio,version=9p2000.L,nofail pks_env /pks-thesis-env 2>/dev/null || true
 fi
-WS=/pks-thesis-env; [ -d "$WS/test" ] || WS=/
-hb "9p_mounted=$(mountpoint -q /pks-thesis-env && echo yes || echo no) ws=$WS common.sh=$([ -f "$WS/common.sh" ] && echo yes || echo no)"
 
-# Determine mode + experimental-condition label.
-MODE=off; printf '%s' "$CMDLINE" | grep -q pcache_pks=on && MODE=on
-LABEL=$MODE; printf '%s' "$CMDLINE" | grep -q pcache_control=1 && LABEL=control
+WORKSPACE_DIR="/pks-thesis-env"
+if [ ! -d "$WORKSPACE_DIR/test" ]; then
+    WORKSPACE_DIR="/"
+fi
 
-# Mount the protected evaluation volume (with the PKS option when enabled).
+hb "9p_mounted=$(mountpoint -q /pks-thesis-env && echo yes || echo no) ws=$WORKSPACE_DIR common.sh=$([ -f "$WORKSPACE_DIR/common.sh" ] && echo yes || echo no)"
+
+# ==============================================================================
+# 4. Experimental Variant Detection
+# ==============================================================================
+MODE="off"
+if printf '%s' "$CMDLINE" | grep -q 'pcache_pks=on'; then
+    MODE="on"
+fi
+
+LABEL="$MODE"
+if printf '%s' "$CMDLINE" | grep -q 'pcache_control=1'; then
+    LABEL="control"
+fi
+
+# ==============================================================================
+# 5. Protected Partition & DebugFS Mounting
+# ==============================================================================
 if [ -b /dev/vda2 ]; then
     mkdir -p /mnt/protected
-    if [ "$MODE" = on ]; then
+    if [ "$MODE" = "on" ]; then
         if ! grep -q '/mnt/protected.*pks_pagecache' /proc/mounts 2>/dev/null; then
             umount -l /mnt/protected 2>/dev/null || true
             mount -o pks_pagecache /dev/vda2 /mnt/protected 2>/dev/null || true
@@ -51,25 +91,55 @@ if [ -b /dev/vda2 ]; then
         fi
     fi
 fi
+
 hb "protected_mounted=$(mountpoint -q /mnt/protected && echo yes || echo no) mode=$MODE label=$LABEL pks_opt=$(grep -q '/mnt/protected.*pks_pagecache' /proc/mounts 2>/dev/null && echo yes || echo no)"
 
-# Ensure debugfs is available for the diagnostic (sec) kernel.
-mountpoint -q /sys/kernel/debug 2>/dev/null || mount -t debugfs none /sys/kernel/debug 2>/dev/null || true
+# Mount debugfs for the security introspection kernel
+if ! mountpoint -q /sys/kernel/debug 2>/dev/null; then
+    mount -t debugfs none /sys/kernel/debug 2>/dev/null || true
+fi
 
+# ==============================================================================
+# 6. Workload Dispatch & Shutdown
+# ==============================================================================
 run_axis() {
-    local s found=0
-    for s in "$WS/$1"/*/run.sh; do [ -x "$s" ] && { found=1; "$s" "$LABEL"; }; done
-    [ "$found" = 1 ] || hb "no executable run.sh under $WS/$1"
+    local axis_dir="$1"
+    local found=0
+    for script in "$WORKSPACE_DIR/$axis_dir"/*/run.sh; do
+        if [ -x "$script" ]; then
+            found=1
+            "$script" "$LABEL"
+        fi
+    done
+    if [ "$found" -eq 0 ]; then
+        hb "no executable run.sh under $WORKSPACE_DIR/$axis_dir"
+    fi
 }
 
 hb "dispatch target=$TARGET"
 case "$TARGET" in
-    test|sec|perf)  run_axis "$TARGET" ;;
-    */*)            if [ -x "$WS/$TARGET/run.sh" ]; then "$WS/$TARGET/run.sh" "$LABEL"; else hb "missing $WS/$TARGET/run.sh"; fi ;;
-    *)              for a in test sec perf; do
-                        [ -x "$WS/$a/$TARGET/run.sh" ] && { "$WS/$a/$TARGET/run.sh" "$LABEL"; break; }
-                    done ;;
+    test|sec|perf)
+        run_axis "$TARGET"
+        ;;
+    */*)
+        if [ -x "$WORKSPACE_DIR/$TARGET/run.sh" ]; then
+            "$WORKSPACE_DIR/$TARGET/run.sh" "$LABEL"
+        else
+            hb "missing $WORKSPACE_DIR/$TARGET/run.sh"
+        fi
+        ;;
+    *)
+        for axis in test sec perf; do
+            if [ -x "$WORKSPACE_DIR/$axis/$TARGET/run.sh" ]; then
+                "$WORKSPACE_DIR/$axis/$TARGET/run.sh" "$LABEL"
+                break
+            fi
+        done
+        ;;
 esac
 
 hb "done; powering off"
-sync; sleep 0.5; poweroff -f
+sync
+sleep 0.5
+poweroff -f
+

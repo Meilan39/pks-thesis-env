@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# build/sec/run.sh - compile the security diagnostic kernel (PKS + introspection).
+# build/sec/run.sh - Compile the security diagnostic kernel (PKS + introspection).
 set -u
-DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/../.." && pwd)"
-source "$ROOT/build/build_kernel.sh"
-build_kernel sec "${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}"
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+source "$REPO_ROOT/build/build_kernel.sh"
+
+KERNEL_DIR="${DEV_KERNEL_DIR:-$HOME/src/linux-pks-thesis}"
+build_kernel sec "$KERNEL_DIR"
+

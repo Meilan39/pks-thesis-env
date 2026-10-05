@@ -1,26 +1,65 @@
 #!/usr/bin/env bash
-# test/fsx/run.sh - 10k randomized filesystem operations; verdict from fsx's own
-# exit code and output (fsx aborts nonzero on any data-integrity mismatch).
+# ==============================================================================
+# test/fsx/run.sh - File System Exerciser (fsx) Stress & Integrity Test
+# ==============================================================================
+# Executes 10,000 randomized filesystem operations (read, write, truncate, hole
+# punch). Under Intel PKS ('on'), shared writable mmap is rejected by kernel
+# policy (-EOPNOTSUPP), so MAPWRITE is disabled via -W to avoid spurious aborts.
+#
+# fsx aborts nonzero on any data mismatch; its exit code is authoritative.
+# ==============================================================================
 set -u
-DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/../.." && pwd)"; source "$ROOT/common.sh"
-VAR="${1:-on}"; BIN="$DIR/fsx"
-[ -x "$BIN" ] || { [ -f "$DIR/fsx.c" ] && gcc -O2 -Wall -D_GNU_SOURCE -o "$BIN" "$DIR/fsx.c" 2>/dev/null || true; }
-TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
-OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true
-LOG="$OUT/fsx.log"; F="$TGT/fsx_${VAR}.dat"; rm -f "$F"
-# This fsx has no -q. Under PKS (on) the protected mount rejects shared writable
-# mmap, so MAPWRITE must be disabled with -W or fsx aborts spuriously.
-WFLAG=""; [ "$VAR" = on ] && WFLAG="-W"
-rc=0
-if [ -x "$BIN" ]; then "$BIN" -N 10000 $WFLAG "$F" > "$LOG" 2>&1; rc=$?; else rc=127; fi
-rm -f "$F"
-# fsx aborts nonzero on any data-integrity mismatch, so its exit code is
-# authoritative. We do NOT fail on the bare word "error" (fsx prints benign
-# progress text); a narrow data-corruption signature is the only text backstop.
-if [ "$rc" -eq 127 ]; then
-    emit_status fsx "$VAR" FAIL note=harness_absent
-elif [ "$rc" -eq 0 ] && ! grep -qiE 'bad data|OP mismatch|verify failed' "$LOG" 2>/dev/null; then
-    emit_status fsx "$VAR" PASS ops=10000 errors=0
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
+source "$REPO_ROOT/common.sh"
+
+VARIANT="${1:-on}"
+FSX_BIN="$SCRIPT_DIR/fsx"
+
+# Ensure fsx binary is compiled
+if [ ! -x "$FSX_BIN" ] && [ -f "$SCRIPT_DIR/fsx.c" ]; then
+    gcc -O2 -Wall -D_GNU_SOURCE -o "$FSX_BIN" "$SCRIPT_DIR/fsx.c" 2>/dev/null || true
+fi
+
+# Target evaluation mount (default to /mnt/protected, fallback to /tmp)
+TARGET_DIR="/mnt/protected"
+if [ ! -d "$TARGET_DIR" ]; then
+    TARGET_DIR="/tmp"
+fi
+
+RAW_DIR="$SCRIPT_DIR/raw/$VARIANT"
+mkdir -p "$RAW_DIR" 2>/dev/null || true
+LOG_FILE="$RAW_DIR/fsx.log"
+TEST_FILE="$TARGET_DIR/fsx_${VARIANT}.dat"
+rm -f "$TEST_FILE"
+
+# Under PKS (on) the protected mount rejects shared writable mmap,
+# so MAPWRITE must be disabled with -W
+EXTRA_FLAGS=""
+if [ "$VARIANT" = "on" ]; then
+    EXTRA_FLAGS="-W"
+fi
+
+# ------------------------------------------------------------------------------
+# 1. Execute fsx Stress Run
+# ------------------------------------------------------------------------------
+fsx_rc=0
+if [ -x "$FSX_BIN" ]; then
+    "$FSX_BIN" -N 10000 $EXTRA_FLAGS "$TEST_FILE" > "$LOG_FILE" 2>&1 || fsx_rc=$?
 else
-    emit_status fsx "$VAR" FAIL rc="$rc"
+    fsx_rc=127
+fi
+
+rm -f "$TEST_FILE"
+
+# ------------------------------------------------------------------------------
+# 2. Verdict Evaluation
+# ------------------------------------------------------------------------------
+if [ "$fsx_rc" -eq 127 ]; then
+    emit_status fsx "$VARIANT" FAIL note=harness_absent
+elif [ "$fsx_rc" -eq 0 ] && ! grep -qiE 'bad data|OP mismatch|verify failed' "$LOG_FILE" 2>/dev/null; then
+    emit_status fsx "$VARIANT" PASS ops=10000 errors=0
+else
+    emit_status fsx "$VARIANT" FAIL rc="$fsx_rc"
 fi

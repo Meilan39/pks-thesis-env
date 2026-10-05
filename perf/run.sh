@@ -1,34 +1,63 @@
 #!/usr/bin/env bash
-# perf/run.sh - HOST aggregator for the performance axis. One consolidated boot
-# per experimental variant: control (baseline kernel), off (mitigated kernel,
-# PKS disabled = ablation), on (mitigated kernel, PKS enabled). Leaves emit real
-# metrics parsed from their own fio/sqlite JSON; analyze.py computes overhead.
+# perf/run.sh - HOST aggregator for the performance axis.
+# Executes one consolidated boot per experimental variant:
+#   - control: baseline kernel, unmitigated
+#   - off: mitigated kernel with PKS disabled (ablation baseline)
+#   - on: mitigated kernel with PKS enabled
+# Leaves emit quantitative metrics parsed from fio and sqlite benchmarks;
+# analyze.py computes relative overheads.
 set -u
 
-DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/.." && pwd)"
-source "$ROOT/common.sh"
-EXEC="$ROOT/exec/${EXECUTOR:-qemu}.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$REPO_ROOT/common.sh"
+
+EXECUTOR_SCRIPT="$REPO_ROOT/exec/${EXECUTOR:-qemu}.sh"
 LEAVES=(fio concurrency sqlite)
 
-# Start clean: truncate each leaf's result.log and drop any stale raw/ JSON from
-# a previous run so analyze.py only ever sees this run's data.
-for l in "${LEAVES[@]}"; do : > "$DIR/$l/result.log"; rm -rf "$DIR/$l/raw"; done
+# ==============================================================================
+# 1. Clean Initialization
+# ==============================================================================
+# Reset leaf result logs and remove previous raw benchmark outputs
+# so analysis runs strictly against the current execution.
+for leaf in "${LEAVES[@]}"; do
+    : > "$SCRIPT_DIR/$leaf/result.log"
+    rm -rf "$SCRIPT_DIR/$leaf/raw"
+done
 
-# One consolidated boot per variant; its transcript is axis-level.
-# variant  kernel_variant  pks_mode
+# ==============================================================================
+# 2. Consolidated Variant Execution
+# ==============================================================================
 run_variant() {
-    local label="$1" kvar="$2" mode="$3"
-    local T="$DIR/raw-${label}.log"
-    "$EXEC" "$kvar" "$mode" perf "$T"
-    local l; for l in "${LEAVES[@]}"; do harvest_node "$T" "$l" "$DIR/$l/result.log"; done
+    local variant_label="$1"
+    local kernel_variant="$2"
+    local pks_mode="$3"
+    local transcript_log="$SCRIPT_DIR/raw-${variant_label}.log"
+
+    echo "--- [perf] Launching variant: $variant_label ($kernel_variant, pks=$pks_mode) ---"
+    "$EXECUTOR_SCRIPT" "$kernel_variant" "$pks_mode" perf "$transcript_log"
+
+    for leaf in "${LEAVES[@]}"; do
+        harvest_node "$transcript_log" "$leaf" "$SCRIPT_DIR/$leaf/result.log"
+    done
 }
+
 run_variant control control off
 run_variant off     perf    off
 run_variant on      perf    on
 
-for l in "${LEAVES[@]}"; do mark_empty_leaves all "$DIR/$l/result.log"; done
-rollup "$DIR/result.log" perf "$DIR"/*/result.log
-rc=$?
-# JSON now lives leaf-local at perf/<leaf>/raw/<variant>/; analyze reads from there.
-python3 "$DIR/analyze.py" "$DIR" "$ROOT/results/data/perf_summary.csv" || true
-exit $rc
+# ==============================================================================
+# 3. Validation, Rollup, and Analysis
+# ==============================================================================
+for leaf in "${LEAVES[@]}"; do
+    mark_empty_leaves all "$SCRIPT_DIR/$leaf/result.log"
+done
+
+rollup "$SCRIPT_DIR/result.log" perf "$SCRIPT_DIR"/*/result.log
+rollup_rc=$?
+
+# Extract summary metrics into results CSV
+python3 "$SCRIPT_DIR/analyze.py" "$SCRIPT_DIR" "$REPO_ROOT/results/data/perf_summary.csv" || true
+
+exit "$rollup_rc"
+

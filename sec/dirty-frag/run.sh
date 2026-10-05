@@ -1,39 +1,36 @@
 #!/usr/bin/env bash
-# sec/dirty-frag/run.sh - softirq/workqueue context. Under PKS the stray write takes
-# an unhandled supervisor fault and the kernel PANICS (fail-closed); the guest
-# will not return here, so the PENDING line + the host's classify_sec (which
-# reads the panic + PKS-active signatures from the serial transcript) resolve
-# the verdict. If it instead survives, the marker comparison decides.
 set -u
-DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/../.." && pwd)"; source "$ROOT/common.sh"
-VAR="${1:-on}"; BIN="$DIR/exp"
-[ -x "$BIN" ] || { [ -f "$DIR/exp.c" ] && gcc -O2 -Wall -pthread -o "$BIN" "$DIR/exp.c" 2>/dev/null || true; }
-TGT=/mnt/protected; [ -d "$TGT" ] || TGT=/tmp
-VICTIM="$TGT/victim_file"; MARK="PKS_CLEAN_MARKER_dirty-frag_DO_NOT_OVERWRITE"
-OUT="$DIR/raw/$VAR"; mkdir -p "$OUT" 2>/dev/null || true; LOG="$OUT/dirty-frag.log"
 
-printf '%s\n' "$MARK" > "$VICTIM"
-head -c 4096 /dev/zero >> "$VICTIM" 2>/dev/null || true
-chmod 644 "$VICTIM"
+cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
+
+# 1. Semantically Static Constants
+TARGET_FILE="/mnt/protected/victim_file"
+EXPLOIT_BIN="./exp"
+EXPLOIT_SRC="./exp.c"
+CLEAN_MARKER="PKS_CLEAN_MARKER_dirty-frag_DO_NOT_OVERWRITE"
+
+# 2. Precondition Checks
+[ "$(id -u)" -eq 0 ]    || { echo "error: root privileges required"; exit 1; }
+id testuser &>/dev/null || { echo "error: testuser account required"; exit 1; }
+[ -d "/mnt/protected" ] || { echo "error: /mnt/protected not mounted"; exit 1; }
+[ -x "$EXPLOIT_BIN" ]   || gcc -O2 -Wall -pthread -o "$EXPLOIT_BIN" "$EXPLOIT_SRC" || { echo "error: build failed"; exit 1; }
+
+# 3. Target Preparation
+printf '%s\n' "$CLEAN_MARKER" > "$TARGET_FILE"
+head -c 4096 /dev/zero >> "$TARGET_FILE" 2>/dev/null || true
+chmod 644 "$TARGET_FILE"
 sync
 echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
-cat "$VICTIM" > /dev/null 2>&1 || true
+cat "$TARGET_FILE" > /dev/null 2>&1 || true
 
-emit_status dirty-frag "$VAR" PENDING phase=pre_trigger   # panic under 'on' -> host resolves
-if [ -x "$BIN" ]; then
-    if [ "$(id -u)" -eq 0 ] && id testuser &>/dev/null; then
-        su -s /bin/bash testuser -c "export TARGET_PATH='$VICTIM'; cd '$DIR' && '$BIN' '$VICTIM'" > "$LOG" 2>&1 || true
-    else
-        export TARGET_PATH="$VICTIM"
-        "$BIN" "$VICTIM" > "$LOG" 2>&1 || true
-    fi
-fi
-# Read back WITHOUT dropping caches (page-cache corruption lives in memory).
-after="$(head -c 256 "$VICTIM" 2>/dev/null)"
+# 4. Exploit Execution
+su -s /bin/bash testuser -c "'$EXPLOIT_BIN'" || true
 
-if printf '%s' "$after" | grep -qF "$MARK"; then
-    if [ "$VAR" = on ]; then emit_status dirty-frag "$VAR" NEUTRALIZED marker=intact note=trapped
-    else                     emit_status dirty-frag "$VAR" FAIL marker=intact note=baseline_not_corrupted; fi
+# 5. Memory Inspection
+if grep -qF "$CLEAN_MARKER" <(head -c 256 "$TARGET_FILE" 2>/dev/null); then
+    echo "marker=intact"
 else
-    emit_status dirty-frag "$VAR" VULNERABLE marker=altered
+    echo "marker=altered"
 fi
+
+

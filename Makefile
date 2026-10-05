@@ -72,10 +72,10 @@ clean:
 
 clean-results:
 	@rm -rf results/*.log results/*.json results/.substrate results/data/* results/raw 2>/dev/null || true
-	@find build disk test sec perf \( -name 'result.log' -o -name 'raw.log' -o -name 'raw-*.log' -o -name raw \) \
+	@find build disk test sec perf \( -name 'result.log' -o -name 'result.csv' -o -name 'raw.log' -o -name 'raw-*.log' -o -name 'off.log' -o -name 'on.log' -o -name raw \) \
 	        -exec rm -rf {} + 2>/dev/null || true
 	@find . -path ./images -prune -o -name '*.img' -prune -o -type d -name '__pycache__' -exec rm -rf {} + 2>/dev/null || true
-	@echo "[clean-results] removed summaries, result.logs, raw transcripts, per-leaf raw/ dirs, and __pycache__."
+	@echo "[clean-results] removed summaries, result.csv, result.logs, raw transcripts, snippets, and __pycache__."
 
 clean-image:
 	@rm -f images/disk.img

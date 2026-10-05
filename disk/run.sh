@@ -1,31 +1,52 @@
 #!/usr/bin/env bash
-# disk/run.sh - Provision the persistent guest image (ONCE; debootstrap is slow
-# and gains nothing from re-runs) and, on every invocation, refresh the two
-# things that DO change: the required package set and the in-guest autorun
-# service. The workspace itself is shared live over virtio-9p, so there is no
-# workspace rsync step - only the autorun script, which must live in the image
-# because it runs before the 9p mount.
+# disk/run.sh - Provisions the persistent guest image (once) and refreshes packages
+# and the in-guest autorun service on subsequent invocations.
+#
+# The thesis workspace is shared live over virtio-9p, so workspace changes do not
+# require disk rebuilds. The autorun script is installed into the image rootfs
+# because it runs before the 9p filesystem is mounted.
 set -euo pipefail
 
-DIR="$(cd "$(dirname "$0")" && pwd)"; ROOT="$(cd "$DIR/.." && pwd)"
-source "$ROOT/common.sh"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+source "$REPO_ROOT/common.sh"
 
-DISK_IMG="${DISK_IMG:-$ROOT/images/disk.img}"
-DISK_SIZE="${DISK_SIZE:-8G}"; ROOTFS_SIZE="${ROOTFS_SIZE:-6G}"
-SUITE="${DEBIAN_SUITE:-bookworm}"; ARCH="${DEBIAN_ARCH:-amd64}"
+DISK_IMG="${DISK_IMG:-$REPO_ROOT/images/disk.img}"
+DISK_SIZE="${DISK_SIZE:-8G}"
+ROOTFS_SIZE="${ROOTFS_SIZE:-6G}"
+SUITE="${DEBIAN_SUITE:-bookworm}"
+ARCH="${DEBIAN_ARCH:-amd64}"
 MIRROR="${DEBIAN_MIRROR:-http://deb.debian.org/debian}"
-RAW="$DIR/raw.log"; mkdir -p "$ROOT/images"
+RAW_LOG="$SCRIPT_DIR/raw.log"
 
-# perl provides prove (pjd); the rest are compilers + benchmark tools.
+mkdir -p "$REPO_ROOT/images"
+
+# Required guest packages: compilers, prove (pjd-fstest harness), fio, sqlite3, and test utilities.
 PACKAGES="build-essential python3 perl libtest-harness-perl fio sqlite3 libsqlite3-dev libcap-dev libc6-dev sudo coreutils procps"
 
-# install_packages <mounted-root> - idempotent apt install inside the image.
-# Needs dev/proc/sys binds + resolv.conf for the chroot's apt to work.
+# ==============================================================================
+# Helper Functions: Virtual Filesystems and Chroot Management
+# ==============================================================================
+mount_chroot_binds() {
+    local mount_point="$1"
+    for dir in dev proc sys; do
+        sudo mount --bind "/$dir" "$mount_point/$dir" 2>/dev/null || true
+    done
+    sudo cp /etc/resolv.conf "$mount_point/etc/resolv.conf" 2>/dev/null || true
+}
+
+unmount_chroot_binds() {
+    local mount_point="$1"
+    for dir in dev proc sys; do
+        sudo umount "$mount_point/$dir" 2>/dev/null || true
+    done
+}
+
 install_packages() {
-    local mp="$1" d
-    for d in dev proc sys; do sudo mount --bind "/$d" "$mp/$d" 2>/dev/null || true; done
-    sudo cp /etc/resolv.conf "$mp/etc/resolv.conf" 2>/dev/null || true
-    sudo chroot "$mp" /bin/bash -c "
+    local mount_point="$1"
+    mount_chroot_binds "$mount_point"
+
+    sudo chroot "$mount_point" /bin/bash -c "
         export DEBIAN_FRONTEND=noninteractive
         apt-get update -qq
         apt-get install -y -qq --no-install-recommends $PACKAGES
@@ -33,79 +54,115 @@ install_packages() {
         echo 'testuser:testuser' | chpasswd 2>/dev/null || true
         echo 'testuser ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/testuser
     "
-    local st=$?
-    for d in dev proc sys; do sudo umount "$mp/$d" 2>/dev/null || true; done
-    return $st
+    local status=$?
+    unmount_chroot_binds "$mount_point"
+    return "$status"
 }
 
-install_autorun() {  # $1 = mounted root
-    sudo cp "$ROOT/guest/autorun.sh" "$1/usr/local/bin/pks-autorun.sh"
-    sudo chmod 755 "$1/usr/local/bin/pks-autorun.sh"
-    sudo cp "$ROOT/guest/autorun.service" "$1/etc/systemd/system/pks-autorun.service"
-    sudo mkdir -p "$1/etc/systemd/system/multi-user.target.wants"
+install_autorun() {
+    local mount_point="$1"
+    sudo cp "$REPO_ROOT/guest/autorun.sh" "$mount_point/usr/local/bin/pks-autorun.sh"
+    sudo chmod 755 "$mount_point/usr/local/bin/pks-autorun.sh"
+    sudo cp "$REPO_ROOT/guest/autorun.service" "$mount_point/etc/systemd/system/pks-autorun.service"
+    sudo mkdir -p "$mount_point/etc/systemd/system/multi-user.target.wants"
     sudo ln -sf /etc/systemd/system/pks-autorun.service \
-        "$1/etc/systemd/system/multi-user.target.wants/pks-autorun.service"
+        "$mount_point/etc/systemd/system/multi-user.target.wants/pks-autorun.service"
 }
 
+# ==============================================================================
+# Provisioning & Refresh Pipelines
+# ==============================================================================
 provision() {
     require_cmds qemu-img debootstrap sfdisk losetup mkfs.ext4 sudo
+
     qemu-img create -f raw "$DISK_IMG" "$DISK_SIZE"
     printf ',%s,L,*\n,,L\n' "$ROOTFS_SIZE" | sfdisk "$DISK_IMG"
 
-    local loop mp
-    loop=$(sudo losetup --find --show --partscan "$DISK_IMG"); sleep 1
-    sudo mkfs.ext4 -F -q "${loop}p1"
-    sudo mkfs.ext4 -F -q -O ^inline_data,^encrypt "${loop}p2"
+    local loop_device
+    loop_device=$(sudo losetup --find --show --partscan "$DISK_IMG")
+    sleep 1
 
-    mp="$(mktemp -d)"
-    cleanup() { for d in dev proc sys ""; do sudo umount "$mp/$d" 2>/dev/null || true; done
-                sudo losetup -d "$loop" 2>/dev/null || true; rmdir "$mp" 2>/dev/null || true; }
+    sudo mkfs.ext4 -F -q "${loop_device}p1"
+    sudo mkfs.ext4 -F -q -O ^inline_data,^encrypt "${loop_device}p2"
+
+    local mount_point
+    mount_point="$(mktemp -d)"
+
+    cleanup() {
+        unmount_chroot_binds "$mount_point"
+        sudo umount "$mount_point" 2>/dev/null || true
+        sudo losetup -d "$loop_device" 2>/dev/null || true
+        rmdir "$mount_point" 2>/dev/null || true
+    }
     trap cleanup RETURN
 
-    sudo mount "${loop}p1" "$mp"
-    sudo debootstrap --arch "$ARCH" "$SUITE" "$mp" "$MIRROR"
-    sudo mkdir -p "$mp/mnt/protected" "$mp/pks-thesis-env"
-    sudo tee "$mp/etc/fstab" >/dev/null <<FSTAB
+    sudo mount "${loop_device}p1" "$mount_point"
+    sudo debootstrap --arch "$ARCH" "$SUITE" "$mount_point" "$MIRROR"
+    sudo mkdir -p "$mount_point/mnt/protected" "$mount_point/pks-thesis-env"
+
+    sudo tee "$mount_point/etc/fstab" >/dev/null <<FSTAB
 /dev/vda1 / ext4 errors=remount-ro 0 1
 /dev/vda2 /mnt/protected ext4 noauto,nofail 0 2
 pks_env /pks-thesis-env 9p trans=virtio,version=9p2000.L,nofail 0 0
 FSTAB
-    install_packages "$mp"
-    install_autorun "$mp"
+
+    install_packages "$mount_point"
+    install_autorun "$mount_point"
 }
 
-# Refresh packages + autorun in an existing image, verifying the new autorun
-# landed. Package install is best-effort (a network/apt hiccup should not fail
-# the run), but autorun must succeed. Returns nonzero only on autorun failure.
 refresh_image() {
-    command -v losetup >/dev/null 2>&1 || { echo "losetup missing"; return 1; }
-    local loop mp rc=0
-    loop=$(sudo losetup --find --show --partscan "$DISK_IMG") || return 1
-    sleep 1; mp="$(mktemp -d)"
-    if sudo mount "${loop}p1" "$mp"; then
-        install_packages "$mp" || echo "[disk] WARN: package refresh failed (offline?); pjd/prove may be unavailable"
-        install_autorun "$mp" || rc=1
-        sudo grep -q 'HB autorun:' "$mp/usr/local/bin/pks-autorun.sh" 2>/dev/null || { echo "autorun marker not found after install"; rc=1; }
-        sudo umount "$mp" 2>/dev/null || true
+    command -v losetup >/dev/null 2>&1 || {
+        echo "losetup utility is missing"
+        return 1
+    }
+
+    local loop_device
+    loop_device=$(sudo losetup --find --show --partscan "$DISK_IMG") || return 1
+    sleep 1
+
+    local mount_point
+    mount_point="$(mktemp -d)"
+    local rc=0
+
+    if sudo mount "${loop_device}p1" "$mount_point"; then
+        install_packages "$mount_point" || echo "[disk] WARN: package refresh failed (offline?); pjd/prove may be unavailable"
+        install_autorun "$mount_point" || rc=1
+
+        # Verify autorun installation marker
+        if ! sudo grep -q 'HB autorun:' "$mount_point/usr/local/bin/pks-autorun.sh" 2>/dev/null; then
+            echo "autorun marker not found after installation"
+            rc=1
+        fi
+
+        sudo umount "$mount_point" 2>/dev/null || true
     else
         rc=1
     fi
-    sudo losetup -d "$loop" 2>/dev/null || true; rmdir "$mp" 2>/dev/null || true
-    return $rc
+
+    sudo losetup -d "$loop_device" 2>/dev/null || true
+    rmdir "$mount_point" 2>/dev/null || true
+    return "$rc"
 }
 
+# ==============================================================================
+# Execution Dispatch
+# ==============================================================================
 if [ ! -f "$DISK_IMG" ]; then
-    log_info "[disk] provisioning $SUITE image (one-time, slow)..."
-    start=$(date +%s)
-    provision >> "$RAW" 2>&1            # set -e aborts loudly on real failure
-    log_done "[disk] provisioned in $(( $(date +%s) - start ))s"
-    emit_status disk all PASS provisioned=yes image="$(du -h "$DISK_IMG" 2>/dev/null | cut -f1)" | tee "$DIR/result.log"
+    log_info "[disk] provisioning $SUITE image (one-time, initial setup)..."
+    start_time=$(date +%s)
+    provision >> "$RAW_LOG" 2>&1
+    elapsed=$(( $(date +%s) - start_time ))
+    log_done "[disk] provisioned in ${elapsed}s"
+    image_size="$(du -h "$DISK_IMG" 2>/dev/null | cut -f1)"
+    emit_status disk all PASS provisioned=yes image="$image_size" | tee "$SCRIPT_DIR/result.log"
 else
-    log_done "[disk] image present; refreshing packages + autorun."
-    if refresh_image >> "$RAW" 2>&1; then
-        emit_status disk all PASS refreshed=yes image="$(du -h "$DISK_IMG" 2>/dev/null | cut -f1)" | tee "$DIR/result.log"
+    log_done "[disk] image present; refreshing packages and autorun service."
+    image_size="$(du -h "$DISK_IMG" 2>/dev/null | cut -f1)"
+    if refresh_image >> "$RAW_LOG" 2>&1; then
+        emit_status disk all PASS refreshed=yes image="$image_size" | tee "$SCRIPT_DIR/result.log"
     else
-        emit_status disk all FAIL note=refresh_failed image="$(du -h "$DISK_IMG" 2>/dev/null | cut -f1)" | tee "$DIR/result.log"
-        die "image refresh failed; see $RAW"
+        emit_status disk all FAIL note=refresh_failed image="$image_size" | tee "$SCRIPT_DIR/result.log"
+        die "image refresh failed; see $RAW_LOG"
     fi
 fi
+
