@@ -17,7 +17,7 @@ id testuser &>/dev/null || { echo "error: testuser account required"; exit 1; }
 
 # 3. Target Preparation
 printf '%s\n' "$CLEAN_MARKER" > "$TARGET_FILE"
-head -c 4096 /dev/zero >> "$TARGET_FILE" 2>/dev/null || true
+head -c 65536 /dev/zero >> "$TARGET_FILE" 2>/dev/null || true
 chmod 644 "$TARGET_FILE"
 sync
 echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true

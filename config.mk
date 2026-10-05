@@ -25,5 +25,5 @@ EXECUTOR           ?= qemu
 QEMU_BIN           ?= qemu-system-x86_64
 SMP                ?= 4
 MEM                ?= 4096
-# Batch run timeout in seconds (1800s = 30 minutes for overnight runs).
-BATCH_TIMEOUT_SEC  ?= 1800
+# Batch run timeout in seconds (0 = disabled, runs until guest shutdown).
+BATCH_TIMEOUT_SEC  ?= 0

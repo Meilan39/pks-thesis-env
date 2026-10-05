@@ -27,3 +27,7 @@
    // Patched:
    // execve("/usr/bin/su", NULL, NULL);
    ```
+
+3. **Victim File Size Requirement**:
+   `collateral-after` mode mandates that `last <= file_size - FRAG_LEN`. For `PAYLOAD_LEN=192` (`last=191`) and `FRAG_LEN=4096`, the target file must be at least 4,288 bytes. `run.sh` prepares a 64 KiB file with trailing zero padding.
+

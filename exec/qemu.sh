@@ -34,7 +34,7 @@ QEMU_BIN="${QEMU_BIN:-qemu-system-x86_64}"
 
 SMP="${SMP:-4}"
 MEM="${MEM:-4096}"
-BATCH_TIMEOUT_SEC="${BATCH_TIMEOUT_SEC:-1800}"
+BATCH_TIMEOUT_SEC="${BATCH_TIMEOUT_SEC:-0}"
 
 # ==============================================================================
 # 2. Kernel & Artifact Validation
