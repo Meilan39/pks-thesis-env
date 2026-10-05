@@ -25,7 +25,30 @@
  */
 
 /* Needs to be first to twiddle appropriate system configuration/HAVE_* flags */
+// PATCH - fallback definitions when compiled standalone without autotools config.h
+#if defined(HAVE_CONFIG_H)
 #include "config.h"
+#else
+#ifndef _GNU_SOURCE
+#define _GNU_SOURCE 1
+#endif
+#define HAVE_OPENAT 1
+#define HAVE_UNLINKAT 1
+#define HAVE_MKDIRAT 1
+#define HAVE_LINKAT 1
+#define HAVE_SYMLINKAT 1
+#define HAVE_RENAMEAT 1
+#define HAVE_MKFIFOAT 1
+#define HAVE_MKNODAT 1
+#define HAVE_FCHMODAT 1
+#define HAVE_FCHOWNAT 1
+#define HAVE_FSTATAT 1
+#define HAVE_UTIMENSAT 1
+#if defined(__linux__)
+#define HAVE_POSIX_FALLOCATE 1
+#define HAVE_SYS_SYSMACROS_H 1
+#endif
+#endif
 
 #include <sys/param.h>
 #ifdef	HAVE_SYS_ACL_H

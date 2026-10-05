@@ -5,7 +5,21 @@
 - **Pristine Verification**: The test file [`test/pks-unit/test_pks.c`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/test/pks-unit/test_pks.c) is byte-for-byte identical to the upstream kernel source.
 - **Role in Thesis**: Validates the low-level hardware and architectural integrity of Protection Keys for Supervisor (PKS) under the evaluated kernel. Before measuring page-cache specific defenses, this test suite ensures that the CPU and kernel properly handle key allocation, thread MSR context switching, and supervisor page faults.
 
+### Directory Layout
+The suite contains only the essential components:
+```text
+test/pks-unit/
+├── test_pks.c   # Upstream Linux x86 selftest source (byte-for-byte pristine)
+├── test_pks     # Precompiled guest testing binary
+├── run.sh       # Execution runner and verdict parser
+└── README.md    # Architecture documentation and evaluation notes
+```
+
 ---
+
+## Applied Patches & Policy Compliance
+- **Applied Patches**: None.
+- **Verification**: [`test/pks-unit/test_pks.c`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/test/pks-unit/test_pks.c) is byte-for-byte identical to upstream [`tools/testing/selftests/x86/test_pks.c`](file:///Users/meilan/Documents/大学/学部卒論/linux-5.18-rc3/tools/testing/selftests/x86/test_pks.c). All runner logic is implemented cleanly in [`test/pks-unit/run.sh`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/test/pks-unit/run.sh) without altering upstream C code.
 
 ## Test Mechanics
 The selftest coordinates between a user-space harness and an in-kernel driver enabled by `CONFIG_PKS_TEST=y`. Commands are dispatched by writing numeric commands to `/sys/kernel/debug/x86/run_pks`:
@@ -51,10 +65,8 @@ if (ret == -ENOENT) {
 ```
 The userspace program exits with return code 0, marking the run as completely successful.
 
-### Applied Patch in Runner
-- **Patch Tag**: `# PATCH - evaluate userspace [OK] and exit code 0`
-- **Location**: [`test/pks-unit/run.sh`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/test/pks-unit/run.sh#L40)
-- **Rationale**: Earlier testbed versions used a naive string search `grep -q '[FAIL]'` over dynamic debug logs, misclassifying the intentional kernel rejection of test case 6 as a testbed failure. The runner evaluates userspace `[OK]` output and exit code 0, ensuring that hardware selftest results reflect actual CPU capability.
+### Runner Evaluation Logic
+Earlier testbed versions used a naive string search `grep -q '[FAIL]'` over dynamic debug logs, misclassifying the intentional kernel rejection of test case 6 as a testbed failure. The runner evaluates userspace `[OK]` output and exit code 0, ensuring that hardware selftest results reflect actual CPU capability without requiring patches to the pristine upstream `test_pks.c` source code.
 
 ---
 

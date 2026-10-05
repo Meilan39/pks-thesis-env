@@ -1,3 +1,0 @@
-STATUS node=sqlite variant=control verdict=PASS tps_syncoff=428.59 tps_syncfull=4.41
-STATUS node=sqlite variant=off verdict=PASS tps_syncoff=410.54 tps_syncfull=4.5
-STATUS node=sqlite variant=on verdict=PASS tps_syncoff=219.0 tps_syncfull=4.68

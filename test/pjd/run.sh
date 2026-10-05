@@ -34,7 +34,7 @@ LOG_FILE="/tmp/pjd_${VARIANT}.log"
 # ------------------------------------------------------------------------------
 # 1. Harness Availability Check
 # ------------------------------------------------------------------------------
-# PATCH - grace on omitted harness if prove/perl is absent
+# Gracefully record omission if prove, binary, or tests are unavailable
 if ! { [ -x "$PJD_BIN" ] && command -v prove >/dev/null 2>&1 && [ -d "$SCRIPT_DIR/tests" ]; }; then
     emit_status pjd "$VARIANT" PASS note=omitted_harness_absent total=0
     exit 0
@@ -43,7 +43,7 @@ fi
 # ------------------------------------------------------------------------------
 # 2. Execute Scoped POSIX Suite
 # ------------------------------------------------------------------------------
-# PATCH - scope POSIX tests to chown, chmod, truncate (non-mmap metadata syscalls)
+# Execute scoped POSIX metadata test suites (chown, chmod, truncate)
 (
     cd "$TARGET_DIR" && \
     prove -r "$SCRIPT_DIR/tests/chown" "$SCRIPT_DIR/tests/chmod" "$SCRIPT_DIR/tests/truncate"

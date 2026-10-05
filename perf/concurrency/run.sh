@@ -19,9 +19,6 @@ if [ ! -d "$TARGET_DIR" ]; then
     TARGET_DIR="/tmp"
 fi
 
-RAW_DIR="$SCRIPT_DIR/raw/$VARIANT"
-mkdir -p "$RAW_DIR" 2>/dev/null || true
-
 # ------------------------------------------------------------------------------
 # 1. Dependency Validation
 # ------------------------------------------------------------------------------
@@ -33,6 +30,8 @@ fi
 # ------------------------------------------------------------------------------
 # 2. Concurrency Sweep (1, 2, 4 Threads)
 # ------------------------------------------------------------------------------
+TMP_PREFIX="/tmp/concur_${VARIANT}"
+
 for num_jobs in 1 2 4; do
     sync
     echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
@@ -55,7 +54,7 @@ for num_jobs in 1 2 4; do
         --group_reporting=1 \
         --filename_format="$TARGET_DIR/fio_concur_${num_jobs}_\$jobnum.dat" \
         --output-format=json \
-        --output="$RAW_DIR/concurrency_${num_jobs}.json" >/dev/null 2>&1 || true
+        --output="${TMP_PREFIX}_${num_jobs}.json" >/dev/null 2>&1 || true
 
     rm -f "$TARGET_DIR/fio_concur_${num_jobs}_"*.dat
 done
@@ -67,11 +66,37 @@ extract_bw_mbps() {
     local json_file="$1"
     python3 -c "
 import json, sys
-data = json.load(open(sys.argv[1]))
-bw_kib = data['jobs'][0]['write']['bw']
-print(round(bw_kib / 1024, 1))
+try:
+    with open(sys.argv[1]) as f:
+        d = json.load(f)
+    bw_kib = d['jobs'][0]['write']['bw']
+    print(round(float(bw_kib) / 1024.0, 1))
+except Exception:
+    print('NA')
 " "$json_file" 2>/dev/null || echo "NA"
 }
 
-bw_4t="$(extract_bw_mbps "$RAW_DIR/concurrency_4.json")"
-emit_status concurrency "$VARIANT" PASS bw_4t_mbps="$bw_4t"
+bw_1t="$(extract_bw_mbps "${TMP_PREFIX}_1.json")"
+bw_2t="$(extract_bw_mbps "${TMP_PREFIX}_2.json")"
+bw_4t="$(extract_bw_mbps "${TMP_PREFIX}_4.json")"
+
+scaling_pct="$(python3 -c "
+try:
+    b1 = float('$bw_1t')
+    b4 = float('$bw_4t')
+    if b1 > 0:
+        eff = (b4 / (4.0 * b1)) * 100.0
+        print(f'{eff:.1f}')
+    else:
+        print('NA')
+except Exception:
+    print('NA')
+" 2>/dev/null || echo "NA")"
+
+rm -f "${TMP_PREFIX}_"*.json
+
+emit_status concurrency "$VARIANT" PASS \
+    bw_1t_mbps="$bw_1t" \
+    bw_2t_mbps="$bw_2t" \
+    bw_4t_mbps="$bw_4t" \
+    scaling_pct="$scaling_pct"

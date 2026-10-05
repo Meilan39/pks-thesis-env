@@ -102,20 +102,40 @@ rm -f "$COLD_FILE"
 # ------------------------------------------------------------------------------
 # 4. Telemetry Extraction and Verdict
 # ------------------------------------------------------------------------------
-extract_lat_us() {
+extract_metric() {
     local json_file="$1"
-    local op_type="$2"
+    local expr="$2"
     python3 -c "
 import json, sys
-data = json.load(open(sys.argv[1]))
-lat_ns = data['jobs'][0][sys.argv[2]]['lat_ns']['mean']
-print(round(lat_ns / 1000, 2))
-" "$json_file" "$op_type" 2>/dev/null || echo "NA"
+try:
+    with open(sys.argv[1]) as f:
+        d = json.load(f)
+    val = $expr
+    print(round(float(val), 2))
+except Exception:
+    print('NA')
+" "$json_file" 2>/dev/null || echo "NA"
 }
 
-warm_write_4k="$(extract_lat_us "$RAW_DIR/write_warm_4096.json" write)"
-warm_read_4k="$(extract_lat_us "$RAW_DIR/read_warm_4096.json" read)"
+warm_write_4k_lat="$(extract_metric "$RAW_DIR/write_warm_4096.json" "d['jobs'][0]['write']['lat_ns']['mean'] / 1000.0")"
+warm_read_4k_lat="$(extract_metric "$RAW_DIR/read_warm_4096.json" "d['jobs'][0]['read']['lat_ns']['mean'] / 1000.0")"
+cold_write_4k_lat="$(extract_metric "$RAW_DIR/write_cold_4096.json" "d['jobs'][0]['write']['lat_ns']['mean'] / 1000.0")"
+warm_write_4k_iops="$(extract_metric "$RAW_DIR/write_warm_4096.json" "d['jobs'][0]['write']['iops']")"
+read_1m_bw="$(extract_metric "$RAW_DIR/read_warm_1048576.json" "d['jobs'][0]['read']['bw']")"
+
+alloc_overhead="$(python3 -c "
+try:
+    cold = float('$cold_write_4k_lat')
+    warm = float('$warm_write_4k_lat')
+    print(round(cold - warm, 2))
+except Exception:
+    print('NA')
+" 2>/dev/null || echo "NA")"
 
 emit_status fio "$VARIANT" PASS \
-    lat4k_warm_write_us="$warm_write_4k" \
-    lat4k_warm_read_us="$warm_read_4k"
+    iops4k_warm_write="$warm_write_4k_iops" \
+    lat4k_warm_write_us="$warm_write_4k_lat" \
+    lat4k_warm_read_us="$warm_read_4k_lat" \
+    lat4k_cold_write_us="$cold_write_4k_lat" \
+    alloc_overhead_us="$alloc_overhead" \
+    bw1m_seq_read_kbs="$read_1m_bw"

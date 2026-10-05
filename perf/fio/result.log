@@ -1,3 +1,0 @@
-STATUS node=fio variant=control verdict=PASS lat4k_warm_write_us=95.34 lat4k_warm_read_us=58.03
-STATUS node=fio variant=off verdict=PASS lat4k_warm_write_us=58.22 lat4k_warm_read_us=43.12
-STATUS node=fio variant=on verdict=PASS lat4k_warm_write_us=249.18 lat4k_warm_read_us=44.84

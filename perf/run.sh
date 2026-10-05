@@ -1,11 +1,18 @@
 #!/usr/bin/env bash
-# perf/run.sh - HOST aggregator for the performance axis.
-# Executes one consolidated boot per experimental variant:
+# ==============================================================================
+# perf/run.sh - Performance & Overhead Evaluation Runner
+# ==============================================================================
+# Executes consolidated evaluation runs across experimental variants:
 #   - control: baseline kernel, unmitigated
 #   - off: mitigated kernel with PKS disabled (ablation baseline)
-#   - on: mitigated kernel with PKS enabled
-# Leaves emit quantitative metrics parsed from fio and sqlite benchmarks;
-# analyze.py computes relative overheads.
+#   - on: mitigated kernel with PKS enabled (hardware write isolation)
+#
+# Emits live execution stream and dual summary tables:
+#   Table 1: Fio Latency & Allocation Cost Breakdown
+#   Table 2: High-Level Benchmark Comparison (control, off, on, overhead)
+#
+# Data persistence: perf/result.csv and results/data/perf_summary.csv
+# ==============================================================================
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,51 +20,194 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/common.sh"
 
 EXECUTOR_SCRIPT="$REPO_ROOT/exec/${EXECUTOR:-qemu}.sh"
-LEAVES=(fio concurrency sqlite)
+PERF_LEAVES=(fio concurrency sqlite)
+AXIS_CSV="$SCRIPT_DIR/result.csv"
 
-# ==============================================================================
-# 1. Clean Initialization
-# ==============================================================================
-# Reset leaf result logs and remove previous raw benchmark outputs
-# so analysis runs strictly against the current execution.
-for leaf in "${LEAVES[@]}"; do
-    : > "$SCRIPT_DIR/$leaf/result.log"
-    rm -rf "$SCRIPT_DIR/$leaf/raw"
-done
+# ------------------------------------------------------------------------------
+# 1. Output Initialization
+# ------------------------------------------------------------------------------
+echo "node,variant,verdict,details" > "$AXIS_CSV"
 
-# ==============================================================================
-# 2. Consolidated Variant Execution
-# ==============================================================================
-run_variant() {
-    local variant_label="$1"
+# ------------------------------------------------------------------------------
+# 2. Header Banner
+# ------------------------------------------------------------------------------
+echo "========================================================================================"
+echo " [perf] PKS Performance Evaluation: Micro- & Macrobenchmarks"
+echo " Workloads: fio (warm/cold), concurrency, sqlite | Variants: control, off, on"
+echo "========================================================================================"
+
+calc_overhead() {
+    local base="$1"
+    local curr="$2"
+    python3 -c "
+try:
+    b = float('$base')
+    c = float('$curr')
+    if b == 0:
+        print('N/A')
+    else:
+        ovh = ((c / b) - 1.0) * 100.0
+        print(f'{ovh:+.2f}%')
+except Exception:
+    print('N/A')
+" 2>/dev/null || echo "N/A"
+}
+
+# ------------------------------------------------------------------------------
+# 3. Consolidated Variant Execution
+# ------------------------------------------------------------------------------
+pass_count=0
+fail_count=0
+
+run_and_harvest() {
+    local variant="$1"
     local kernel_variant="$2"
     local pks_mode="$3"
-    local transcript_log="$SCRIPT_DIR/raw-${variant_label}.log"
+    local desc="$4"
+    local raw_log="$SCRIPT_DIR/raw-${variant}.log"
 
-    echo "--- [perf] Launching variant: $variant_label ($kernel_variant, pks=$pks_mode) ---"
-    "$EXECUTOR_SCRIPT" "$kernel_variant" "$pks_mode" perf "$transcript_log"
+    echo ""
+    echo "--- Variant: $variant ($desc: kernel=$kernel_variant, pcache_pks=$pks_mode) ---"
+    "$EXECUTOR_SCRIPT" "$kernel_variant" "$pks_mode" perf "$raw_log" >/dev/null
 
-    for leaf in "${LEAVES[@]}"; do
-        harvest_node "$transcript_log" "$leaf" "$SCRIPT_DIR/$leaf/result.log"
+    for leaf in "${PERF_LEAVES[@]}"; do
+        line=$(grep -aoE "STATUS node=${leaf} variant=${variant} .*" "$raw_log" 2>/dev/null | tail -n1)
+        verdict="FAIL"
+        details="unresolved"
+        if [ -n "$line" ]; then
+            verdict=$(status_field "$line" verdict)
+            details=$(printf '%s\n' "$line" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//')
+            [ -z "$details" ] && details="ok"
+        fi
+
+        color="$C_RED"
+        if [ "$verdict" = "PASS" ]; then
+            color="$C_GREEN"
+            pass_count=$((pass_count + 1))
+        else
+            fail_count=$((fail_count + 1))
+        fi
+
+        echo "$leaf,$variant,$verdict,$details" >> "$AXIS_CSV"
+        tag="[${leaf}-${variant}]"
+        printf " %-22s %-10s ... %b%-4s%b (%s)\n" \
+            "$tag" "$variant" "$color" "$verdict" "$C_RESET" "$details"
     done
 }
 
-run_variant control control off
-run_variant off     perf    off
-run_variant on      perf    on
+run_and_harvest control control off "Baseline Unmitigated Kernel"
+run_and_harvest off     perf    off "Mitigated Kernel (PKS Unloaded)"
+run_and_harvest on      perf    on  "Mitigated Kernel (PKS Active)"
 
-# ==============================================================================
-# 3. Validation, Rollup, and Analysis
-# ==============================================================================
-for leaf in "${LEAVES[@]}"; do
-    mark_empty_leaves all "$SCRIPT_DIR/$leaf/result.log"
+# ------------------------------------------------------------------------------
+# 4. Summary Tables & Analysis
+# ------------------------------------------------------------------------------
+echo ""
+echo "========================================================================================"
+echo " Table 1: Fio Latency & Allocation Cost Breakdown"
+echo "----------------------------------------------------------------------------------------"
+printf " %-12s %-16s %-16s %-18s %-12s %-12s\n" \
+    "Variant" "4K Warm (us)" "4K Cold (us)" "Alloc Delta (us)" "4K IOPS" "1M Read (MB/s)"
+echo "----------------------------------------------------------------------------------------"
+
+for v in control off on; do
+    fio_line=$(grep -aoE "^fio,${v},.*" "$AXIS_CSV" 2>/dev/null | tail -n1)
+    f_warm=$(printf '%s\n' "$fio_line" | tr ', ' '\n\n' | sed -n 's/^lat4k_warm_write_us=//p' | head -n1)
+    f_cold=$(printf '%s\n' "$fio_line" | tr ', ' '\n\n' | sed -n 's/^lat4k_cold_write_us=//p' | head -n1)
+    f_delta=$(printf '%s\n' "$fio_line" | tr ', ' '\n\n' | sed -n 's/^alloc_overhead_us=//p' | head -n1)
+    f_iops=$(printf '%s\n' "$fio_line" | tr ', ' '\n\n' | sed -n 's/^iops4k_warm_write=//p' | head -n1)
+    f_bw_kib=$(printf '%s\n' "$fio_line" | tr ', ' '\n\n' | sed -n 's/^bw1m_seq_read_kbs=//p' | head -n1)
+
+    f_read_mb=$(python3 -c "
+try:
+    print(round(float('$f_bw_kib') / 1024.0, 1))
+except Exception:
+    print('N/A')
+" 2>/dev/null || echo "N/A")
+
+    printf " %-12s %-16s %-16s %-18s %-12s %-12s\n" \
+        "$v" "${f_warm:-N/A}" "${f_cold:-N/A}" "${f_delta:-N/A}" "${f_iops:-N/A}" "${f_read_mb:-N/A}"
 done
+echo "----------------------------------------------------------------------------------------"
 
-rollup "$SCRIPT_DIR/result.log" perf "$SCRIPT_DIR"/*/result.log
-rollup_rc=$?
+echo ""
+echo "========================================================================================"
+echo " Table 2: High-Level Performance Comparison"
+echo "----------------------------------------------------------------------------------------"
+printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
+    "Benchmark" "Metric" "Control" "Off" "On" "PKS Overhead (%)"
+echo "----------------------------------------------------------------------------------------"
 
-# Extract summary metrics into results CSV
-python3 "$SCRIPT_DIR/analyze.py" "$SCRIPT_DIR" "$REPO_ROOT/results/data/perf_summary.csv" || true
+get_detail() {
+    local node="$1"
+    local var="$2"
+    local field="$3"
+    local l
+    l=$(grep -aoE "^${node},${var},.*" "$AXIS_CSV" 2>/dev/null | tail -n1)
+    printf '%s\n' "$l" | tr ', ' '\n\n' | sed -n "s/^${field}=//p" | head -n1
+}
 
-exit "$rollup_rc"
+# 1. fio warm write lat
+f_w_c=$(get_detail fio control lat4k_warm_write_us)
+f_w_off=$(get_detail fio off lat4k_warm_write_us)
+f_w_on=$(get_detail fio on lat4k_warm_write_us)
+f_w_ovh=$(calc_overhead "$f_w_c" "$f_w_on")
+printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
+    "fio 4KB warm" "Write Lat (us)" "${f_w_c:-N/A}" "${f_w_off:-N/A}" "${f_w_on:-N/A}" "$f_w_ovh"
+
+# 2. fio warm read lat
+f_r_c=$(get_detail fio control lat4k_warm_read_us)
+f_r_off=$(get_detail fio off lat4k_warm_read_us)
+f_r_on=$(get_detail fio on lat4k_warm_read_us)
+f_r_ovh=$(calc_overhead "$f_r_c" "$f_r_on")
+printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
+    "fio 4KB warm" "Read Lat (us)" "${f_r_c:-N/A}" "${f_r_off:-N/A}" "${f_r_on:-N/A}" "$f_r_ovh"
+
+# 3. fio cold write lat
+f_c_c=$(get_detail fio control lat4k_cold_write_us)
+f_c_off=$(get_detail fio off lat4k_cold_write_us)
+f_c_on=$(get_detail fio on lat4k_cold_write_us)
+f_c_ovh=$(calc_overhead "$f_c_c" "$f_c_on")
+printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
+    "fio 4KB cold" "Write Lat (us)" "${f_c_c:-N/A}" "${f_c_off:-N/A}" "${f_c_on:-N/A}" "$f_c_ovh"
+
+# 4. concurrency 4-thread bw
+c_4_c=$(get_detail concurrency control bw_4t_mbps)
+c_4_off=$(get_detail concurrency off bw_4t_mbps)
+c_4_on=$(get_detail concurrency on bw_4t_mbps)
+c_4_ovh=$(calc_overhead "$c_4_c" "$c_4_on")
+printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
+    "concurrency" "4-Thread BW (MB/s)" "${c_4_c:-N/A}" "${c_4_off:-N/A}" "${c_4_on:-N/A}" "$c_4_ovh"
+
+# 5. sqlite sync=OFF
+s_off_c=$(get_detail sqlite control tps_syncoff)
+s_off_off=$(get_detail sqlite off tps_syncoff)
+s_off_on=$(get_detail sqlite on tps_syncoff)
+s_off_ovh=$(calc_overhead "$s_off_c" "$s_off_on")
+printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
+    "sqlite" "Tx/s (sync=OFF)" "${s_off_c:-N/A}" "${s_off_off:-N/A}" "${s_off_on:-N/A}" "$s_off_ovh"
+
+# 6. sqlite sync=FULL
+s_full_c=$(get_detail sqlite control tps_syncfull)
+s_full_off=$(get_detail sqlite off tps_syncfull)
+s_full_on=$(get_detail sqlite on tps_syncfull)
+s_full_ovh=$(calc_overhead "$s_full_c" "$s_full_on")
+printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
+    "sqlite" "Tx/s (sync=FULL)" "${s_full_c:-N/A}" "${s_full_off:-N/A}" "${s_full_on:-N/A}" "$s_full_ovh"
+
+echo "----------------------------------------------------------------------------------------"
+
+overall="PASS"
+[ "$fail_count" -gt 0 ] && overall="FAIL"
+overall_color="$([ "$overall" = "PASS" ] && echo "$C_GREEN" || echo "$C_RED")"
+
+echo "perf,all,$overall,completed=${pass_count}_failed=${fail_count}" >> "$AXIS_CSV"
+
+printf " OVERALL: %b%s%b (%d/9 benchmark runs completed, %d failing)\n" \
+    "$overall_color" "$overall" "$C_RESET" "$pass_count" "$fail_count"
+echo "========================================================================================"
+
+python3 "$SCRIPT_DIR/analyze.py" "$SCRIPT_DIR" "$REPO_ROOT/results/data/perf_summary.csv" >/dev/null 2>&1 || true
+
+[ "$overall" = "PASS" ]
 

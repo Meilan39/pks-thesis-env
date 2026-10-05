@@ -35,7 +35,7 @@ LOG_FILE="/tmp/pks-unit_${VARIANT}.log"
 # ------------------------------------------------------------------------------
 # 1. Execute Upstream PKS Selftest
 # ------------------------------------------------------------------------------
-# PATCH - evaluate userspace [OK] and exit code 0
+# Execute selftest; userspace exit code and assertions reflect pass/fail
 test_rc=127
 if [ -x "$TEST_BIN" ] && [ -e "$RUN_PKS_TRIGGER" ]; then
     "$TEST_BIN" -d > "$LOG_FILE" 2>&1

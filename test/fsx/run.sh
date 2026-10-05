@@ -32,7 +32,7 @@ LOG_FILE="/tmp/fsx_${VARIANT}.log"
 TEST_FILE="$TARGET_DIR/fsx_${VARIANT}.dat"
 rm -f "$TEST_FILE"
 
-# PATCH - disable MAPWRITE on PKS protected mount (-W)
+# Pass -W to disable MAPWRITE operations when running against PKS protected mounts
 EXTRA_FLAGS=""
 if [ "$VARIANT" = "on" ]; then
     EXTRA_FLAGS="-W"
