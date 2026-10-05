@@ -8,24 +8,24 @@ verdict from observed guest behaviour — nothing is hardcoded or simulated.**
 
 ## Layout: a self-similar tree
 
-Every node is a directory with a `run.sh` and a generated `result.log`.
+Every evaluation axis provides a self-contained runner (`run.sh`), comprehensive reviewer documentation (`README.md`), and exports structured records strictly into an in-tree `result.csv`.
 
-```
+```text
 pks-thesis-env/
 ├── Makefile          # 5 verbs: build, disk, test, sec, perf
 ├── config.mk         # kernel paths, disk sizes, SMP/MEM, EXECUTOR
-├── common.sh         # logging + the STATUS contract + harvest/rollup helpers
+├── common.sh         # logging, ANSI formatting, and the STATUS contract
 ├── preflight.sh      # deps + substrate detection + provenance
 ├── configs/          # kconfig fragments: common, sec, perf, control
 ├── exec/             # substrate adapters: qemu.sh (now), baremetal.sh (stub)
 ├── guest/            # in-guest autorun.sh + autorun.service
-├── build/  run.sh  result.log   {control,sec,perf}/run.sh   # 3 kernels
-├── disk/   run.sh  result.log                               # provision + autorun
-├── test/   run.sh  result.log   {pks-unit,sanity,fsx,pjd}/  # compliance
-├── sec/    run.sh  result.log   {copy-fail,dirty-frag,fragnesia}/  # exploits
-├── perf/   run.sh  result.log   {fio,concurrency,sqlite}/ + analyze.py
-├── results/  raw/ (timestamped transcripts + JSON) + data/ (CSVs) + <verb>.log
-└── tools/plotting/   # offline figures/TOST, consumes results/data/perf_summary.csv
+├── build/            # kernel compilation: control, sec, perf
+├── disk/             # debian image provisioning + autorun setup
+├── test/             # Compliance axis: {fsx, pjd, pks-unit, sanity} -> test/result.csv
+├── sec/              # Security axis: {copy-fail, dirty-frag, fragnesia} -> sec/result.csv
+├── perf/             # Performance axis: {fio, concurrency, sqlite} -> perf/result.csv + analyze.py
+├── results/          # Publication datasets: results/data/perf_summary.csv
+└── tools/plotting/   # Offline thesis figure generation from results/data/
 ```
 
 Note the deliberate, documented name reuse: `build/sec/` **builds the diagnostic
@@ -59,10 +59,15 @@ STATUS node=<name> variant=<control|off|on> verdict=<PASS|FAIL|NEUTRALIZED|VULNE
 emitted just before a possibly-fatal step and resolved later by the host.
 
 An **aggregator** `run.sh` boots the guest via `exec/$(EXECUTOR).sh`, captures the
-serial transcript, harvests the leaf STATUS lines from it, writes each leaf's
-`result.log`, and appends a rollup line to its own `result.log` — exiting nonzero
-if any child failed. Two artifacts are kept, never conflated: `result.log`
-(parsed, latest, rolled up) and `results/raw/**` (timestamped transcripts + JSON).
+serial transcript, harvests the leaf STATUS lines directly, prints a structured
+3-tier console report (88-col banner, live per-variant stream, and summary table footer),
+and appends structured rows to its axis `result.csv` — exiting nonzero if any child failed.
+
+All intermediate `result.log` files and raw JSONs (with the exception of `fio` multi-block
+size curves in `perf/fio/raw/`) are eliminated:
+- **Terminal Console**: Live 3-tier formatted stream.
+- **Persistent Structured Records**: Solely in-tree `<axis>/result.csv` (`sec/result.csv`, `test/result.csv`, `perf/result.csv`).
+- **Raw Transcripts**: Captured in `<axis>/raw-<variant>.log` for serial auditing.
 
 Because the transport is the **live serial stream**, a fail-closed kernel panic
 (the intended `on` outcome for the softirq/workqueue exploits) is captured before

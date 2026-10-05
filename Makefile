@@ -13,8 +13,8 @@ export DEV_KERNEL_DIR CONTROL_KERNEL_DIR DISK_IMG DISK_SIZE ROOTFS_SIZE
 export DEBIAN_SUITE DEBIAN_ARCH DEBIAN_MIRROR EXECUTOR QEMU_BIN SMP MEM BATCH_TIMEOUT_SEC
 
 # Top-level results/ holds ONLY summaries: results/data/*.csv and preflight.json.
-# Raw transcripts + JSON live next to their producers (leaf raw/ and axis raw-*.log);
-# rolled-up STATUS lives in each node's result.log. Nothing else belongs here.
+# Raw transcripts + JSON live next to their producers (fio raw/ and axis raw-*.log);
+# rolled-up metrics live in each axis's result.csv. Nothing else belongs here.
 $(shell mkdir -p results/data images)
 
 .PHONY: help preflight build disk test sec perf run-qemu end-qemu \
@@ -37,7 +37,7 @@ help:
 preflight:
 	@./preflight.sh
 
-# Verbs stream to the console; persistence is in-tree (result.log + raw next to
+# Verbs stream to the console; persistence is in-tree (result.csv + raw next to
 # each producer). We deliberately do NOT duplicate a full transcript into results/.
 build:
 	@./build/run.sh
