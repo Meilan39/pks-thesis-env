@@ -1,0 +1,91 @@
+[WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
+[DONE] Preflight recorded (tcg) -> results/preflight.json
+========================================================================================
+ [test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics
+ Leaves: fsx, pjd, pks-unit, sanity | Modes: off, on | Executor: qemu
+========================================================================================
+ [fsx-off]          pcache_pks=off ... PASS (ops=10000 errors=0)
+ [pjd-off]          pcache_pks=off ... FAIL (unresolved)
+ [pks-unit-off]     pcache_pks=off ... FAIL (unresolved)
+ [sanity-off]       pcache_pks=off ... FAIL (unresolved)
+ [fsx-on]           pcache_pks=on  ... PASS (ops=10000 errors=0)
+ [pjd-on]           pcache_pks=on  ... FAIL (unresolved)
+ [pks-unit-on]      pcache_pks=on  ... FAIL (unresolved)
+ [sanity-on]        pcache_pks=on  ... FAIL (unresolved)
+----------------------------------------------------------------------------------------
+ Test            pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
+----------------------------------------------------------------------------------------
+ fsx             PASS (ops=10000 errors=0)             PASS (ops=10000 errors=0)    
+ pjd             FAIL (unresolved)                      FAIL (unresolved)             
+ pks-unit        FAIL (unresolved)                      FAIL (unresolved)             
+ sanity          FAIL (unresolved)                      FAIL (unresolved)             
+----------------------------------------------------------------------------------------
+ OVERALL: FAIL (2/8 passing, 6 failing)
+========================================================================================
+[WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
+[DONE] Preflight recorded (tcg) -> results/preflight.json
+========================================================================================
+ [sec] PKS Security Evaluation: End-to-End Exploit Neutralization
+ Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: qemu
+========================================================================================
+ [copy-fail-off]    pcache_pks=off ... PASS (outcome=altered)
+ [copy-fail-on]     pcache_pks=on  ... PASS (outcome=fail_closed_panic)
+ [dirty-frag-off]   pcache_pks=off ... PASS (outcome=altered)
+ [dirty-frag-on]    pcache_pks=on  ... PASS (outcome=fail_closed_panic)
+ [fragnesia-off]    pcache_pks=off ... FAIL (outcome=intact)
+ [fragnesia-on]     pcache_pks=on  ... PASS (outcome=intact)
+----------------------------------------------------------------------------------------
+ Exploit         pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
+----------------------------------------------------------------------------------------
+ copy-fail       PASS (altered)                         PASS (fail_closed_panic)      
+ dirty-frag      PASS (altered)                         PASS (fail_closed_panic)      
+ fragnesia       FAIL (intact)                          PASS (intact)                 
+----------------------------------------------------------------------------------------
+ OVERALL: FAIL (5/6 passing, 1 failing)
+========================================================================================
+[WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
+[DONE] Preflight recorded (tcg) -> results/preflight.json
+========================================================================================
+ [perf] PKS Performance Evaluation: Micro- & Macrobenchmarks
+ Workloads: fio (warm/cold), concurrency, sqlite | Variants: control, off, on
+========================================================================================
+
+--- Variant: control (Baseline Unmitigated Kernel: kernel=control, pcache_pks=off) ---
+ [fio-control]          control    ... PASS (iops4k_warm_write=14681.0 lat4k_warm_write_us=53.11 lat4k_warm_read_us=33.72 lat4k_cold_write_us=55.92 alloc_overhead_us=2.81 bw1m_seq_read_kbs=103044.0)
+ [concurrency-control]  control    ... PASS (bw_1t_mbps=61.1 bw_2t_mbps=49.9 bw_4t_mbps=49.0 scaling_pct=20.0)
+ [sqlite-control]       control    ... PASS (tps_syncoff=484.13 tps_syncfull=4.87 lat_syncoff_us=2065.58 lat_syncfull_us=205327.52)
+
+--- Variant: off (Mitigated Kernel (PKS Unloaded): kernel=perf, pcache_pks=off) ---
+ [fio-off]              off        ... PASS (iops4k_warm_write=15283.58 lat4k_warm_write_us=50.33 lat4k_warm_read_us=38.97 lat4k_cold_write_us=49.46 alloc_overhead_us=-0.87 bw1m_seq_read_kbs=117028.0)
+ [concurrency-off]      off        ... PASS (bw_1t_mbps=55.2 bw_2t_mbps=45.3 bw_4t_mbps=49.2 scaling_pct=22.3)
+ [sqlite-off]           off        ... PASS (tps_syncoff=502.31 tps_syncfull=5.48 lat_syncoff_us=1990.82 lat_syncfull_us=182505.24)
+
+--- Variant: on (Mitigated Kernel (PKS Active): kernel=perf, pcache_pks=on) ---
+ [fio-on]               on         ... PASS (iops4k_warm_write=4478.95 lat4k_warm_write_us=189.62 lat4k_warm_read_us=34.66 lat4k_cold_write_us=176.82 alloc_overhead_us=-12.8 bw1m_seq_read_kbs=106389.0)
+ [concurrency-on]       on         ... PASS (bw_1t_mbps=18.4 bw_2t_mbps=13.8 bw_4t_mbps=13.7 scaling_pct=18.6)
+ [sqlite-on]            on         ... PASS (tps_syncoff=294.28 tps_syncfull=5.36 lat_syncoff_us=3398.1 lat_syncfull_us=186644.44)
+
+========================================================================================
+ Table 1: Fio Latency & Allocation Cost Breakdown
+----------------------------------------------------------------------------------------
+ Variant      4K Warm (us)     4K Cold (us)     Alloc Delta (us)   4K IOPS      1M Read (MB/s)
+----------------------------------------------------------------------------------------
+ control      53.11            55.92            2.81               14681.0      N/A         
+ off          50.33            49.46            -0.87              15283.58     N/A         
+ on           189.62           176.82           -12.8              4478.95      N/A         
+----------------------------------------------------------------------------------------
+
+========================================================================================
+ Table 2: High-Level Performance Comparison
+----------------------------------------------------------------------------------------
+ Benchmark        Metric               Control      Off          On           PKS Overhead (%)
+----------------------------------------------------------------------------------------
+ fio 4KB warm     Write Lat (us)       53.11        50.33        189.62       +257.03%        
+ fio 4KB warm     Read Lat (us)        33.72        38.97        34.66        +2.79%          
+ fio 4KB cold     Write Lat (us)       55.92        49.46        176.82       +216.20%        
+ concurrency      4-Thread BW (MB/s)   49.0         49.2         13.7         -72.04%         
+ sqlite           Tx/s (sync=OFF)      484.13       502.31       294.28       -39.21%         
+ sqlite           Tx/s (sync=FULL)     4.87         5.48         5.36         +10.06%         
+----------------------------------------------------------------------------------------
+ OVERALL: PASS (9/9 benchmark runs completed, 0 failing)
+========================================================================================

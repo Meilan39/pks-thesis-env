@@ -1,11 +1,11 @@
 node,variant,verdict,details
-fio,control,PASS,iops4k_warm_write=10488.77 lat4k_warm_write_us=95.34 lat4k_warm_read_us=58.03 lat4k_cold_write_us=76.75 alloc_overhead_us=-18.59 bw1m_seq_read_kbs=81245.0
-concurrency,control,PASS,bw_1t_mbps=42.1 bw_2t_mbps=82.4 bw_4t_mbps=35.3 scaling_pct=21.0
-sqlite,control,PASS,tps_syncoff=428.59 tps_syncfull=4.41 lat_syncoff_us=2333.23 lat_syncfull_us=226757.37
-fio,off,PASS,iops4k_warm_write=17176.22 lat4k_warm_write_us=58.22 lat4k_warm_read_us=43.12 lat4k_cold_write_us=76.54 alloc_overhead_us=18.32 bw1m_seq_read_kbs=79341.0
-concurrency,off,PASS,bw_1t_mbps=43.0 bw_2t_mbps=83.1 bw_4t_mbps=34.9 scaling_pct=20.3
-sqlite,off,PASS,tps_syncoff=410.54 tps_syncfull=4.5 lat_syncoff_us=2435.81 lat_syncfull_us=222222.22
-fio,on,PASS,iops4k_warm_write=4013.16 lat4k_warm_write_us=249.18 lat4k_warm_read_us=44.84 lat4k_cold_write_us=221.12 alloc_overhead_us=-28.06 bw1m_seq_read_kbs=79341.0
-concurrency,on,PASS,bw_1t_mbps=16.8 bw_2t_mbps=32.9 bw_4t_mbps=9.7 scaling_pct=14.4
-sqlite,on,PASS,tps_syncoff=219.0 tps_syncfull=4.68 lat_syncoff_us=4566.21 lat_syncfull_us=213675.21
+fio,control,PASS,iops4k_warm_write=14681.0 lat4k_warm_write_us=53.11 lat4k_warm_read_us=33.72 lat4k_cold_write_us=55.92 alloc_overhead_us=2.81 bw1m_seq_read_kbs=103044.0
+concurrency,control,PASS,bw_1t_mbps=61.1 bw_2t_mbps=49.9 bw_4t_mbps=49.0 scaling_pct=20.0
+sqlite,control,PASS,tps_syncoff=484.13 tps_syncfull=4.87 lat_syncoff_us=2065.58 lat_syncfull_us=205327.52
+fio,off,PASS,iops4k_warm_write=15283.58 lat4k_warm_write_us=50.33 lat4k_warm_read_us=38.97 lat4k_cold_write_us=49.46 alloc_overhead_us=-0.87 bw1m_seq_read_kbs=117028.0
+concurrency,off,PASS,bw_1t_mbps=55.2 bw_2t_mbps=45.3 bw_4t_mbps=49.2 scaling_pct=22.3
+sqlite,off,PASS,tps_syncoff=502.31 tps_syncfull=5.48 lat_syncoff_us=1990.82 lat_syncfull_us=182505.24
+fio,on,PASS,iops4k_warm_write=4478.95 lat4k_warm_write_us=189.62 lat4k_warm_read_us=34.66 lat4k_cold_write_us=176.82 alloc_overhead_us=-12.8 bw1m_seq_read_kbs=106389.0
+concurrency,on,PASS,bw_1t_mbps=18.4 bw_2t_mbps=13.8 bw_4t_mbps=13.7 scaling_pct=18.6
+sqlite,on,PASS,tps_syncoff=294.28 tps_syncfull=5.36 lat_syncoff_us=3398.1 lat_syncfull_us=186644.44
 perf,all,PASS,completed=9_failed=0
