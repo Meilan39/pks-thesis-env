@@ -59,7 +59,7 @@ from perf/run.sh from run.sh   from run.sh     (serial output)    (sole axis log
 
 1. **Terminal Console**: Driven entirely by [`perf/run.sh`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/perf/run.sh). An 88-column header opens the run, followed by per-variant live execution logs. The footer delivers dual summary tables:
    - **Table 1: Fio Latency & Allocation Cost Breakdown**: Warm vs. cold write latencies, allocation cost delta ($\text{Cold} - \text{Warm}$), 4 KiB IOPS, and 1 MiB read bandwidth.
-   - **Table 2: High-Level Benchmark Comparison**: Direct side-by-side comparison across `control`, `off`, and `on` variants with calculated percentage overheads.
+   - **Table 2: High-Level Performance Comparison**: Direct side-by-side comparison across `control`, `off`, and `on` variants with calculated percentage overheads.
 2. **Persistent Storage**: All structured test records are stored strictly in [`perf/result.csv`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/perf/result.csv). Historical summaries are synthesized to [`results/data/perf_summary.csv`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/results/data/perf_summary.csv). No intermediate `result.log` files are created.
 3. **Raw Telemetry**: Virtual machine serial transcripts are captured in `perf/raw-control.log`, `perf/raw-off.log`, and `perf/raw-on.log`. Comprehensive multi-block-size JSON outputs are preserved strictly for `fio` under `perf/fio/raw/<variant>/`.
 

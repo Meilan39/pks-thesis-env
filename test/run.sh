@@ -2,6 +2,10 @@
 # ==============================================================================
 # test/run.sh - Compliance & Integrity Evaluation Runner
 # ==============================================================================
+# Boots the guest once per mode (off, on), harvests the four compliance leaves
+# (fsx, pjd, pks-unit, sanity) from each serial transcript, and renders the
+# shared axis console report. Structured rows are appended to test/result.csv.
+# ==============================================================================
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -20,100 +24,62 @@ echo "node,variant,verdict,details" > "$AXIS_CSV"
 # ------------------------------------------------------------------------------
 # 2. Header Banner
 # ------------------------------------------------------------------------------
-echo "========================================================================================"
-echo " [test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics"
-echo " Leaves: fsx, pjd, pks-unit, sanity | Modes: off, on | Executor: ${EXECUTOR:-qemu}"
-echo "========================================================================================"
+report_banner \
+    "[test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics" \
+    "Leaves: fsx, pjd, pks-unit, sanity | Modes: off, on | Executor: ${EXECUTOR:-qemu}"
 
 pass_count=0
 fail_count=0
-TABLE_ROWS=()
+# Per-leaf verdict/detail, indexed in lockstep with COMPLIANCE_LEAVES.
+V_OFF=(); D_OFF=()
+V_ON=();  D_ON=()
+
+# Harvests one leaf verdict/detail from a transcript into the per-mode arrays at
+# the given index, tallies the global counters, prints its live line, and records
+# the CSV row.
+harvest_leaf() {
+    local raw_log="$1"
+    local leaf="$2"
+    local variant="$3"
+    local idx="$4"
+
+    local line verdict details
+    line=$(grep -aoE "STATUS node=${leaf} variant=${variant} .*" "$raw_log" 2>/dev/null | tail -n1)
+    verdict="FAIL"
+    details="unresolved"
+    if [ -n "$line" ]; then
+        verdict=$(status_field "$line" verdict)
+        details=$(status_detail_tail "$line")
+        [ -z "$details" ] && details="ok"
+    fi
+
+    if [ "$variant" = "off" ]; then
+        V_OFF[$idx]="$verdict"; D_OFF[$idx]="$details"
+    else
+        V_ON[$idx]="$verdict";  D_ON[$idx]="$details"
+    fi
+
+    if [ "$verdict" = "PASS" ]; then
+        pass_count=$((pass_count + 1))
+    else
+        fail_count=$((fail_count + 1))
+    fi
+
+    echo "$leaf,$variant,$verdict,$details" >> "$AXIS_CSV"
+    report_leaf "[${leaf}-${variant}]" "pcache_pks=${variant}" "$verdict" "$details"
+}
 
 # ------------------------------------------------------------------------------
 # 3. Execution & Evaluation Loop
 # ------------------------------------------------------------------------------
-# --- Mode: off (Baseline) ---
-raw_off="$SCRIPT_DIR/raw-off.log"
-"$EXECUTOR_SCRIPT" sec off test "$raw_off" >/dev/null
-
-for leaf in "${COMPLIANCE_LEAVES[@]}"; do
-    line_off=$(grep -aoE "STATUS node=${leaf} variant=off .*" "$raw_off" 2>/dev/null | tail -n1)
-    verdict_off="FAIL"
-    details_off="unresolved"
-    if [ -n "$line_off" ]; then
-        verdict_off=$(status_field "$line_off" verdict)
-        details_off=$(printf '%s\n' "$line_off" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//')
-        [ -z "$details_off" ] && details_off="ok"
-    fi
-
-    color_off="$C_RED"
-    if [ "$verdict_off" = "PASS" ]; then
-        color_off="$C_GREEN"
-        pass_count=$((pass_count + 1))
-    else
-        fail_count=$((fail_count + 1))
-    fi
-
-    echo "$leaf,off,$verdict_off,$details_off" >> "$AXIS_CSV"
-    tag_off="[${leaf}-off]"
-    printf " %-18s pcache_pks=off ... %b%-4s%b (%s)\n" \
-        "$tag_off" "$color_off" "$verdict_off" "$C_RESET" "$details_off"
-done
-
-# --- Mode: on (Hardware PKS) ---
-raw_on="$SCRIPT_DIR/raw-on.log"
-"$EXECUTOR_SCRIPT" sec on test "$raw_on" >/dev/null
-
-for leaf in "${COMPLIANCE_LEAVES[@]}"; do
-    line_on=$(grep -aoE "STATUS node=${leaf} variant=on .*" "$raw_on" 2>/dev/null | tail -n1)
-    verdict_on="FAIL"
-    details_on="unresolved"
-    if [ -n "$line_on" ]; then
-        verdict_on=$(status_field "$line_on" verdict)
-        details_on=$(printf '%s\n' "$line_on" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//')
-        [ -z "$details_on" ] && details_on="ok"
-    fi
-
-    color_on="$C_RED"
-    if [ "$verdict_on" = "PASS" ]; then
-        color_on="$C_GREEN"
-        pass_count=$((pass_count + 1))
-    else
-        fail_count=$((fail_count + 1))
-    fi
-
-    echo "$leaf,on,$verdict_on,$details_on" >> "$AXIS_CSV"
-    tag_on="[${leaf}-on]"
-    printf " %-18s pcache_pks=on  ... %b%-4s%b (%s)\n" \
-        "$tag_on" "$color_on" "$verdict_on" "$C_RESET" "$details_on"
-done
-
-# Populate summary table rows
-for leaf in "${COMPLIANCE_LEAVES[@]}"; do
-    line_off=$(grep -aoE "STATUS node=${leaf} variant=off .*" "$raw_off" 2>/dev/null | tail -n1)
-    verdict_off="FAIL"
-    details_off="unresolved"
-    if [ -n "$line_off" ]; then
-        verdict_off=$(status_field "$line_off" verdict)
-        details_off=$(printf '%s\n' "$line_off" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//')
-        [ -z "$details_off" ] && details_off="ok"
-    fi
-    color_off="$([ "$verdict_off" = "PASS" ] && echo "$C_GREEN" || echo "$C_RED")"
-
-    line_on=$(grep -aoE "STATUS node=${leaf} variant=on .*" "$raw_on" 2>/dev/null | tail -n1)
-    verdict_on="FAIL"
-    details_on="unresolved"
-    if [ -n "$line_on" ]; then
-        verdict_on=$(status_field "$line_on" verdict)
-        details_on=$(printf '%s\n' "$line_on" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//')
-        [ -z "$details_on" ] && details_on="ok"
-    fi
-    color_on="$([ "$verdict_on" = "PASS" ] && echo "$C_GREEN" || echo "$C_RED")"
-
-    TABLE_ROWS+=("$(printf ' %-15s %b%-4s%b %-33s %b%-4s%b %-25s' \
-        "$leaf" \
-        "$color_off" "$verdict_off" "$C_RESET" "(${details_off})" \
-        "$color_on" "$verdict_on" "$C_RESET" "(${details_on})")")
+for variant in off on; do
+    raw_log="$SCRIPT_DIR/raw-${variant}.log"
+    "$EXECUTOR_SCRIPT" sec "$variant" test "$raw_log" >/dev/null
+    idx=0
+    for leaf in "${COMPLIANCE_LEAVES[@]}"; do
+        harvest_leaf "$raw_log" "$leaf" "$variant" "$idx"
+        idx=$((idx + 1))
+    done
 done
 
 # ------------------------------------------------------------------------------
@@ -121,19 +87,19 @@ done
 # ------------------------------------------------------------------------------
 overall="PASS"
 [ "$fail_count" -gt 0 ] && overall="FAIL"
-overall_color="$([ "$overall" = "PASS" ] && echo "$C_GREEN" || echo "$C_RED")"
 
 echo "test,all,$overall,passed=${pass_count}_failed=${fail_count}" >> "$AXIS_CSV"
 
-echo "----------------------------------------------------------------------------------------"
-printf " %-15s %-38s %-30s\n" "Test" "pcache_pks=off (Baseline)" "pcache_pks=on (Hardware PKS)"
-echo "----------------------------------------------------------------------------------------"
-for row in "${TABLE_ROWS[@]}"; do
-    echo "$row"
+report_compare_head "Test" "pcache_pks=off (Baseline)" "pcache_pks=on (Hardware PKS)"
+idx=0
+for leaf in "${COMPLIANCE_LEAVES[@]}"; do
+    report_compare_row "$leaf" \
+        "${V_OFF[$idx]}" "${D_OFF[$idx]}" \
+        "${V_ON[$idx]}"  "${D_ON[$idx]}"
+    idx=$((idx + 1))
 done
-echo "----------------------------------------------------------------------------------------"
-printf " OVERALL: %b%s%b (%d/8 passing, %d failing)\n" \
-    "$overall_color" "$overall" "$C_RESET" "$pass_count" "$fail_count"
-echo "========================================================================================"
+report_hrule
+report_overall "$overall" "$pass_count/8 passing, $fail_count failing"
+report_rule
 
 [ "$overall" = "PASS" ]

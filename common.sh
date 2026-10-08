@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# common.sh - Shared logging, STATUS node protocol, and result harvesting.
+# common.sh - Shared logging, console reporting, STATUS node protocol, and rollup.
 #
 # Sourced by both host orchestrators and in-guest runners.
 # Does NOT set shell options (each script owns its own strictness settings).
@@ -14,6 +14,9 @@
 #     - PENDING           : Pre-exploit marker resolved from panic transcripts
 #
 # Only lines beginning with 'STATUS ' are parsed into machine-readable summaries.
+#
+# All terminal styling is owned here: scripts call the log_* and report_*
+# helpers and never emit ANSI color codes themselves.
 
 # ==============================================================================
 # 1. Terminal Color & Logging Utilities
@@ -63,14 +66,81 @@ require_cmds() {
 }
 
 # ==============================================================================
-# 2. Kernel Panic & Security Signatures
+# 2. Axis Console Report Formatting
+# ==============================================================================
+# The three evaluation axes (test, sec, perf) share one console report layout:
+# an 88-column banner, a live per-leaf stream, and a summary footer. These
+# helpers own every width and color decision so that axis scripts stay free of
+# ANSI codes and render identically.
+REPORT_WIDTH=88
+
+# Draws an 88-column rule out of a single repeated character.
+_report_rule_char() {
+    printf '%*s\n' "$REPORT_WIDTH" '' | tr ' ' "$1"
+}
+
+report_rule()  { _report_rule_char '='; }  # heavy banner rule
+report_hrule() { _report_rule_char '-'; }  # light section rule
+
+# Maps a verdict to its terminal color (passing is green, everything else red).
+_verdict_color() {
+    case "$1" in
+        PASS|NEUTRALIZED) printf '%s' "$C_GREEN" ;;
+        *)                printf '%s' "$C_RED" ;;
+    esac
+}
+
+# report_banner <title> <subtitle>
+report_banner() {
+    report_rule
+    printf ' %s\n' "$1"
+    printf ' %s\n' "$2"
+    report_rule
+}
+
+# report_leaf <tag> <mode-label> <verdict> <detail>
+# One live line per leaf, e.g.:  [fsx-off]  pcache_pks=off  ... PASS (ops=10000)
+report_leaf() {
+    local color
+    color="$(_verdict_color "$3")"
+    printf ' %-20s %-15s ... %b%-4s%b (%s)\n' \
+        "$1" "$2" "$color" "$3" "$C_RESET" "$4"
+}
+
+# report_compare_head <left-title> <off-title> <on-title>
+# Opens the off-vs-on summary table (rule, header row, rule).
+report_compare_head() {
+    report_hrule
+    printf ' %-15s %-38s %-30s\n' "$1" "$2" "$3"
+    report_hrule
+}
+
+# report_compare_row <name> <verdict-off> <detail-off> <verdict-on> <detail-on>
+report_compare_row() {
+    local color_off color_on
+    color_off="$(_verdict_color "$2")"
+    color_on="$(_verdict_color "$4")"
+    printf ' %-15s %b%-4s%b %-33s %b%-4s%b %-25s\n' \
+        "$1" "$color_off" "$2" "$C_RESET" "($3)" \
+        "$color_on" "$4" "$C_RESET" "($5)"
+}
+
+# report_overall <verdict> <summary-text>
+report_overall() {
+    local color
+    color="$(_verdict_color "$1")"
+    printf ' OVERALL: %b%s%b (%s)\n' "$color" "$1" "$C_RESET" "$2"
+}
+
+# ==============================================================================
+# 3. Kernel Panic & Security Signatures
 # ==============================================================================
 # Signatures used to classify fail-closed security events from kernel transcripts.
 PKS_ACTIVE_REGEX="${PKS_ACTIVE_REGEX:-pcache_pks: initialized}"
 PKS_PANIC_REGEX="${PKS_PANIC_REGEX:-Kernel panic|unable to handle .*page fault|BUG: |Oops|general protection|protection key}"
 
 # ==============================================================================
-# 3. STATUS Protocol Formatting & Parsing
+# 4. STATUS Protocol Formatting & Parsing
 # ==============================================================================
 emit_status() {
     local node="$1"
@@ -90,6 +160,11 @@ status_field() {
     local line="$1"
     local field_key="$2"
     printf '%s\n' "$line" | tr ' ' '\n' | sed -n "s/^${field_key}=//p" | head -n1
+}
+
+# Returns the trailing "k=v k=v ..." detail of a STATUS line (empty if none).
+status_detail_tail() {
+    printf '%s\n' "$1" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//'
 }
 
 verdict_is_pass() {
@@ -120,47 +195,7 @@ _status_lines() {
 }
 
 # ==============================================================================
-# 4. Host Harvesting & Security Classification
-# ==============================================================================
-harvest_node() {
-    local transcript_file="$1"
-    local node_name="$2"
-    local output_result_log="$3"
-
-    local matching_line
-    matching_line=$(_status_lines "$transcript_file" | grep -F "node=$node_name " | grep -v 'verdict=PENDING' | tail -n1 || true)
-    if [ -n "$matching_line" ]; then
-        printf '%s\n' "$matching_line" >> "$output_result_log"
-    fi
-}
-
-classify_sec() {
-    local transcript_file="$1"
-    local node_name="$2"
-    local variant="$3"
-    local output_result_log="$4"
-
-    local resolved_line
-    resolved_line=$(_status_lines "$transcript_file" | grep -F "node=$node_name " | grep -v 'verdict=PENDING' | tail -n1 || true)
-    if [ -n "$resolved_line" ]; then
-        printf '%s\n' "$resolved_line" >> "$output_result_log"
-        return
-    fi
-
-    # Evaluate fail-closed panic attribution
-    if grep -qE "$PKS_PANIC_REGEX" "$transcript_file" 2>/dev/null; then
-        if grep -qE "$PKS_ACTIVE_REGEX" "$transcript_file" 2>/dev/null; then
-            emit_status "$node_name" "$variant" NEUTRALIZED marker=intact note=fail_closed_panic >> "$output_result_log"
-        else
-            emit_status "$node_name" "$variant" FAIL note=panic_without_pks_active >> "$output_result_log"
-        fi
-    else
-        emit_status "$node_name" "$variant" FAIL note=no_verdict_no_panic >> "$output_result_log"
-    fi
-}
-
-# ==============================================================================
-# 5. Status Rollup & CSV Export
+# 5. Status Rollup
 # ==============================================================================
 rollup() {
     local destination_log="$1"
@@ -202,67 +237,3 @@ rollup() {
 
     [ "$overall_verdict" = "PASS" ]
 }
-
-mark_empty_leaves() {
-    local variant="$1"
-    shift
-
-    local leaf_log
-    local node_name
-    for leaf_log in "$@"; do
-        if ! _status_lines "$leaf_log" | grep -q .; then
-            node_name="$(basename "$(dirname "$leaf_log")")"
-            emit_status "$node_name" "$variant" FAIL note=no_status >> "$leaf_log"
-        fi
-    done
-}
-
-statuses_to_csv() {
-    local source_log="$1"
-    local output_csv="$2"
-
-    awk '
-        /^STATUS / {
-            delete fields
-            field_count = 0
-            for (i = 2; i <= NF; i++) {
-                split($i, key_value, "=")
-                fields[key_value[1]] = key_value[2]
-                if (!(key_value[1] in seen_keys)) {
-                    seen_keys[key_value[1]] = 1
-                    ordered_keys[++num_ordered_keys] = key_value[1]
-                }
-            }
-            raw_rows[++num_rows] = $0
-        }
-        END {
-            # Core primary headers
-            printf "node,variant,verdict"
-            for (k = 1; k <= num_ordered_keys; k++) {
-                key = ordered_keys[k]
-                if (key != "node" && key != "variant" && key != "verdict") {
-                    printf ",%s", key
-                }
-            }
-            printf "\n"
-
-            # Row records
-            for (r = 1; r <= num_rows; r++) {
-                delete fields
-                split(raw_rows[r], parts, " ")
-                for (i = 2; i <= length(parts); i++) {
-                    split(parts[i], key_value, "=")
-                    fields[key_value[1]] = key_value[2]
-                }
-                printf "%s,%s,%s", fields["node"], fields["variant"], fields["verdict"]
-                for (k = 1; k <= num_ordered_keys; k++) {
-                    key = ordered_keys[k]
-                    if (key != "node" && key != "variant" && key != "verdict") {
-                        printf ",%s", (key in fields ? fields[key] : "")
-                    }
-                }
-                printf "\n"
-            }
-        }' "$source_log" > "$output_csv"
-}
-

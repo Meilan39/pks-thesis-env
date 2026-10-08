@@ -1,10 +1,11 @@
 # Dirty Frag PoC (CVE-2022-43284)
 
+## Upstream Origin & Purpose
 - **Source Origin**: [https://github.com/v4bel/dirtyfrag](https://github.com/v4bel/dirtyfrag)
 - **Vulnerability**: XFRM / ESP in UDP socket buffer splice page-cache corruption
 - **Source File**: `exp.c` (compiled via `gcc -O2 -Wall -pthread exp.c -o exp`)
 
-### Modifications Applied
+## Applied Patches & Justification
 
 1. **Target File Redirection**:
    Hardcoded `TARGET_PATH` directly to the mounted evaluation victim file:
@@ -30,4 +31,19 @@
      ```c
      // (void)run_root_pty();
      ```
+
+## Output Contract
+The leaf echoes a single marker line on stdout, which `sec/run.sh` resolves into
+a verdict (see the [security axis README](../README.md)):
+- Marker survived the PoC:
+  ```text
+  marker=intact
+  ```
+- Marker overwritten by the PoC:
+  ```text
+  marker=altered
+  ```
+Under `pcache_pks=off` an altered marker is the expected real vulnerability
+(`PASS`). Under `pcache_pks=on` the neutralization is either an intact marker or
+a PKS-attributable kernel panic captured on the serial transcript (`PASS`).
 

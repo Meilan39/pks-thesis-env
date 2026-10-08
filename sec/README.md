@@ -5,7 +5,7 @@ The security axis evaluates end-to-end exploit neutralization of dirty page-cach
 
 Under the unmitigated Linux kernel, memory corruption flaws in asynchronous kernel subsystems allow unprivileged attackers to splice or write arbitrary data into clean, file-backed page-cache pages without standard discretionary access control (DAC) checks. The security axis empirically verifies that:
 1. Under `pcache_pks=off`, exploits successfully overwrite target victim pages on disk ([`marker=altered`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/dirty-frag/README.md)), confirming real vulnerability.
-2. Under `pcache_pks=on`, hardware write protection prevents unauthorized stores to protected direct-map pages, either trapping the violation as an unhandled fault ([`fail_closed_panic`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/copy-fail/README.md)) or blocking the store so the victim data remains pristine ([`marker=intact`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/fragnesia/README.md)).
+2. Under `pcache_pks=on`, hardware write protection prevents unauthorized stores to protected direct-map pages, either blocking the store in syscall context so the victim data remains pristine ([`marker=intact`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/copy-fail/README.md)) or, in softirq/workqueue context, trapping the violation as an unhandled supervisor fault that fails closed ([`fail_closed_panic`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/fragnesia/README.md)).
 
 ---
 
@@ -80,10 +80,10 @@ The single output log [`sec/result.csv`](file:///Users/meilan/Documents/大学/�
 ```csv
 node,variant,verdict,outcome
 copy-fail,off,PASS,altered
-copy-fail,on,PASS,fail_closed_panic
-dirty-frag,off,FAIL,intact
-dirty-frag,on,PASS,intact
-fragnesia,off,FAIL,intact
-fragnesia,on,PASS,intact
-sec,all,FAIL,passed=4_failed=2
+copy-fail,on,PASS,intact
+dirty-frag,off,PASS,altered
+dirty-frag,on,PASS,fail_closed_panic
+fragnesia,off,PASS,altered
+fragnesia,on,PASS,fail_closed_panic
+sec,all,PASS,passed=6_failed=0
 ```

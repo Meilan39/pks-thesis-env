@@ -9,7 +9,7 @@
 #
 # Emits live execution stream and dual summary tables:
 #   Table 1: Fio Latency & Allocation Cost Breakdown
-#   Table 2: High-Level Benchmark Comparison (control, off, on, overhead)
+#   Table 2: High-Level Performance Comparison (control, off, on, overhead)
 #
 # Data persistence: perf/result.csv and results/data/perf_summary.csv
 # ==============================================================================
@@ -31,10 +31,9 @@ echo "node,variant,verdict,details" > "$AXIS_CSV"
 # ------------------------------------------------------------------------------
 # 2. Header Banner
 # ------------------------------------------------------------------------------
-echo "========================================================================================"
-echo " [perf] PKS Performance Evaluation: Micro- & Macrobenchmarks"
-echo " Workloads: fio (warm/cold), concurrency, sqlite | Variants: control, off, on"
-echo "========================================================================================"
+report_banner \
+    "[perf] PKS Performance Evaluation: Micro- & Macrobenchmarks" \
+    "Workloads: fio (warm/cold), concurrency, sqlite | Variants: control, off, on"
 
 calc_overhead() {
     local base="$1"
@@ -76,22 +75,18 @@ run_and_harvest() {
         details="unresolved"
         if [ -n "$line" ]; then
             verdict=$(status_field "$line" verdict)
-            details=$(printf '%s\n' "$line" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//')
+            details=$(status_detail_tail "$line")
             [ -z "$details" ] && details="ok"
         fi
 
-        color="$C_RED"
         if [ "$verdict" = "PASS" ]; then
-            color="$C_GREEN"
             pass_count=$((pass_count + 1))
         else
             fail_count=$((fail_count + 1))
         fi
 
         echo "$leaf,$variant,$verdict,$details" >> "$AXIS_CSV"
-        tag="[${leaf}-${variant}]"
-        printf " %-22s %-10s ... %b%-4s%b (%s)\n" \
-            "$tag" "$variant" "$color" "$verdict" "$C_RESET" "$details"
+        report_leaf "[${leaf}-${variant}]" "$variant" "$verdict" "$details"
     done
 }
 
@@ -103,12 +98,12 @@ run_and_harvest on      perf    on  "Mitigated Kernel (PKS Active)"
 # 4. Summary Tables & Analysis
 # ------------------------------------------------------------------------------
 echo ""
-echo "========================================================================================"
+report_rule
 echo " Table 1: Fio Latency & Allocation Cost Breakdown"
-echo "----------------------------------------------------------------------------------------"
+report_hrule
 printf " %-12s %-16s %-16s %-18s %-12s %-12s\n" \
     "Variant" "4K Warm (us)" "4K Cold (us)" "Alloc Delta (us)" "4K IOPS" "1M Read (MB/s)"
-echo "----------------------------------------------------------------------------------------"
+report_hrule
 
 for v in control off on; do
     fio_line=$(grep -aoE "^fio,${v},.*" "$AXIS_CSV" 2>/dev/null | tail -n1)
@@ -128,15 +123,15 @@ except Exception:
     printf " %-12s %-16s %-16s %-18s %-12s %-12s\n" \
         "$v" "${f_warm:-N/A}" "${f_cold:-N/A}" "${f_delta:-N/A}" "${f_iops:-N/A}" "${f_read_mb:-N/A}"
 done
-echo "----------------------------------------------------------------------------------------"
+report_hrule
 
 echo ""
-echo "========================================================================================"
+report_rule
 echo " Table 2: High-Level Performance Comparison"
-echo "----------------------------------------------------------------------------------------"
+report_hrule
 printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
     "Benchmark" "Metric" "Control" "Off" "On" "PKS Overhead (%)"
-echo "----------------------------------------------------------------------------------------"
+report_hrule
 
 get_detail() {
     local node="$1"
@@ -195,17 +190,15 @@ s_full_ovh=$(calc_overhead "$s_full_c" "$s_full_on")
 printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
     "sqlite" "Tx/s (sync=FULL)" "${s_full_c:-N/A}" "${s_full_off:-N/A}" "${s_full_on:-N/A}" "$s_full_ovh"
 
-echo "----------------------------------------------------------------------------------------"
+report_hrule
 
 overall="PASS"
 [ "$fail_count" -gt 0 ] && overall="FAIL"
-overall_color="$([ "$overall" = "PASS" ] && echo "$C_GREEN" || echo "$C_RED")"
 
 echo "perf,all,$overall,completed=${pass_count}_failed=${fail_count}" >> "$AXIS_CSV"
 
-printf " OVERALL: %b%s%b (%d/9 benchmark runs completed, %d failing)\n" \
-    "$overall_color" "$overall" "$C_RESET" "$pass_count" "$fail_count"
-echo "========================================================================================"
+report_overall "$overall" "$pass_count/9 benchmark runs completed, $fail_count failing"
+report_rule
 
 python3 "$SCRIPT_DIR/analyze.py" "$SCRIPT_DIR" "$REPO_ROOT/results/data/perf_summary.csv" >/dev/null 2>&1 || true
 

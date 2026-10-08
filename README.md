@@ -14,7 +14,7 @@ Every evaluation axis provides a self-contained runner (`run.sh`), comprehensive
 pks-thesis-env/
 ├── Makefile          # 5 verbs: build, disk, test, sec, perf
 ├── config.mk         # kernel paths, disk sizes, SMP/MEM, EXECUTOR
-├── common.sh         # logging, ANSI formatting, and the STATUS contract
+├── common.sh         # logging, console report helpers, and the STATUS contract
 ├── preflight.sh      # deps + substrate detection + provenance
 ├── configs/          # kconfig fragments: common, sec, perf, control
 ├── exec/             # substrate adapters: qemu.sh (now), baremetal.sh (stub)
@@ -71,10 +71,13 @@ size curves in `perf/fio/raw/`) are eliminated:
 
 Because the transport is the **live serial stream**, a fail-closed kernel panic
 (the intended `on` outcome for the softirq/workqueue exploits) is captured before
-the VM dies. `classify_sec()` resolves a security leaf as: a final STATUS wins;
-otherwise a PKS-attributable panic (`PKS_PANIC_REGEX` + `PKS_ACTIVE_REGEX`, both
-overridable in `config.mk`) is a neutralization; anything else is an inconclusive
-`FAIL`. Verdicts are always observations, never functions of the input flag.
+the VM dies. Each security leaf echoes a `marker=intact|altered` line that
+`sec/run.sh` resolves into an outcome: under `off`, an altered marker is the
+expected real vulnerability (`PASS`); under `on`, a surviving marker or a
+PKS-attributable panic (`PKS_PANIC_REGEX` + `PKS_ACTIVE_REGEX`, both overridable
+via the environment) is a neutralization (`PASS`); anything else is an
+inconclusive `FAIL`. Verdicts are always observations, never functions of the
+input flag.
 
 ## Security causality
 
@@ -89,7 +92,7 @@ a real page-cache re-fault, runs the PoC, and compares the marker back:
 ## Substrate & provenance
 
 `preflight.sh` detects `kvm-pks` / `kvm-nopks` / `tcg` and records host kernel,
-CPU, QEMU version and substrate to `results/raw/preflight.json`. The workload tree
+CPU, QEMU version and substrate to `results/preflight.json`. The workload tree
 and the STATUS contract are substrate-agnostic: moving to a PKS-capable server is a
 one-line `EXECUTOR` change (implement `exec/baremetal.sh` against the same
 contract) with zero changes to `build/ test/ sec/ perf/`.

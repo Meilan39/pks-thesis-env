@@ -2,6 +2,11 @@
 # ==============================================================================
 # sec/run.sh - Security Exploit Evaluation Runner
 # ==============================================================================
+# Runs each exploit leaf (copy-fail, dirty-frag, fragnesia) in its own guest
+# boot per mode (off, on), resolves the outcome from the victim-file marker and
+# any fail-closed kernel panic, and renders the shared axis console report.
+# Structured rows are appended to sec/result.csv.
+# ==============================================================================
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,7 +18,7 @@ SECURITY_LEAVES=(copy-fail dirty-frag fragnesia)
 AXIS_CSV="$SCRIPT_DIR/result.csv"
 
 # ------------------------------------------------------------------------------
-# 1. Clean Initialization
+# 1. Output Initialization
 # ------------------------------------------------------------------------------
 rm -f "$AXIS_CSV" "$SCRIPT_DIR"/*/result.csv
 echo "node,variant,verdict,outcome" > "$AXIS_CSV"
@@ -21,80 +26,73 @@ echo "node,variant,verdict,outcome" > "$AXIS_CSV"
 # ------------------------------------------------------------------------------
 # 2. Header Banner
 # ------------------------------------------------------------------------------
-echo "========================================================================================"
-echo " [sec] PKS Security Evaluation: End-to-End Exploit Neutralization"
-echo " Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: ${EXECUTOR:-qemu}"
-echo "========================================================================================"
+report_banner \
+    "[sec] PKS Security Evaluation: End-to-End Exploit Neutralization" \
+    "Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: ${EXECUTOR:-qemu}"
 
 pass_count=0
 fail_count=0
-TABLE_ROWS=()
+# Per-leaf resolved verdict/outcome for the given mode (reset each leaf).
+leaf_verdict_off=""; leaf_outcome_off=""
+leaf_verdict_on="";  leaf_outcome_on=""
+
+# Resolves the marker outcome for one leaf/mode, tallies counters, prints the
+# live line, records the CSV row, and stashes the result for the summary table.
+# The 'off' baseline passes when the marker was altered (a real vulnerability);
+# 'on' passes when the marker survived or a PKS-attributable panic trapped the store.
+resolve_leaf() {
+    local leaf="$1"
+    local variant="$2"
+    local raw_log="$3"
+
+    local marker outcome verdict
+    marker=$(grep -aoE 'marker=(intact|altered)' "$raw_log" 2>/dev/null | tail -n1 | cut -d= -f2)
+
+    if [ "$variant" = "on" ] \
+        && grep -qE "$PKS_PANIC_REGEX" "$raw_log" 2>/dev/null \
+        && grep -qE "$PKS_ACTIVE_REGEX" "$raw_log" 2>/dev/null; then
+        outcome="fail_closed_panic"
+    else
+        outcome="${marker:-unresolved}"
+    fi
+
+    verdict="FAIL"
+    if [ "$variant" = "off" ]; then
+        [ "$outcome" = "altered" ] && verdict="PASS"
+    else
+        { [ "$outcome" = "intact" ] || [ "$outcome" = "fail_closed_panic" ]; } && verdict="PASS"
+    fi
+
+    if [ "$variant" = "off" ]; then
+        leaf_verdict_off="$verdict"; leaf_outcome_off="$outcome"
+    else
+        leaf_verdict_on="$verdict";  leaf_outcome_on="$outcome"
+    fi
+
+    if [ "$verdict" = "PASS" ]; then
+        pass_count=$((pass_count + 1))
+    else
+        fail_count=$((fail_count + 1))
+    fi
+
+    echo "$leaf,$variant,$verdict,$outcome" >> "$AXIS_CSV"
+    report_leaf "[${leaf}-${variant}]" "pcache_pks=${variant}" "$verdict" "outcome=$outcome"
+}
 
 # ------------------------------------------------------------------------------
 # 3. Execution & Evaluation Loop
 # ------------------------------------------------------------------------------
+TABLE_ROWS=()
 for leaf in "${SECURITY_LEAVES[@]}"; do
     leaf_dir="$SCRIPT_DIR/$leaf"
-
-    # --- Mode: off (Baseline) ---
-    raw_off="$leaf_dir/raw-off.log"
-    "$EXECUTOR_SCRIPT" sec off "sec/$leaf" "$raw_off" >/dev/null
-
-    marker_off=$(grep -aoE 'marker=(intact|altered)' "$raw_off" 2>/dev/null | tail -n1 | cut -d= -f2)
-    outcome_off="${marker_off:-unresolved}"
-
-    verdict_off="FAIL"
-    [ "$outcome_off" = "altered" ] && verdict_off="PASS"
-
-    color_off="$C_RED"
-    if [ "$verdict_off" = "PASS" ]; then
-        color_off="$C_GREEN"
-        pass_count=$((pass_count + 1))
-    else
-        fail_count=$((fail_count + 1))
-    fi
-
-    echo "$leaf,off,$verdict_off,$outcome_off" >> "$AXIS_CSV"
-    tag_off="[${leaf}-off]"
-    printf " %-18s pcache_pks=off ... %b%-4s%b (outcome=%s)\n" \
-        "$tag_off" "$color_off" "$verdict_off" "$C_RESET" "$outcome_off"
-
-    # --- Mode: on (Mitigated) ---
-    raw_on="$leaf_dir/raw-on.log"
-    "$EXECUTOR_SCRIPT" sec on "sec/$leaf" "$raw_on" >/dev/null
-
-    marker_on=$(grep -aoE 'marker=(intact|altered)' "$raw_on" 2>/dev/null | tail -n1 | cut -d= -f2)
-    if grep -qE "$PKS_PANIC_REGEX" "$raw_on" 2>/dev/null && grep -qE "$PKS_ACTIVE_REGEX" "$raw_on" 2>/dev/null; then
-        outcome_on="fail_closed_panic"
-    elif [ -n "$marker_on" ]; then
-        outcome_on="$marker_on"
-    else
-        outcome_on="unresolved"
-    fi
-
-    verdict_on="FAIL"
-    if [ "$outcome_on" = "intact" ] || [ "$outcome_on" = "fail_closed_panic" ]; then
-        verdict_on="PASS"
-    fi
-
-    color_on="$C_RED"
-    if [ "$verdict_on" = "PASS" ]; then
-        color_on="$C_GREEN"
-        pass_count=$((pass_count + 1))
-    else
-        fail_count=$((fail_count + 1))
-    fi
-
-    echo "$leaf,on,$verdict_on,$outcome_on" >> "$AXIS_CSV"
-    tag_on="[${leaf}-on]"
-    printf " %-18s pcache_pks=on  ... %b%-4s%b (outcome=%s)\n" \
-        "$tag_on" "$color_on" "$verdict_on" "$C_RESET" "$outcome_on"
-
-    # Insert variables directly into summary table row template
-    TABLE_ROWS+=("$(printf ' %-15s %b%-4s%b %-33s %b%-4s%b %-25s' \
-        "$leaf" \
-        "$color_off" "$verdict_off" "$C_RESET" "(${outcome_off})" \
-        "$color_on" "$verdict_on" "$C_RESET" "(${outcome_on})")")
+    for variant in off on; do
+        raw_log="$leaf_dir/raw-${variant}.log"
+        "$EXECUTOR_SCRIPT" sec "$variant" "sec/$leaf" "$raw_log" >/dev/null
+        resolve_leaf "$leaf" "$variant" "$raw_log"
+    done
+    TABLE_ROWS+=("$(report_compare_row "$leaf" \
+        "$leaf_verdict_off" "$leaf_outcome_off" \
+        "$leaf_verdict_on"  "$leaf_outcome_on")")
 done
 
 # ------------------------------------------------------------------------------
@@ -102,21 +100,15 @@ done
 # ------------------------------------------------------------------------------
 overall="PASS"
 [ "$fail_count" -gt 0 ] && overall="FAIL"
-overall_color="$([ "$overall" = "PASS" ] && echo "$C_GREEN" || echo "$C_RED")"
 
 echo "sec,all,$overall,passed=${pass_count}_failed=${fail_count}" >> "$AXIS_CSV"
 
-echo "----------------------------------------------------------------------------------------"
-printf " %-15s %-38s %-30s\n" "Exploit" "pcache_pks=off (Baseline)" "pcache_pks=on (Hardware PKS)"
-echo "----------------------------------------------------------------------------------------"
+report_compare_head "Exploit" "pcache_pks=off (Baseline)" "pcache_pks=on (Hardware PKS)"
 for row in "${TABLE_ROWS[@]}"; do
-    echo "$row"
+    printf '%s\n' "$row"
 done
-echo "----------------------------------------------------------------------------------------"
-printf " OVERALL: %b%s%b (%d/6 passing, %d failing)\n" \
-    "$overall_color" "$overall" "$C_RESET" "$pass_count" "$fail_count"
-echo "========================================================================================"
+report_hrule
+report_overall "$overall" "$pass_count/6 passing, $fail_count failing"
+report_rule
 
 [ "$overall" = "PASS" ]
-
-
