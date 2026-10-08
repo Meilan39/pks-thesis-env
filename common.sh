@@ -138,6 +138,7 @@ report_overall() {
 # Signatures used to classify fail-closed security events from kernel transcripts.
 PKS_ACTIVE_REGEX="${PKS_ACTIVE_REGEX:-pcache_pks: initialized}"
 PKS_PANIC_REGEX="${PKS_PANIC_REGEX:-Kernel panic|unable to handle .*page fault|BUG: |Oops|general protection|protection key}"
+PKS_SUPPRESS_REGEX="${PKS_SUPPRESS_REGEX:-pcache_pks: (unauthorized write trapped|softirq store suppressed)}"
 
 # ==============================================================================
 # 4. STATUS Protocol Formatting & Parsing

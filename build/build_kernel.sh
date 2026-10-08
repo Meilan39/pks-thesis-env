@@ -56,6 +56,19 @@ build_kernel() {
             "$repo_root/configs/${variant}.config"
 
         make O="$out_dir" olddefconfig
+
+        # Validate that PKS configuration is accepted for non-control builds
+        if [ "$variant" != "control" ]; then
+            if ! grep -q '^CONFIG_PCACHE_PKS=y' "$out_dir/.config"; then
+                echo "error: CONFIG_PCACHE_PKS=y was dropped by kconfig. Kernel tree lacks PKS patches." >&2
+                exit 1
+            fi
+            if ! grep -q '^CONFIG_INSTRUCTION_DECODER=y' "$out_dir/.config"; then
+                echo "error: CONFIG_INSTRUCTION_DECODER=y was dropped by kconfig." >&2
+                exit 1
+            fi
+        fi
+
         make O="$out_dir" -j"$jobs" bzImage
     ) >> "$raw_log" 2>&1 || true
 

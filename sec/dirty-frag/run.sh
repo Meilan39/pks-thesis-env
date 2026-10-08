@@ -5,9 +5,9 @@
 # Builds the PoC from exp.c if needed, writes a unique marker into the protected
 # victim file, drops caches to force a real page-cache re-fault, runs the
 # unprivileged PoC as testuser, and reports whether the marker survived. Under
-# pcache_pks=on the asynchronous store takes an unhandled supervisor fault and
-# the kernel fails closed (panic, harvested from the serial transcript by
-# sec/run.sh); under off the marker is overwritten.
+# pcache_pks=on the asynchronous store is neutralized by suppressing the softirq
+# store through instruction pointer advance, while falling back to panic on
+# unhandled paths; under off the marker is overwritten.
 # ==============================================================================
 set -u
 
