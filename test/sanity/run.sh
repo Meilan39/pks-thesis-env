@@ -2,10 +2,16 @@
 # ==============================================================================
 # test/sanity/run.sh - PKS Page-Cache Scoping and Subsystem Sanity Test
 # ==============================================================================
-# Validates in-kernel PKS page-cache protection invariants:
-# 1. VFS system call write scoping (write, pwrite, writev, ftruncate, fallocate)
-# 2. Static pool page-cache residency (PFN bounds verification via /proc/self/pagemap)
-# 3. Fail-closed policy enforcement (rejection of mmap(PROT_WRITE) and O_DIRECT)
+# Validates the in-kernel PKS page-cache protection contract across four suites:
+# 1. Sanctioned write-path scoping (write, pwrite, writev, ftruncate, fallocate)
+# 2. Static pool page-cache residency (PFN bounds via /proc/self/pagemap)
+# 3. Fail-closed rejection matrix (mmap(PROT_WRITE), O_DIRECT, splice, sendfile,
+#    copy_file_range, AIO, EXT4_IOC_MOVE_EXT -> all -EOPNOTSUPP)
+# 4. Permitted-operation positive controls (buffered I/O round-trip, truncation,
+#    read-only mappings, blocked writable upgrade: no false rejections)
+#
+# The verdict is derived purely by counting [PASS]/[FAIL] lines; [SKIP] lines
+# (environment preconditions unmet) are ignored.
 #
 # These invariants hold ONLY when pcache_pks=on with the protected mount active.
 # Under off/control, the PKS pool is inactive, so the checks are not applicable.

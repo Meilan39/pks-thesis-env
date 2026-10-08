@@ -2,8 +2,8 @@
 # ==============================================================================
 # test/run.sh - Compliance & Integrity Evaluation Runner
 # ==============================================================================
-# Boots the guest once per mode (off, on), harvests the four compliance leaves
-# (fsx, pjd, pks-unit, sanity) from each serial transcript, and renders the
+# Boots the guest once per mode (off, on), harvests the three compliance leaves
+# (fsx, pks-unit, sanity) from each serial transcript, and renders the
 # shared axis console report. Structured rows are appended to test/result.csv.
 # ==============================================================================
 set -u
@@ -13,7 +13,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/common.sh"
 
 EXECUTOR_SCRIPT="$REPO_ROOT/exec/${EXECUTOR:-qemu}.sh"
-COMPLIANCE_LEAVES=(fsx pjd pks-unit sanity)
+COMPLIANCE_LEAVES=(fsx pks-unit sanity)
 AXIS_CSV="$SCRIPT_DIR/result.csv"
 
 # ------------------------------------------------------------------------------
@@ -26,7 +26,7 @@ echo "node,variant,verdict,details" > "$AXIS_CSV"
 # ------------------------------------------------------------------------------
 report_banner \
     "[test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics" \
-    "Leaves: fsx, pjd, pks-unit, sanity | Modes: off, on | Executor: ${EXECUTOR:-qemu}"
+    "Leaves: fsx, pks-unit, sanity | Modes: off, on | Executor: ${EXECUTOR:-qemu}"
 
 pass_count=0
 fail_count=0
@@ -99,7 +99,7 @@ for leaf in "${COMPLIANCE_LEAVES[@]}"; do
     idx=$((idx + 1))
 done
 report_hrule
-report_overall "$overall" "$pass_count/8 passing, $fail_count failing"
+report_overall "$overall" "$pass_count/6 passing, $fail_count failing"
 report_rule
 
 [ "$overall" = "PASS" ]

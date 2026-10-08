@@ -21,7 +21,7 @@ pks-thesis-env/
 ├── guest/            # in-guest autorun.sh + autorun.service
 ├── build/            # kernel compilation: control, sec, perf
 ├── disk/             # debian image provisioning + autorun setup
-├── test/             # Compliance axis: {fsx, pjd, pks-unit, sanity} -> test/result.csv
+├── test/             # Compliance axis: {fsx, pks-unit, sanity} -> test/result.csv
 ├── sec/              # Security axis: {copy-fail, dirty-frag, fragnesia} -> sec/result.csv
 ├── perf/             # Performance axis: {fio, concurrency, sqlite} -> perf/result.csv + analyze.py
 ├── results/          # Publication datasets: results/data/perf_summary.csv

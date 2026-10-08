@@ -21,8 +21,8 @@ RAW_LOG="$SCRIPT_DIR/raw.log"
 
 mkdir -p "$REPO_ROOT/images"
 
-# Required guest packages: compilers, prove (pjd-fstest harness), fio, sqlite3, and test utilities.
-PACKAGES="build-essential python3 perl libtest-harness-perl fio sqlite3 libsqlite3-dev libcap-dev libc6-dev sudo coreutils procps"
+# Required guest packages: compilers, fio, sqlite3, and test utilities.
+PACKAGES="build-essential python3 fio sqlite3 libsqlite3-dev libcap-dev libc6-dev sudo coreutils procps"
 
 # ==============================================================================
 # Helper Functions: Virtual Filesystems and Chroot Management
@@ -125,7 +125,7 @@ refresh_image() {
     local rc=0
 
     if sudo mount "${loop_device}p1" "$mount_point"; then
-        install_packages "$mount_point" || echo "[disk] WARN: package refresh failed (offline?); pjd/prove may be unavailable"
+        install_packages "$mount_point" || echo "[disk] WARN: package refresh failed (offline?); some benchmark tools may be unavailable"
         install_autorun "$mount_point" || rc=1
 
         # Verify autorun installation marker

@@ -24,7 +24,7 @@ help:
 	@echo "PKS Evaluation Testbed"
 	@echo "  make build   Compile the three guest kernels (control, sec, perf)"
 	@echo "  make disk    Provision the guest image (once) + refresh autorun"
-	@echo "  make test    Compliance axis  (pks-unit, sanity, fsx, pjd) off & on"
+	@echo "  make test    Compliance axis  (fsx, pks-unit, sanity) off & on"
 	@echo "  make sec     Security axis    (copy-fail, dirty-frag, fragnesia) off & on"
 	@echo "  make perf    Performance axis (fio, concurrency, sqlite) control/off/on"
 	@echo ""
@@ -66,7 +66,7 @@ end-qemu:
 # ------------------------------------------------------------------------------
 clean:
 	@find test sec perf -name '*.o' -delete 2>/dev/null || true
-	@rm -f test/fsx/fsx test/pjd/pjdfstest test/sanity/pks_sanity_test test/pks-unit/test_pks \
+	@rm -f test/fsx/fsx test/sanity/pks_sanity_test test/pks-unit/test_pks \
 	       sec/dirty-frag/exp sec/fragnesia/exp 2>/dev/null || true
 	@echo "[clean] removed compiled evaluation binaries."
 

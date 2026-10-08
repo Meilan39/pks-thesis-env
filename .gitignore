@@ -3,7 +3,6 @@ images/*.img
 
 # Compiled in-guest binaries (rebuilt lazily by each leaf run.sh).
 test/fsx/fsx
-test/pjd/pjdfstest
 test/sanity/pks_sanity_test
 test/pks-unit/test_pks
 sec/dirty-frag/exp
