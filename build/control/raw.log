@@ -91,3 +91,283 @@ make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_con
 Kernel: arch/x86/boot/bzImage is ready  (#1)
 make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
 make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+*** Default configuration is based on 'x86_64_defconfig'
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+Using .config as base
+Merging ../kernel/configs/kvm_guest.config
+#
+# merged configuration written to .config (needs make)
+#
+  GEN     Makefile
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+Using /home/vmuser/src/linux-pks-thesis-control/build_control/.config as base
+Merging /home/vmuser/src/env/configs/common.config
+Value of CONFIG_9P_FS_POSIX_ACL is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_9P_FS_POSIX_ACL is not set
+New value: CONFIG_9P_FS_POSIX_ACL=y
+
+Value of CONFIG_USER_NS is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_USER_NS is not set
+New value: CONFIG_USER_NS=y
+
+Value of CONFIG_NET_KEY is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_NET_KEY is not set
+New value: CONFIG_NET_KEY=y
+
+Value of CONFIG_INET_ESP is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_INET_ESP is not set
+New value: CONFIG_INET_ESP=y
+
+Value of CONFIG_INET6_ESPINTCP is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_INET6_ESPINTCP is not set
+New value: CONFIG_INET6_ESPINTCP=y
+
+Value of CONFIG_CRYPTO_ECB is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_ECB is not set
+New value: CONFIG_CRYPTO_ECB=y
+
+Value of CONFIG_CRYPTO_USER_API_AEAD is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_USER_API_AEAD is not set
+New value: CONFIG_CRYPTO_USER_API_AEAD=y
+
+Value of CONFIG_CRYPTO_USER_API_SKCIPHER is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_USER_API_SKCIPHER is not set
+New value: CONFIG_CRYPTO_USER_API_SKCIPHER=y
+
+Value of CONFIG_AF_RXRPC is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_AF_RXRPC is not set
+New value: CONFIG_AF_RXRPC=y
+
+Value of CONFIG_CRYPTO_FCRYPT is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_FCRYPT is not set
+New value: CONFIG_CRYPTO_FCRYPT=y
+
+Value of CONFIG_CRYPTO_PCBC is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_PCBC is not set
+New value: CONFIG_CRYPTO_PCBC=y
+
+Merging /home/vmuser/src/env/configs/control.config
+#
+# merged configuration written to /home/vmuser/src/linux-pks-thesis-control/build_control/.config (needs make)
+#
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+make[4]: *** [../scripts/Makefile.build:550: drivers/acpi/acpica] Interrupt
+make[3]: *** [../scripts/Makefile.build:550: drivers/acpi] Interrupt
+make[2]: *** [/home/vmuser/src/linux-pks-thesis-control/Makefile:1834: drivers] Interrupt
+make[1]: *** [Makefile:219: __sub-make] Interrupt
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+*** Default configuration is based on 'x86_64_defconfig'
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+Using .config as base
+Merging ../kernel/configs/kvm_guest.config
+#
+# merged configuration written to .config (needs make)
+#
+  GEN     Makefile
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+Using /home/vmuser/src/linux-pks-thesis-control/build_control/.config as base
+Merging /home/vmuser/src/env/configs/common.config
+Value of CONFIG_9P_FS_POSIX_ACL is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_9P_FS_POSIX_ACL is not set
+New value: CONFIG_9P_FS_POSIX_ACL=y
+
+Value of CONFIG_USER_NS is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_USER_NS is not set
+New value: CONFIG_USER_NS=y
+
+Value of CONFIG_NET_KEY is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_NET_KEY is not set
+New value: CONFIG_NET_KEY=y
+
+Value of CONFIG_INET_ESP is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_INET_ESP is not set
+New value: CONFIG_INET_ESP=y
+
+Value of CONFIG_INET6_ESPINTCP is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_INET6_ESPINTCP is not set
+New value: CONFIG_INET6_ESPINTCP=y
+
+Value of CONFIG_CRYPTO_ECB is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_ECB is not set
+New value: CONFIG_CRYPTO_ECB=y
+
+Value of CONFIG_CRYPTO_USER_API_AEAD is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_USER_API_AEAD is not set
+New value: CONFIG_CRYPTO_USER_API_AEAD=y
+
+Value of CONFIG_CRYPTO_USER_API_SKCIPHER is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_USER_API_SKCIPHER is not set
+New value: CONFIG_CRYPTO_USER_API_SKCIPHER=y
+
+Value of CONFIG_AF_RXRPC is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_AF_RXRPC is not set
+New value: CONFIG_AF_RXRPC=y
+
+Value of CONFIG_CRYPTO_FCRYPT is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_FCRYPT is not set
+New value: CONFIG_CRYPTO_FCRYPT=y
+
+Value of CONFIG_CRYPTO_PCBC is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_PCBC is not set
+New value: CONFIG_CRYPTO_PCBC=y
+
+Merging /home/vmuser/src/env/configs/control.config
+#
+# merged configuration written to /home/vmuser/src/linux-pks-thesis-control/build_control/.config (needs make)
+#
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#1)
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+*** Default configuration is based on 'x86_64_defconfig'
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+Using .config as base
+Merging ../kernel/configs/kvm_guest.config
+#
+# merged configuration written to .config (needs make)
+#
+  GEN     Makefile
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+Using /home/vmuser/src/linux-pks-thesis-control/build_control/.config as base
+Merging /home/vmuser/src/env/configs/common.config
+Value of CONFIG_9P_FS_POSIX_ACL is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_9P_FS_POSIX_ACL is not set
+New value: CONFIG_9P_FS_POSIX_ACL=y
+
+Value of CONFIG_USER_NS is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_USER_NS is not set
+New value: CONFIG_USER_NS=y
+
+Value of CONFIG_NET_KEY is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_NET_KEY is not set
+New value: CONFIG_NET_KEY=y
+
+Value of CONFIG_INET_ESP is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_INET_ESP is not set
+New value: CONFIG_INET_ESP=y
+
+Value of CONFIG_INET6_ESPINTCP is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_INET6_ESPINTCP is not set
+New value: CONFIG_INET6_ESPINTCP=y
+
+Value of CONFIG_CRYPTO_ECB is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_ECB is not set
+New value: CONFIG_CRYPTO_ECB=y
+
+Value of CONFIG_CRYPTO_USER_API_AEAD is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_USER_API_AEAD is not set
+New value: CONFIG_CRYPTO_USER_API_AEAD=y
+
+Value of CONFIG_CRYPTO_USER_API_SKCIPHER is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_USER_API_SKCIPHER is not set
+New value: CONFIG_CRYPTO_USER_API_SKCIPHER=y
+
+Value of CONFIG_AF_RXRPC is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_AF_RXRPC is not set
+New value: CONFIG_AF_RXRPC=y
+
+Value of CONFIG_CRYPTO_FCRYPT is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_FCRYPT is not set
+New value: CONFIG_CRYPTO_FCRYPT=y
+
+Value of CONFIG_CRYPTO_PCBC is redefined by fragment /home/vmuser/src/env/configs/common.config:
+Previous value: # CONFIG_CRYPTO_PCBC is not set
+New value: CONFIG_CRYPTO_PCBC=y
+
+Merging /home/vmuser/src/env/configs/control.config
+#
+# merged configuration written to /home/vmuser/src/linux-pks-thesis-control/build_control/.config (needs make)
+#
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  GEN     Makefile
+#
+# configuration written to .config
+#
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'
+make[1]: Entering directory '/home/vmuser/src/linux-pks-thesis-control'
+make[2]: Entering directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+  SYNC    include/config/auto.conf.cmd
+  GEN     Makefile
+  GEN     Makefile
+  CALL    ../scripts/checksyscalls.sh
+  CALL    ../scripts/atomic/check-atomics.sh
+  DESCEND objtool
+  CHK     include/generated/compile.h
+Kernel: arch/x86/boot/bzImage is ready  (#1)
+make[2]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control/build_control'
+make[1]: Leaving directory '/home/vmuser/src/linux-pks-thesis-control'

@@ -1,10 +1,8 @@
 node,variant,verdict,details
 fsx,off,PASS,ops=10000 errors=0
-pjd,off,FAIL,unresolved
-pks-unit,off,FAIL,unresolved
-sanity,off,FAIL,unresolved
+pks-unit,off,PASS,ok
+sanity,off,PASS,note=not_applicable_when_off
 fsx,on,PASS,ops=10000 errors=0
-pjd,on,FAIL,unresolved
-pks-unit,on,FAIL,unresolved
-sanity,on,FAIL,unresolved
-test,all,FAIL,passed=2_failed=6
+pks-unit,on,PASS,ok
+sanity,on,FAIL,passed=19 failed=2
+test,all,FAIL,passed=3_failed=3
