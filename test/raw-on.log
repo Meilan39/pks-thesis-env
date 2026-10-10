@@ -27,568 +27,563 @@ qemu-system-x86_64 -machine q35 -m 4096M -smp 4 -cpu max\,pks=on -accel tcg -ker
 [    0.000000] SMBIOS 2.8 present.
 [    0.000000] DMI: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.15.0-1 04/01/2014
 [    0.000000] tsc: Fast TSC calibration using PIT
-[    0.000000] tsc: Detected 2294.610 MHz processor
-[    0.007587] last_pfn = 0x180000 max_arch_pfn = 0x10000000000
-[    0.008412] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
-[    0.008699] last_pfn = 0x7ffdc max_arch_pfn = 0x10000000000
-[    0.020294] found SMP MP-table at [mem 0x000f5b90-0x000f5b9f]
-[    0.022092] Using GB pages for direct mapping
-[    0.026280] ACPI: Early table checksum verification disabled
-[    0.026673] ACPI: RSDP 0x00000000000F59C0 000014 (v00 BOCHS )
-[    0.026926] ACPI: RSDT 0x000000007FFE23F3 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
-[    0.027561] ACPI: FACP 0x000000007FFE21D3 0000F4 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
-[    0.028133] ACPI: DSDT 0x000000007FFE0040 002193 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
-[    0.028228] ACPI: FACS 0x000000007FFE0000 000040
-[    0.028283] ACPI: APIC 0x000000007FFE22C7 000090 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
-[    0.028308] ACPI: HPET 0x000000007FFE2357 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
-[    0.028330] ACPI: MCFG 0x000000007FFE238F 00003C (v01 BOCHS  BXPC     00000001 BXPC 00000001)
-[    0.028351] ACPI: WAET 0x000000007FFE23CB 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
-[    0.028428] ACPI: Reserving FACP table memory at [mem 0x7ffe21d3-0x7ffe22c6]
-[    0.028460] ACPI: Reserving DSDT table memory at [mem 0x7ffe0040-0x7ffe21d2]
-[    0.028471] ACPI: Reserving FACS table memory at [mem 0x7ffe0000-0x7ffe003f]
-[    0.028479] ACPI: Reserving APIC table memory at [mem 0x7ffe22c7-0x7ffe2356]
-[    0.028487] ACPI: Reserving HPET table memory at [mem 0x7ffe2357-0x7ffe238e]
-[    0.028495] ACPI: Reserving MCFG table memory at [mem 0x7ffe238f-0x7ffe23ca]
-[    0.028503] ACPI: Reserving WAET table memory at [mem 0x7ffe23cb-0x7ffe23f2]
-[    0.030830] No NUMA configuration found
-[    0.030866] Faking a node at [mem 0x0000000000000000-0x000000017fffffff]
-[    0.031496] NODE_DATA(0) allocated [mem 0x16fffa000-0x16fffdfff]
-[    0.036091] Zone ranges:
-[    0.036131]   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
-[    0.036214]   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
-[    0.036228]   Normal   [mem 0x0000000100000000-0x000000017fffffff]
-[    0.036243] Movable zone start for each node
-[    0.036276] Early memory node ranges
-[    0.036306]   node   0: [mem 0x0000000000001000-0x000000000009efff]
-[    0.036438]   node   0: [mem 0x0000000000100000-0x000000007ffdbfff]
-[    0.036471]   node   0: [mem 0x0000000100000000-0x000000017fffffff]
-[    0.036662] Initmem setup node 0 [mem 0x0000000000001000-0x000000017fffffff]
-[    0.037438] On node 0, zone DMA: 1 pages in unavailable ranges
-[    0.037817] On node 0, zone DMA: 97 pages in unavailable ranges
-[    0.083019] On node 0, zone Normal: 36 pages in unavailable ranges
-[    0.083551] ACPI: PM-Timer IO Port: 0x608
-[    0.084084] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
-[    0.084470] IOAPIC[0]: apic_id 0, version 32, address 0xfec00000, GSI 0-23
-[    0.084605] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
-[    0.084867] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
-[    0.084902] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
-[    0.084998] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
-[    0.085010] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
-[    0.085185] ACPI: Using ACPI (MADT) for SMP configuration information
-[    0.085234] ACPI: HPET id: 0x8086a201 base: 0xfed00000
-[    0.085561] smpboot: Allowing 4 CPUs, 0 hotplug CPUs
-[    0.086451] [mem 0xc0000000-0xfed1bfff] available for PCI devices
-[    0.086494] Booting paravirtualized kernel on bare hardware
-[    0.086836] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
-[    0.097976] setup_percpu: NR_CPUS:64 nr_cpumask_bits:64 nr_cpu_ids:4 nr_node_ids:1
-[    0.106428] percpu: Embedded 52 pages/cpu s176040 r8192 d28760 u524288
-[    0.108925] Fallback order for Node 0: 0 
-[    0.109200] Built 1 zonelists, mobility grouping on.  Total pages: 1031900
-[    0.109221] Policy zone: Normal
-[    0.109437] Kernel command line: root=/dev/vda1 rw console=ttyS0 nokaslr pcache_pks=on pks_run=test pks_auto=test panic=1 systemd.mask=serial-getty@ttyS0.service SYSTEMD_COLORS=0
-[    0.110819] Unknown kernel command line parameters "nokaslr pks_run=test pks_auto=test SYSTEMD_COLORS=0", will be passed to user space.
-[    0.121734] Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes, linear)
-[    0.127126] Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
-[    0.128924] mem auto-init: stack:off, heap alloc:off, heap free:off
-[    0.448020] Memory: 3756008K/4193768K available (16396K kernel code, 2867K rwdata, 5440K rodata, 1288K init, 904K bss, 437560K reserved, 0K cma-reserved)
-[    0.451591] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
-[    0.461779] Dynamic Preempt: voluntary
-[    0.464490] rcu: Preemptible hierarchical RCU implementation.
-[    0.464512] rcu: 	RCU event tracing is enabled.
-[    0.464540] rcu: 	RCU restricting CPUs from NR_CPUS=64 to nr_cpu_ids=4.
-[    0.464754] 	Trampoline variant of Tasks RCU enabled.
-[    0.464875] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
-[    0.464912] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
-[    0.473463] NR_IRQS: 4352, nr_irqs: 456, preallocated irqs: 16
-[    0.480531] random: get_random_bytes called from start_kernel+0x493/0x665 with crng_init=0
-[    0.485457] Console: colour VGA+ 80x25
-[    0.503850] printk: console [ttyS0] enabled
-[    0.504903] ACPI: Core revision 20211217
-[    0.509913] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
-[    0.514982] APIC: Switch to symmetric I/O mode setup
-[    0.519316] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
-[    0.524929] tsc: Marking TSC unstable due to TSCs unsynchronized
-[    0.525579] Calibrating delay loop (skipped), value calculated using timer frequency.. 4589.22 BogoMIPS (lpj=2294610)
-[    0.526422] pid_max: default: 32768 minimum: 301
-[    0.527947] LSM: Security Framework initializing
-[    0.529195] SELinux:  Initializing.
-[    0.531844] Mount-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
-[    0.532427] Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
-[    0.556990] process: using AMD E400 aware idle routine
-[    0.560548] Last level iTLB entries: 4KB 512, 2MB 255, 4MB 127
-[    0.560973] Last level dTLB entries: 4KB 512, 2MB 255, 4MB 127, 1GB 0
-[    0.562623] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
-[    0.563702] Spectre V2 : Mitigation: Retpolines
-[    0.564599] Spectre V2 : Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch
-[    0.590306] Freeing SMP alternatives memory: 44K
-[    0.710355] smpboot: CPU0: AMD QEMU TCG CPU version 2.5+ (family: 0xf, model: 0x6b, stepping: 0x1)
-[    0.725600] cblist_init_generic: Setting adjustable number of callback queues.
-[    0.726165] cblist_init_generic: Setting shift to 2 and lim to 1.
-[    0.726887] Performance Events: PMU not available due to virtualization, using software events only.
-[    0.729421] rcu: Hierarchical SRCU implementation.
-[    0.979388] pcache_pks: initialized 256MB pool at 0x0000000170000000
-[    0.983604] smp: Bringing up secondary CPUs ...
-[    0.988605] x86: Booting SMP configuration:
-[    0.989062] .... node  #0, CPUs:      #1
-[    0.036157] calibrate_delay_direct() dropping max bogoMips estimate 2 = 5174579
-[    0.036157] calibrate_delay_direct() dropping max bogoMips estimate 0 = 4344833
-[    0.036157] calibrate_delay_direct() dropping max bogoMips estimate 1 = 3419656
-[    1.075688]  #2
-[    0.036157] calibrate_delay_direct() dropping max bogoMips estimate 0 = 5254672
-[    1.140176]  #3
-[    0.036157] calibrate_delay_direct() dropping max bogoMips estimate 0 = 10415973
-[    0.036157] calibrate_delay_direct() dropping max bogoMips estimate 1 = 6892566
-[    0.036157] calibrate_delay_direct() dropping max bogoMips estimate 4 = 3970933
-[    0.036157] calibrate_delay_direct() failed to get a good estimate for loops_per_jiffy.
-[    0.036157] Probably due to long platform interrupts. Consider using "lpj=" boot option.
-[    1.214529] smp: Brought up 1 node, 4 CPUs
-[    1.214723] smpboot: Max logical packages: 1
-[    1.214939] smpboot: Total of 4 processors activated (19742.48 BogoMIPS)
-[    1.254390] devtmpfs: initialized
-[    1.275166] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
-[    1.276581] futex hash table entries: 1024 (order: 4, 65536 bytes, linear)
-[    1.282224] PM: RTC time: 08:29:02, date: 2026-10-10
-[    1.290803] NET: Registered PF_NETLINK/PF_ROUTE protocol family
-[    1.296440] audit: initializing netlink subsys (disabled)
-[    1.303818] audit: type=2000 audit(1791620941.787:1): state=initialized audit_enabled=0 res=1
-[    1.310237] thermal_sys: Registered thermal governor 'step_wise'
-[    1.310286] thermal_sys: Registered thermal governor 'user_space'
-[    1.315428] cpuidle: using governor menu
-[    1.321721] PCI: MMCONFIG for domain 0000 [bus 00-ff] at [mem 0xb0000000-0xbfffffff] (base 0xb0000000)
-[    1.323419] PCI: MMCONFIG at [mem 0xb0000000-0xbfffffff] reserved in E820
-[    1.327328] PCI: Using configuration type 1 for base access
-[    1.330853] mtrr: your CPUs had inconsistent fixed MTRR settings
-[    1.331399] mtrr: your CPUs had inconsistent variable MTRR settings
-[    1.331548] mtrr: your CPUs had inconsistent MTRRdefType settings
-[    1.331663] mtrr: probably your BIOS does not setup all CPUs.
-[    1.331770] mtrr: corrected configuration.
-[    1.374475] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
-[    1.385769] HugeTLB registered 2.00 MiB page size, pre-allocated 0 pages
-[    1.400533] ACPI: Added _OSI(Module Device)
-[    1.400835] ACPI: Added _OSI(Processor Device)
-[    1.400930] ACPI: Added _OSI(3.0 _SCP Extensions)
-[    1.401000] ACPI: Added _OSI(Processor Aggregator Device)
-[    1.401152] ACPI: Added _OSI(Linux-Dell-Video)
-[    1.401225] ACPI: Added _OSI(Linux-Lenovo-NV-HDMI-Audio)
-[    1.401377] ACPI: Added _OSI(Linux-HPI-Hybrid-Graphics)
-[    1.428629] ACPI: 1 ACPI AML tables successfully acquired and loaded
-[    1.455227] ACPI: Interpreter enabled
-[    1.456760] ACPI: PM: (supports S0 S3 S5)
-[    1.457050] ACPI: Using IOAPIC for interrupt routing
-[    1.458521] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
-[    1.460826] ACPI: Enabled 2 GPEs in block 00 to 3F
-[    1.500746] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
-[    1.501854] acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI HPX-Type3]
-[    1.504278] acpi PNP0A08:00: _OSC: platform does not support [LTR]
-[    1.505844] acpi PNP0A08:00: _OSC: OS now controls [PME PCIeCapability]
-[    1.509413] PCI host bridge to bus 0000:00
-[    1.510542] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
-[    1.510992] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
-[    1.511113] pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
-[    1.511227] pci_bus 0000:00: root bus resource [mem 0x80000000-0xafffffff window]
-[    1.511338] pci_bus 0000:00: root bus resource [mem 0xc0000000-0xfebfffff window]
-[    1.511355] pci_bus 0000:00: root bus resource [mem 0x180000000-0x97fffffff window]
-[    1.512553] pci_bus 0000:00: root bus resource [bus 00-ff]
-[    1.514565] pci 0000:00:00.0: [8086:29c0] type 00 class 0x060000
-[    1.520215] pci 0000:00:01.0: [1234:1111] type 00 class 0x030000
-[    1.522589] pci 0000:00:01.0: reg 0x10: [mem 0xfd000000-0xfdffffff pref]
-[    1.525355] pci 0000:00:01.0: reg 0x18: [mem 0xfebd4000-0xfebd4fff]
-[    1.533096] pci 0000:00:01.0: reg 0x30: [mem 0xfebc0000-0xfebcffff pref]
-[    1.534399] pci 0000:00:01.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
-[    1.536379] pci 0000:00:02.0: [8086:10d3] type 00 class 0x020000
-[    1.538388] pci 0000:00:02.0: reg 0x10: [mem 0xfeb80000-0xfeb9ffff]
-[    1.541389] pci 0000:00:02.0: reg 0x14: [mem 0xfeba0000-0xfebbffff]
-[    1.543389] pci 0000:00:02.0: reg 0x18: [io  0xc100-0xc11f]
-[    1.546386] pci 0000:00:02.0: reg 0x1c: [mem 0xfebd0000-0xfebd3fff]
-[    1.552387] pci 0000:00:02.0: reg 0x30: [mem 0xfeb00000-0xfeb7ffff pref]
-[    1.555567] pci 0000:00:03.0: [1af4:1009] type 00 class 0x000200
-[    1.557387] pci 0000:00:03.0: reg 0x10: [io  0xc080-0xc0bf]
-[    1.559460] pci 0000:00:03.0: reg 0x14: [mem 0xfebd5000-0xfebd5fff]
-[    1.566388] pci 0000:00:03.0: reg 0x20: [mem 0xfe000000-0xfe003fff 64bit pref]
-[    1.569976] pci 0000:00:04.0: [1af4:1001] type 00 class 0x010000
-[    1.572487] pci 0000:00:04.0: reg 0x10: [io  0xc000-0xc07f]
-[    1.574391] pci 0000:00:04.0: reg 0x14: [mem 0xfebd6000-0xfebd6fff]
-[    1.580387] pci 0000:00:04.0: reg 0x20: [mem 0xfe004000-0xfe007fff 64bit pref]
-[    1.583921] pci 0000:00:1f.0: [8086:2918] type 00 class 0x060100
-[    1.584524] pci 0000:00:1f.0: quirk: [io  0x0600-0x067f] claimed by ICH6 ACPI/GPIO/TCO
-[    1.586811] pci 0000:00:1f.2: [8086:2922] type 00 class 0x010601
-[    1.593389] pci 0000:00:1f.2: reg 0x20: [io  0xc120-0xc13f]
-[    1.595414] pci 0000:00:1f.2: reg 0x24: [mem 0xfebd7000-0xfebd7fff]
-[    1.598669] pci 0000:00:1f.3: [8086:2930] type 00 class 0x0c0500
-[    1.603389] pci 0000:00:1f.3: reg 0x20: [io  0x0700-0x073f]
-[    1.613028] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
-[    1.614616] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
-[    1.615355] ACPI: PCI: Interrupt link LNKC configured for IRQ 11
-[    1.616588] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
-[    1.617611] ACPI: PCI: Interrupt link LNKE configured for IRQ 10
-[    1.618621] ACPI: PCI: Interrupt link LNKF configured for IRQ 10
-[    1.619602] ACPI: PCI: Interrupt link LNKG configured for IRQ 11
-[    1.620572] ACPI: PCI: Interrupt link LNKH configured for IRQ 11
-[    1.621132] ACPI: PCI: Interrupt link GSIA configured for IRQ 16
-[    1.621355] ACPI: PCI: Interrupt link GSIB configured for IRQ 17
-[    1.621355] ACPI: PCI: Interrupt link GSIC configured for IRQ 18
-[    1.621442] ACPI: PCI: Interrupt link GSID configured for IRQ 19
-[    1.622545] ACPI: PCI: Interrupt link GSIE configured for IRQ 20
-[    1.623039] ACPI: PCI: Interrupt link GSIF configured for IRQ 21
-[    1.623473] ACPI: PCI: Interrupt link GSIG configured for IRQ 22
-[    1.623658] ACPI: PCI: Interrupt link GSIH configured for IRQ 23
-[    1.628146] iommu: Default domain type: Translated 
-[    1.628400] iommu: DMA domain TLB invalidation policy: lazy mode 
-[    1.630578] SCSI subsystem initialized
-[    1.636658] ACPI: bus type USB registered
-[    1.637445] usbcore: registered new interface driver usbfs
-[    1.639168] usbcore: registered new interface driver hub
-[    1.639512] usbcore: registered new device driver usb
-[    1.640355] pps_core: LinuxPPS API ver. 1 registered
-[    1.640355] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
-[    1.640355] PTP clock support registered
-[    1.647927] Advanced Linux Sound Architecture Driver Initialized.
-[    1.659355] NetLabel: Initializing
-[    1.659355] NetLabel:  domain hash size = 128
-[    1.659355] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
-[    1.661615] NetLabel:  unlabeled traffic allowed by default
-[    1.668544] PCI: Using ACPI for IRQ routing
-[    1.675752] pci 0000:00:01.0: vgaarb: setting as boot VGA device
-[    1.676201] pci 0000:00:01.0: vgaarb: bridge control possible
-[    1.676355] pci 0000:00:01.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
-[    1.676355] vgaarb: loaded
-[    1.677366] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
-[    1.677770] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
-[    1.687285] clocksource: Switched to clocksource hpet
-[    1.790687] VFS: Disk quotas dquot_6.6.0
-[    1.790993] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
-[    1.796832] pnp: PnP ACPI init
-[    1.806890] system 00:05: [mem 0xb0000000-0xbfffffff window] has been reserved
-[    1.812134] pnp: PnP ACPI: found 6 devices
-[    1.950233] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
-[    1.951911] NET: Registered PF_INET protocol family
-[    1.958774] IP idents hash table entries: 65536 (order: 7, 524288 bytes, linear)
-[    1.975629] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes, linear)
-[    1.975996] TCP established hash table entries: 32768 (order: 6, 262144 bytes, linear)
-[    1.977863] TCP bind hash table entries: 32768 (order: 7, 524288 bytes, linear)
-[    1.979879] TCP: Hash tables configured (established 32768 bind 32768)
-[    1.985864] UDP hash table entries: 2048 (order: 4, 65536 bytes, linear)
-[    1.986252] UDP-Lite hash table entries: 2048 (order: 4, 65536 bytes, linear)
-[    1.994471] NET: Registered PF_UNIX/PF_LOCAL protocol family
-[    2.009536] RPC: Registered named UNIX socket transport module.
-[    2.010096] RPC: Registered udp transport module.
-[    2.010188] RPC: Registered tcp transport module.
-[    2.010274] RPC: Registered tcp NFSv4.1 backchannel transport module.
-[    2.022619] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
-[    2.023674] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
-[    2.023791] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
-[    2.023900] pci_bus 0000:00: resource 7 [mem 0x80000000-0xafffffff window]
-[    2.025168] pci_bus 0000:00: resource 8 [mem 0xc0000000-0xfebfffff window]
-[    2.025305] pci_bus 0000:00: resource 9 [mem 0x180000000-0x97fffffff window]
-[    2.027850] PCI: CLS 0 bytes, default 64
-[    2.029898] PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
-[    2.030038] software IO TLB: mapped [mem 0x000000007bfdc000-0x000000007ffdc000] (64MB)
-[    3.115972] Initialise system trusted keyrings
-[    3.149295] workingset: timestamp_bits=56 max_order=20 bucket_order=0
-[    3.179840] NFS: Registering the id_resolver key type
-[    3.180869] Key type id_resolver registered
-[    3.181068] Key type id_legacy registered
-[    3.182686] 9p: Installing v9fs 9p2000 file system support
-[    3.218857] NET: Registered PF_ALG protocol family
-[    3.219888] Key type asymmetric registered
-[    3.220122] Asymmetric key parser 'x509' registered
-[    3.220708] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
-[    3.222013] io scheduler mq-deadline registered
-[    3.222514] io scheduler kyber registered
-[    3.227904] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
-[    3.231638] ACPI: button: Power Button [PWRF]
-[    3.244025] ACPI: \_SB_.GSIH: Enabled at IRQ 23
-[    3.252220] ACPI: \_SB_.GSIE: Enabled at IRQ 20
-[    3.255852] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
-[    3.258588] 00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
-[    3.272324] Non-volatile memory driver v1.3
-[    3.273109] Linux agpgart interface v0.103
-[    3.274914] ACPI: bus type drm_connector registered
-[    3.320492] loop: module loaded
-[    3.332094] virtio_blk virtio1: [vda] 16777216 512-byte logical blocks (8.59 GB/8.00 GiB)
-[    3.345194]  vda: vda1 vda2
-[    3.357203] ACPI: \_SB_.GSIA: Enabled at IRQ 16
-[    3.361891] ahci 0000:00:1f.2: AHCI 0001.0000 32 slots 6 ports 1.5 Gbps 0x3f impl SATA mode
-[    3.362268] ahci 0000:00:1f.2: flags: 64bit ncq only 
-[    3.375101] scsi host0: ahci
-[    3.380172] scsi host1: ahci
-[    3.388008] scsi host2: ahci
-[    3.394332] scsi host3: ahci
-[    3.399048] scsi host4: ahci
-[    3.403226] scsi host5: ahci
-[    3.405534] ata1: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7100 irq 29
-[    3.405994] ata2: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7180 irq 29
-[    3.406115] ata3: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7200 irq 29
-[    3.406220] ata4: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7280 irq 29
-[    3.406332] ata5: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7300 irq 29
-[    3.406750] ata6: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7380 irq 29
-[    3.425643] e100: Intel(R) PRO/100 Network Driver
-[    3.425756] e100: Copyright(c) 1999-2006 Intel Corporation
-[    3.426529] e1000: Intel(R) PRO/1000 Network Driver
-[    3.427591] e1000: Copyright (c) 1999-2006 Intel Corporation.
-[    3.428267] e1000e: Intel(R) PRO/1000 Network Driver
-[    3.428745] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
-[    3.431763] ACPI: \_SB_.GSIG: Enabled at IRQ 22
-[    3.433908] e1000e 0000:00:02.0: Interrupt Throttling Rate (ints/sec) set to dynamic conservative mode
-[    3.482043] e1000e 0000:00:02.0 0000:00:02.0 (uninitialized): registered PHC clock
-[    3.540178] e1000e 0000:00:02.0 eth0: (PCI Express:2.5GT/s:Width x1) 52:54:00:12:34:56
-[    3.540744] e1000e 0000:00:02.0 eth0: Intel(R) PRO/1000 Network Connection
-[    3.541057] e1000e 0000:00:02.0 eth0: MAC: 3, PHY: 8, PBA No: 000000-000
-[    3.541861] sky2: driver version 1.30
-[    3.544803] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
-[    3.545150] ehci-pci: EHCI PCI platform driver
-[    3.545835] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
-[    3.546206] ohci-pci: OHCI PCI platform driver
-[    3.546638] uhci_hcd: USB Universal Host Controller Interface driver
-[    3.547543] usbcore: registered new interface driver usblp
-[    3.547913] usbcore: registered new interface driver usb-storage
-[    3.548890] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
-[    3.554128] serio: i8042 KBD port at 0x60,0x64 irq 1
-[    3.554777] serio: i8042 AUX port at 0x60,0x64 irq 12
-[    3.559591] rtc_cmos 00:04: RTC can wake from S4
-[    3.570636] rtc_cmos 00:04: registered as rtc0
-[    3.572327] rtc_cmos 00:04: alarms up to one day, y3k, 242 bytes nvram, hpet irqs
-[    3.581611] i801_smbus 0000:00:1f.3: SMBus using PCI interrupt
-[    3.589569] i2c i2c-0: 1/1 memory slots populated (from DMI)
-[    3.589729] i2c i2c-0: Memory type 0x07 not supported yet, not instantiating SPD
-[    3.591697] fail to initialize ptp_kvm
-[    3.593889] device-mapper: ioctl: 4.46.0-ioctl (2022-02-22) initialised: dm-devel@redhat.com
-[    3.595947] hid: raw HID events driver (C) Jiri Kosina
-[    3.603470] usbcore: registered new interface driver usbhid
-[    3.603598] usbhid: USB HID core driver
-[    3.630906] Initializing XFRM netlink socket
-[    3.632327] NET: Registered PF_INET6 protocol family
-[    3.648793] Segment Routing with IPv6
-[    3.650639] In-situ OAM (IOAM) with IPv6
-[    3.652557] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
-[    3.657869] NET: Registered PF_PACKET protocol family
-[    3.658769] NET: Registered PF_KEY protocol family
-[    3.683933] kworker/u8:6 (76) used greatest stack depth: 14728 bytes left
-[    3.704682] NET: Registered PF_RXRPC protocol family
-[    3.704820] Key type rxrpc registered
-[    3.704890] Key type rxrpc_s registered
-[    3.710138] 9pnet: Installing 9P2000 support
-[    3.715358] Key type dns_resolver registered
-[    3.728050] IPI shorthand broadcast: enabled
-[    3.732203] registered taskstats version 1
-[    3.732320] Loading compiled-in X.509 certificates
-[    3.732978] ata1: SATA link down (SStatus 0 SControl 300)
-[    3.742796] ata5: SATA link down (SStatus 0 SControl 300)
-[    3.743289] ata2: SATA link down (SStatus 0 SControl 300)
-[    3.747304] ata3: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
-[    3.758351] ata6: SATA link down (SStatus 0 SControl 300)
-[    3.759853] ata4: SATA link down (SStatus 0 SControl 300)
-[    3.765340] ata3.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
-[    3.765534] ata3.00: applying bridge limits
-[    3.772154] ata3.00: configured for UDMA/100
-[    3.796814] scsi 2:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
-[    3.828609] PM:   Magic number: 14:548:472
-[    3.828957] acpi LNXSYSTM:00: hash matches
-[    3.831051] printk: console [netcon0] enabled
-[    3.832136] netconsole: network logging started
-[    3.836254] sr 2:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
-[    3.837662] cdrom: Uniform CD-ROM driver Revision: 3.20
-[    3.845177] cfg80211: Loading compiled-in X.509 certificates for regulatory database
-[    3.865852] cryptomgr_probe (106) used greatest stack depth: 14448 bytes left
-[    3.876625] sr 2:0:0:0: Attached scsi generic sg0 type 5
-[    3.880101] cfg80211: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
-[    3.883048] Unstable clock detected, switching default tracing clock to "global"
-[    3.883048] If you want to keep using the local clock, then add:
-[    3.883048]   "trace_clock=local"
-[    3.883048] on the kernel command line
-[    3.885265] platform regulatory.0: Direct firmware load for regulatory.db failed with error -2
-[    3.887060] cfg80211: failed to load regulatory.db
-[    3.890546] ALSA device list:
-[    3.890789]   No soundcards found.
-[    4.314798] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input2
-[    4.327051] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input3
-[    4.332620] md: Waiting for all devices to be available before autodetect
-[    4.332778] md: If you don't use raid, use raid=noautodetect
-[    4.332984] md: Autodetecting RAID arrays.
-[    4.333119] md: autorun ...
-[    4.333179] md: ... autorun DONE.
-[    4.685548] EXT4-fs (vda1): recovery complete
-[    4.723334] EXT4-fs (vda1): mounted filesystem with ordered data mode. Quota mode: none.
-[    4.725889] VFS: Mounted root (ext4 filesystem) on device 253:1.
-[    4.731715] devtmpfs: mounted
-[    4.780292] Freeing unused kernel image (initmem) memory: 1288K
-[    4.780852] Write protecting the kernel read-only data: 24576k
-[    4.786326] Freeing unused kernel image (text/rodata gap) memory: 2032K
-[    4.788239] Freeing unused kernel image (rodata/data gap) memory: 704K
-[    4.789049] Run /sbin/init as init process
-[    4.881099] random: fast init done
+[    0.000000] tsc: Detected 2294.659 MHz processor
+[    0.008344] last_pfn = 0x180000 max_arch_pfn = 0x10000000000
+[    0.009166] x86/PAT: Configuration [0-7]: WB  WC  UC- UC  WB  WP  UC- WT  
+[    0.009507] last_pfn = 0x7ffdc max_arch_pfn = 0x10000000000
+[    0.021159] found SMP MP-table at [mem 0x000f5b90-0x000f5b9f]
+[    0.022991] Using GB pages for direct mapping
+[    0.027161] ACPI: Early table checksum verification disabled
+[    0.027513] ACPI: RSDP 0x00000000000F59C0 000014 (v00 BOCHS )
+[    0.027741] ACPI: RSDT 0x000000007FFE23F3 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.028321] ACPI: FACP 0x000000007FFE21D3 0000F4 (v03 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.028847] ACPI: DSDT 0x000000007FFE0040 002193 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.028935] ACPI: FACS 0x000000007FFE0000 000040
+[    0.028986] ACPI: APIC 0x000000007FFE22C7 000090 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.029010] ACPI: HPET 0x000000007FFE2357 000038 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.029053] ACPI: MCFG 0x000000007FFE238F 00003C (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.029075] ACPI: WAET 0x000000007FFE23CB 000028 (v01 BOCHS  BXPC     00000001 BXPC 00000001)
+[    0.029153] ACPI: Reserving FACP table memory at [mem 0x7ffe21d3-0x7ffe22c6]
+[    0.029186] ACPI: Reserving DSDT table memory at [mem 0x7ffe0040-0x7ffe21d2]
+[    0.029197] ACPI: Reserving FACS table memory at [mem 0x7ffe0000-0x7ffe003f]
+[    0.029205] ACPI: Reserving APIC table memory at [mem 0x7ffe22c7-0x7ffe2356]
+[    0.029213] ACPI: Reserving HPET table memory at [mem 0x7ffe2357-0x7ffe238e]
+[    0.029221] ACPI: Reserving MCFG table memory at [mem 0x7ffe238f-0x7ffe23ca]
+[    0.029229] ACPI: Reserving WAET table memory at [mem 0x7ffe23cb-0x7ffe23f2]
+[    0.031434] No NUMA configuration found
+[    0.031467] Faking a node at [mem 0x0000000000000000-0x000000017fffffff]
+[    0.032026] NODE_DATA(0) allocated [mem 0x16fffa000-0x16fffdfff]
+[    0.036704] Zone ranges:
+[    0.036743]   DMA      [mem 0x0000000000001000-0x0000000000ffffff]
+[    0.036820]   DMA32    [mem 0x0000000001000000-0x00000000ffffffff]
+[    0.036833]   Normal   [mem 0x0000000100000000-0x000000017fffffff]
+[    0.036848] Movable zone start for each node
+[    0.036879] Early memory node ranges
+[    0.036908]   node   0: [mem 0x0000000000001000-0x000000000009efff]
+[    0.037061]   node   0: [mem 0x0000000000100000-0x000000007ffdbfff]
+[    0.037097]   node   0: [mem 0x0000000100000000-0x000000017fffffff]
+[    0.037297] Initmem setup node 0 [mem 0x0000000000001000-0x000000017fffffff]
+[    0.038103] On node 0, zone DMA: 1 pages in unavailable ranges
+[    0.038433] On node 0, zone DMA: 97 pages in unavailable ranges
+[    0.082389] On node 0, zone Normal: 36 pages in unavailable ranges
+[    0.082919] ACPI: PM-Timer IO Port: 0x608
+[    0.083439] ACPI: LAPIC_NMI (acpi_id[0xff] dfl dfl lint[0x1])
+[    0.083833] IOAPIC[0]: apic_id 0, version 32, address 0xfec00000, GSI 0-23
+[    0.083966] ACPI: INT_SRC_OVR (bus 0 bus_irq 0 global_irq 2 dfl dfl)
+[    0.084222] ACPI: INT_SRC_OVR (bus 0 bus_irq 5 global_irq 5 high level)
+[    0.084257] ACPI: INT_SRC_OVR (bus 0 bus_irq 9 global_irq 9 high level)
+[    0.084352] ACPI: INT_SRC_OVR (bus 0 bus_irq 10 global_irq 10 high level)
+[    0.084363] ACPI: INT_SRC_OVR (bus 0 bus_irq 11 global_irq 11 high level)
+[    0.084551] ACPI: Using ACPI (MADT) for SMP configuration information
+[    0.084602] ACPI: HPET id: 0x8086a201 base: 0xfed00000
+[    0.084920] smpboot: Allowing 4 CPUs, 0 hotplug CPUs
+[    0.085780] [mem 0xc0000000-0xfed1bfff] available for PCI devices
+[    0.085821] Booting paravirtualized kernel on bare hardware
+[    0.086126] clocksource: refined-jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1910969940391419 ns
+[    0.096699] setup_percpu: NR_CPUS:64 nr_cpumask_bits:64 nr_cpu_ids:4 nr_node_ids:1
+[    0.104913] percpu: Embedded 52 pages/cpu s176040 r8192 d28760 u524288
+[    0.107240] Fallback order for Node 0: 0 
+[    0.107493] Built 1 zonelists, mobility grouping on.  Total pages: 1031900
+[    0.107513] Policy zone: Normal
+[    0.107708] Kernel command line: root=/dev/vda1 rw console=ttyS0 nokaslr pcache_pks=on pks_run=test pks_auto=test panic=1 systemd.mask=serial-getty@ttyS0.service SYSTEMD_COLORS=0
+[    0.108986] Unknown kernel command line parameters "nokaslr pks_run=test pks_auto=test SYSTEMD_COLORS=0", will be passed to user space.
+[    0.119828] Dentry cache hash table entries: 524288 (order: 10, 4194304 bytes, linear)
+[    0.125213] Inode-cache hash table entries: 262144 (order: 9, 2097152 bytes, linear)
+[    0.127027] mem auto-init: stack:off, heap alloc:off, heap free:off
+[    0.398224] Memory: 3756008K/4193768K available (16396K kernel code, 2867K rwdata, 5440K rodata, 1288K init, 904K bss, 437560K reserved, 0K cma-reserved)
+[    0.401615] SLUB: HWalign=64, Order=0-3, MinObjects=0, CPUs=4, Nodes=1
+[    0.411708] Dynamic Preempt: voluntary
+[    0.414559] rcu: Preemptible hierarchical RCU implementation.
+[    0.414582] rcu: 	RCU event tracing is enabled.
+[    0.414610] rcu: 	RCU restricting CPUs from NR_CPUS=64 to nr_cpu_ids=4.
+[    0.414709] 	Trampoline variant of Tasks RCU enabled.
+[    0.414821] rcu: RCU calculated value of scheduler-enlistment delay is 100 jiffies.
+[    0.414856] rcu: Adjusting geometry for rcu_fanout_leaf=16, nr_cpu_ids=4
+[    0.423405] NR_IRQS: 4352, nr_irqs: 456, preallocated irqs: 16
+[    0.430162] random: get_random_bytes called from start_kernel+0x493/0x665 with crng_init=0
+[    0.435041] Console: colour VGA+ 80x25
+[    0.453187] printk: console [ttyS0] enabled
+[    0.454217] ACPI: Core revision 20211217
+[    0.459089] clocksource: hpet: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 19112604467 ns
+[    0.463540] APIC: Switch to symmetric I/O mode setup
+[    0.467324] ..TIMER: vector=0x30 apic1=0 pin1=2 apic2=-1 pin2=-1
+[    0.473525] tsc: Marking TSC unstable due to TSCs unsynchronized
+[    0.475057] Calibrating delay loop (skipped), value calculated using timer frequency.. 4589.31 BogoMIPS (lpj=2294659)
+[    0.475965] pid_max: default: 32768 minimum: 301
+[    0.477164] LSM: Security Framework initializing
+[    0.478561] SELinux:  Initializing.
+[    0.480711] Mount-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.481036] Mountpoint-cache hash table entries: 8192 (order: 4, 65536 bytes, linear)
+[    0.505344] process: using AMD E400 aware idle routine
+[    0.508035] Last level iTLB entries: 4KB 512, 2MB 255, 4MB 127
+[    0.508981] Last level dTLB entries: 4KB 512, 2MB 255, 4MB 127, 1GB 0
+[    0.510692] Spectre V1 : Mitigation: usercopy/swapgs barriers and __user pointer sanitization
+[    0.511267] Spectre V2 : Mitigation: Retpolines
+[    0.511385] Spectre V2 : Spectre v2 / SpectreRSB mitigation: Filling RSB on context switch
+[    0.540837] Freeing SMP alternatives memory: 44K
+[    0.659945] smpboot: CPU0: AMD QEMU TCG CPU version 2.5+ (family: 0xf, model: 0x6b, stepping: 0x1)
+[    0.674250] cblist_init_generic: Setting adjustable number of callback queues.
+[    0.674820] cblist_init_generic: Setting shift to 2 and lim to 1.
+[    0.676046] Performance Events: PMU not available due to virtualization, using software events only.
+[    0.678967] rcu: Hierarchical SRCU implementation.
+[    0.947256] pcache_pks: initialized 256MB pool at 0x0000000170000000
+[    0.951323] smp: Bringing up secondary CPUs ...
+[    0.956297] x86: Booting SMP configuration:
+[    0.956500] .... node  #0, CPUs:      #1
+[    0.036008] calibrate_delay_direct() dropping max bogoMips estimate 3 = 4397222
+[    0.036008] calibrate_delay_direct() dropping max bogoMips estimate 2 = 3822025
+[    1.036702]  #2
+[    0.036008] calibrate_delay_direct() dropping min bogoMips estimate 0 = 2928942
+[    0.036008] calibrate_delay_direct() dropping max bogoMips estimate 1 = 5280559
+[    0.036008] calibrate_delay_direct() dropping max bogoMips estimate 3 = 4887915
+[    1.099740]  #3
+[    0.036008] calibrate_delay_direct() dropping max bogoMips estimate 0 = 7104254
+[    0.036008] calibrate_delay_direct() dropping max bogoMips estimate 3 = 5767115
+[    0.036008] calibrate_delay_direct() dropping max bogoMips estimate 2 = 4230880
+[    0.036008] calibrate_delay_direct() failed to get a good estimate for loops_per_jiffy.
+[    0.036008] Probably due to long platform interrupts. Consider using "lpj=" boot option.
+[    1.174250] smp: Brought up 1 node, 4 CPUs
+[    1.174910] smpboot: Max logical packages: 1
+[    1.175053] smpboot: Total of 4 processors activated (21737.41 BogoMIPS)
+[    1.207980] devtmpfs: initialized
+[    1.224287] clocksource: jiffies: mask: 0xffffffff max_cycles: 0xffffffff, max_idle_ns: 1911260446275000 ns
+[    1.225098] futex hash table entries: 1024 (order: 4, 65536 bytes, linear)
+[    1.230447] PM: RTC time: 09:34:16, date: 2026-10-10
+[    1.237972] NET: Registered PF_NETLINK/PF_ROUTE protocol family
+[    1.242293] audit: initializing netlink subsys (disabled)
+[    1.249945] audit: type=2000 audit(1791624855.784:1): state=initialized audit_enabled=0 res=1
+[    1.253697] thermal_sys: Registered thermal governor 'step_wise'
+[    1.253742] thermal_sys: Registered thermal governor 'user_space'
+[    1.258024] cpuidle: using governor menu
+[    1.265616] PCI: MMCONFIG for domain 0000 [bus 00-ff] at [mem 0xb0000000-0xbfffffff] (base 0xb0000000)
+[    1.266727] PCI: MMCONFIG at [mem 0xb0000000-0xbfffffff] reserved in E820
+[    1.269821] PCI: Using configuration type 1 for base access
+[    1.272962] mtrr: your CPUs had inconsistent fixed MTRR settings
+[    1.273199] mtrr: your CPUs had inconsistent variable MTRR settings
+[    1.273307] mtrr: your CPUs had inconsistent MTRRdefType settings
+[    1.273883] mtrr: probably your BIOS does not setup all CPUs.
+[    1.273945] mtrr: corrected configuration.
+[    1.329874] kprobes: kprobe jump-optimization is enabled. All kprobes are optimized if possible.
+[    1.344215] HugeTLB registered 2.00 MiB page size, pre-allocated 0 pages
+[    1.358298] ACPI: Added _OSI(Module Device)
+[    1.358411] ACPI: Added _OSI(Processor Device)
+[    1.358482] ACPI: Added _OSI(3.0 _SCP Extensions)
+[    1.358552] ACPI: Added _OSI(Processor Aggregator Device)
+[    1.359052] ACPI: Added _OSI(Linux-Dell-Video)
+[    1.359449] ACPI: Added _OSI(Linux-Lenovo-NV-HDMI-Audio)
+[    1.359945] ACPI: Added _OSI(Linux-HPI-Hybrid-Graphics)
+[    1.383945] ACPI: 1 ACPI AML tables successfully acquired and loaded
+[    1.413854] ACPI: Interpreter enabled
+[    1.415311] ACPI: PM: (supports S0 S3 S5)
+[    1.415896] ACPI: Using IOAPIC for interrupt routing
+[    1.417439] PCI: Using host bridge windows from ACPI; if necessary, use "pci=nocrs" and report a bug
+[    1.419775] ACPI: Enabled 2 GPEs in block 00 to 3F
+[    1.460652] ACPI: PCI Root Bridge [PCI0] (domain 0000 [bus 00-ff])
+[    1.461449] acpi PNP0A08:00: _OSC: OS supports [ExtendedConfig ASPM ClockPM Segments MSI HPX-Type3]
+[    1.463864] acpi PNP0A08:00: _OSC: platform does not support [LTR]
+[    1.465621] acpi PNP0A08:00: _OSC: OS now controls [PME PCIeCapability]
+[    1.469419] PCI host bridge to bus 0000:00
+[    1.470161] pci_bus 0000:00: root bus resource [io  0x0000-0x0cf7 window]
+[    1.470990] pci_bus 0000:00: root bus resource [io  0x0d00-0xffff window]
+[    1.471122] pci_bus 0000:00: root bus resource [mem 0x000a0000-0x000bffff window]
+[    1.471254] pci_bus 0000:00: root bus resource [mem 0x80000000-0xafffffff window]
+[    1.471963] pci_bus 0000:00: root bus resource [mem 0xc0000000-0xfebfffff window]
+[    1.472086] pci_bus 0000:00: root bus resource [mem 0x180000000-0x97fffffff window]
+[    1.472394] pci_bus 0000:00: root bus resource [bus 00-ff]
+[    1.474466] pci 0000:00:00.0: [8086:29c0] type 00 class 0x060000
+[    1.479801] pci 0000:00:01.0: [1234:1111] type 00 class 0x030000
+[    1.482199] pci 0000:00:01.0: reg 0x10: [mem 0xfd000000-0xfdffffff pref]
+[    1.486976] pci 0000:00:01.0: reg 0x18: [mem 0xfebd4000-0xfebd4fff]
+[    1.495709] pci 0000:00:01.0: reg 0x30: [mem 0xfebc0000-0xfebcffff pref]
+[    1.496223] pci 0000:00:01.0: Video device with shadowed ROM at [mem 0x000c0000-0x000dffff]
+[    1.498180] pci 0000:00:02.0: [8086:10d3] type 00 class 0x020000
+[    1.500966] pci 0000:00:02.0: reg 0x10: [mem 0xfeb80000-0xfeb9ffff]
+[    1.502981] pci 0000:00:02.0: reg 0x14: [mem 0xfeba0000-0xfebbffff]
+[    1.504976] pci 0000:00:02.0: reg 0x18: [io  0xc100-0xc11f]
+[    1.506976] pci 0000:00:02.0: reg 0x1c: [mem 0xfebd0000-0xfebd3fff]
+[    1.512976] pci 0000:00:02.0: reg 0x30: [mem 0xfeb00000-0xfeb7ffff pref]
+[    1.515156] pci 0000:00:03.0: [1af4:1009] type 00 class 0x000200
+[    1.517082] pci 0000:00:03.0: reg 0x10: [io  0xc080-0xc0bf]
+[    1.519976] pci 0000:00:03.0: reg 0x14: [mem 0xfebd5000-0xfebd5fff]
+[    1.525976] pci 0000:00:03.0: reg 0x20: [mem 0xfe000000-0xfe003fff 64bit pref]
+[    1.528987] pci 0000:00:04.0: [1af4:1001] type 00 class 0x010000
+[    1.531975] pci 0000:00:04.0: reg 0x10: [io  0xc000-0xc07f]
+[    1.534955] pci 0000:00:04.0: reg 0x14: [mem 0xfebd6000-0xfebd6fff]
+[    1.540976] pci 0000:00:04.0: reg 0x20: [mem 0xfe004000-0xfe007fff 64bit pref]
+[    1.544208] pci 0000:00:1f.0: [8086:2918] type 00 class 0x060100
+[    1.544945] pci 0000:00:1f.0: quirk: [io  0x0600-0x067f] claimed by ICH6 ACPI/GPIO/TCO
+[    1.546166] pci 0000:00:1f.2: [8086:2922] type 00 class 0x010601
+[    1.551976] pci 0000:00:1f.2: reg 0x20: [io  0xc120-0xc13f]
+[    1.554594] pci 0000:00:1f.2: reg 0x24: [mem 0xfebd7000-0xfebd7fff]
+[    1.557532] pci 0000:00:1f.3: [8086:2930] type 00 class 0x0c0500
+[    1.561925] pci 0000:00:1f.3: reg 0x20: [io  0x0700-0x073f]
+[    1.571339] ACPI: PCI: Interrupt link LNKA configured for IRQ 10
+[    1.572629] ACPI: PCI: Interrupt link LNKB configured for IRQ 10
+[    1.573452] ACPI: PCI: Interrupt link LNKC configured for IRQ 11
+[    1.574444] ACPI: PCI: Interrupt link LNKD configured for IRQ 11
+[    1.575463] ACPI: PCI: Interrupt link LNKE configured for IRQ 10
+[    1.576442] ACPI: PCI: Interrupt link LNKF configured for IRQ 10
+[    1.577419] ACPI: PCI: Interrupt link LNKG configured for IRQ 11
+[    1.578452] ACPI: PCI: Interrupt link LNKH configured for IRQ 11
+[    1.579031] ACPI: PCI: Interrupt link GSIA configured for IRQ 16
+[    1.579391] ACPI: PCI: Interrupt link GSIB configured for IRQ 17
+[    1.579575] ACPI: PCI: Interrupt link GSIC configured for IRQ 18
+[    1.580125] ACPI: PCI: Interrupt link GSID configured for IRQ 19
+[    1.580601] ACPI: PCI: Interrupt link GSIE configured for IRQ 20
+[    1.580945] ACPI: PCI: Interrupt link GSIF configured for IRQ 21
+[    1.581072] ACPI: PCI: Interrupt link GSIG configured for IRQ 22
+[    1.581257] ACPI: PCI: Interrupt link GSIH configured for IRQ 23
+[    1.585862] iommu: Default domain type: Translated 
+[    1.585996] iommu: DMA domain TLB invalidation policy: lazy mode 
+[    1.588376] SCSI subsystem initialized
+[    1.594431] ACPI: bus type USB registered
+[    1.597180] usbcore: registered new interface driver usbfs
+[    1.597871] usbcore: registered new interface driver hub
+[    1.598152] usbcore: registered new device driver usb
+[    1.599443] pps_core: LinuxPPS API ver. 1 registered
+[    1.599855] pps_core: Software ver. 5.3.6 - Copyright 2005-2007 Rodolfo Giometti <giometti@linux.it>
+[    1.600348] PTP clock support registered
+[    1.605034] Advanced Linux Sound Architecture Driver Initialized.
+[    1.615879] NetLabel: Initializing
+[    1.615973] NetLabel:  domain hash size = 128
+[    1.616064] NetLabel:  protocols = UNLABELED CIPSOv4 CALIPSO
+[    1.617630] NetLabel:  unlabeled traffic allowed by default
+[    1.624187] PCI: Using ACPI for IRQ routing
+[    1.632506] pci 0000:00:01.0: vgaarb: setting as boot VGA device
+[    1.632945] pci 0000:00:01.0: vgaarb: bridge control possible
+[    1.632945] pci 0000:00:01.0: vgaarb: VGA device added: decodes=io+mem,owns=io+mem,locks=none
+[    1.633000] vgaarb: loaded
+[    1.634327] hpet0: at MMIO 0xfed00000, IRQs 2, 8, 0
+[    1.635088] hpet0: 3 comparators, 64-bit 100.000000 MHz counter
+[    1.640645] clocksource: Switched to clocksource hpet
+[    1.752178] VFS: Disk quotas dquot_6.6.0
+[    1.754278] VFS: Dquot-cache hash table entries: 512 (order 0, 4096 bytes)
+[    1.760399] pnp: PnP ACPI init
+[    1.771257] system 00:05: [mem 0xb0000000-0xbfffffff window] has been reserved
+[    1.776314] pnp: PnP ACPI: found 6 devices
+[    1.930412] clocksource: acpi_pm: mask: 0xffffff max_cycles: 0xffffff, max_idle_ns: 2085701024 ns
+[    1.932942] NET: Registered PF_INET protocol family
+[    1.938850] IP idents hash table entries: 65536 (order: 7, 524288 bytes, linear)
+[    1.953486] tcp_listen_portaddr_hash hash table entries: 2048 (order: 3, 32768 bytes, linear)
+[    1.954475] TCP established hash table entries: 32768 (order: 6, 262144 bytes, linear)
+[    1.955855] TCP bind hash table entries: 32768 (order: 7, 524288 bytes, linear)
+[    1.957347] TCP: Hash tables configured (established 32768 bind 32768)
+[    1.960517] UDP hash table entries: 2048 (order: 4, 65536 bytes, linear)
+[    1.961667] UDP-Lite hash table entries: 2048 (order: 4, 65536 bytes, linear)
+[    1.965842] NET: Registered PF_UNIX/PF_LOCAL protocol family
+[    1.979458] RPC: Registered named UNIX socket transport module.
+[    1.980221] RPC: Registered udp transport module.
+[    1.980499] RPC: Registered tcp transport module.
+[    1.980574] RPC: Registered tcp NFSv4.1 backchannel transport module.
+[    1.989289] pci_bus 0000:00: resource 4 [io  0x0000-0x0cf7 window]
+[    1.990118] pci_bus 0000:00: resource 5 [io  0x0d00-0xffff window]
+[    1.990221] pci_bus 0000:00: resource 6 [mem 0x000a0000-0x000bffff window]
+[    1.990329] pci_bus 0000:00: resource 7 [mem 0x80000000-0xafffffff window]
+[    1.990612] pci_bus 0000:00: resource 8 [mem 0xc0000000-0xfebfffff window]
+[    1.990725] pci_bus 0000:00: resource 9 [mem 0x180000000-0x97fffffff window]
+[    1.991945] PCI: CLS 0 bytes, default 64
+[    1.995573] PCI-DMA: Using software bounce buffering for IO (SWIOTLB)
+[    1.998030] software IO TLB: mapped [mem 0x000000007bfdc000-0x000000007ffdc000] (64MB)
+[    3.057279] Initialise system trusted keyrings
+[    3.106267] workingset: timestamp_bits=56 max_order=20 bucket_order=0
+[    3.130725] NFS: Registering the id_resolver key type
+[    3.131532] Key type id_resolver registered
+[    3.132293] Key type id_legacy registered
+[    3.135297] 9p: Installing v9fs 9p2000 file system support
+[    3.169365] NET: Registered PF_ALG protocol family
+[    3.169756] Key type asymmetric registered
+[    3.169898] Asymmetric key parser 'x509' registered
+[    3.170516] Block layer SCSI generic (bsg) driver version 0.4 loaded (major 251)
+[    3.171638] io scheduler mq-deadline registered
+[    3.172085] io scheduler kyber registered
+[    3.179153] input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+[    3.182861] ACPI: button: Power Button [PWRF]
+[    3.193231] ACPI: \_SB_.GSIH: Enabled at IRQ 23
+[    3.200548] ACPI: \_SB_.GSIE: Enabled at IRQ 20
+[    3.204334] Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+[    3.206925] 00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+[    3.221337] Non-volatile memory driver v1.3
+[    3.221479] Linux agpgart interface v0.103
+[    3.223596] ACPI: bus type drm_connector registered
+[    3.269267] loop: module loaded
+[    3.280752] virtio_blk virtio1: [vda] 16777216 512-byte logical blocks (8.59 GB/8.00 GiB)
+[    3.293691]  vda: vda1 vda2
+[    3.305484] ACPI: \_SB_.GSIA: Enabled at IRQ 16
+[    3.310516] ahci 0000:00:1f.2: AHCI 0001.0000 32 slots 6 ports 1.5 Gbps 0x3f impl SATA mode
+[    3.310851] ahci 0000:00:1f.2: flags: 64bit ncq only 
+[    3.327262] scsi host0: ahci
+[    3.335057] scsi host1: ahci
+[    3.340207] scsi host2: ahci
+[    3.348626] scsi host3: ahci
+[    3.361818] scsi host4: ahci
+[    3.365437] scsi host5: ahci
+[    3.368152] ata1: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7100 irq 29
+[    3.369421] ata2: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7180 irq 29
+[    3.369909] ata3: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7200 irq 29
+[    3.370036] ata4: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7280 irq 29
+[    3.371346] ata5: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7300 irq 29
+[    3.371481] ata6: SATA max UDMA/133 abar m4096@0xfebd7000 port 0xfebd7380 irq 29
+[    3.413087] e100: Intel(R) PRO/100 Network Driver
+[    3.413244] e100: Copyright(c) 1999-2006 Intel Corporation
+[    3.414230] e1000: Intel(R) PRO/1000 Network Driver
+[    3.416404] e1000: Copyright (c) 1999-2006 Intel Corporation.
+[    3.417198] e1000e: Intel(R) PRO/1000 Network Driver
+[    3.417313] e1000e: Copyright(c) 1999 - 2015 Intel Corporation.
+[    3.428684] ACPI: \_SB_.GSIG: Enabled at IRQ 22
+[    3.434025] e1000e 0000:00:02.0: Interrupt Throttling Rate (ints/sec) set to dynamic conservative mode
+[    3.486741] e1000e 0000:00:02.0 0000:00:02.0 (uninitialized): registered PHC clock
+[    3.541859] e1000e 0000:00:02.0 eth0: (PCI Express:2.5GT/s:Width x1) 52:54:00:12:34:56
+[    3.542329] e1000e 0000:00:02.0 eth0: Intel(R) PRO/1000 Network Connection
+[    3.542953] e1000e 0000:00:02.0 eth0: MAC: 3, PHY: 8, PBA No: 000000-000
+[    3.544069] sky2: driver version 1.30
+[    3.547934] ehci_hcd: USB 2.0 'Enhanced' Host Controller (EHCI) Driver
+[    3.548515] ehci-pci: EHCI PCI platform driver
+[    3.548940] ohci_hcd: USB 1.1 'Open' Host Controller (OHCI) Driver
+[    3.549562] ohci-pci: OHCI PCI platform driver
+[    3.549924] uhci_hcd: USB Universal Host Controller Interface driver
+[    3.551107] usbcore: registered new interface driver usblp
+[    3.551516] usbcore: registered new interface driver usb-storage
+[    3.552512] i8042: PNP: PS/2 Controller [PNP0303:KBD,PNP0f13:MOU] at 0x60,0x64 irq 1,12
+[    3.556267] serio: i8042 KBD port at 0x60,0x64 irq 1
+[    3.556920] serio: i8042 AUX port at 0x60,0x64 irq 12
+[    3.564874] rtc_cmos 00:04: RTC can wake from S4
+[    3.576407] input: AT Translated Set 2 keyboard as /devices/platform/i8042/serio0/input/input1
+[    3.578787] rtc_cmos 00:04: registered as rtc0
+[    3.580503] rtc_cmos 00:04: alarms up to one day, y3k, 242 bytes nvram, hpet irqs
+[    3.589474] i801_smbus 0000:00:1f.3: SMBus using PCI interrupt
+[    3.593250] i2c i2c-0: 1/1 memory slots populated (from DMI)
+[    3.593743] i2c i2c-0: Memory type 0x07 not supported yet, not instantiating SPD
+[    3.595190] fail to initialize ptp_kvm
+[    3.596304] device-mapper: ioctl: 4.46.0-ioctl (2022-02-22) initialised: dm-devel@redhat.com
+[    3.598166] hid: raw HID events driver (C) Jiri Kosina
+[    3.600723] usbcore: registered new interface driver usbhid
+[    3.601178] usbhid: USB HID core driver
+[    3.624543] Initializing XFRM netlink socket
+[    3.627342] NET: Registered PF_INET6 protocol family
+[    3.646805] Segment Routing with IPv6
+[    3.647670] In-situ OAM (IOAM) with IPv6
+[    3.651601] sit: IPv6, IPv4 and MPLS over IPv4 tunneling driver
+[    3.657772] NET: Registered PF_PACKET protocol family
+[    3.658702] NET: Registered PF_KEY protocol family
+[    3.688233] kworker/u8:6 (76) used greatest stack depth: 14728 bytes left
+[    3.711868] ata2: SATA link down (SStatus 0 SControl 300)
+[    3.727377] ata5: SATA link down (SStatus 0 SControl 300)
+[    3.727600] ata4: SATA link down (SStatus 0 SControl 300)
+[    3.728573] ata3: SATA link up 1.5 Gbps (SStatus 113 SControl 300)
+[    3.729524] cryptomgr_probe (78) used greatest stack depth: 14568 bytes left
+[    3.736054] NET: Registered PF_RXRPC protocol family
+[    3.736544] Key type rxrpc registered
+[    3.736637] Key type rxrpc_s registered
+[    3.737597] ata6: SATA link down (SStatus 0 SControl 300)
+[    3.742252] 9pnet: Installing 9P2000 support
+[    3.745086] ata3.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+[    3.745314] ata3.00: applying bridge limits
+[    3.750409] ata3.00: configured for UDMA/100
+[    3.752187] Key type dns_resolver registered
+[    3.756144] ata1: SATA link down (SStatus 0 SControl 300)
+[    3.767254] IPI shorthand broadcast: enabled
+[    3.773740] registered taskstats version 1
+[    3.778053] Loading compiled-in X.509 certificates
+[    3.781765] scsi 2:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ: 0 ANSI: 5
+[    3.823875] sr 2:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+[    3.825667] cdrom: Uniform CD-ROM driver Revision: 3.20
+[    3.867890] sr 2:0:0:0: Attached scsi generic sg0 type 5
+[    3.874902] PM:   Magic number: 14:757:575
+[    3.875251]  workqueue: hash matches
+[    3.876319] printk: console [netcon0] enabled
+[    3.877685] netconsole: network logging started
+[    3.882537] cfg80211: Loading compiled-in X.509 certificates for regulatory database
+[    3.912616] cfg80211: Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
+[    3.915271] platform regulatory.0: Direct firmware load for regulatory.db failed with error -2
+[    3.915776] cfg80211: failed to load regulatory.db
+[    3.917681] Unstable clock detected, switching default tracing clock to "global"
+[    3.917681] If you want to keep using the local clock, then add:
+[    3.917681]   "trace_clock=local"
+[    3.917681] on the kernel command line
+[    3.920817] ALSA device list:
+[    3.921186]   No soundcards found.
+[    4.214283] input: ImExPS/2 Generic Explorer Mouse as /devices/platform/i8042/serio1/input/input3
+[    4.220941] md: Waiting for all devices to be available before autodetect
+[    4.221424] md: If you don't use raid, use raid=noautodetect
+[    4.221589] md: Autodetecting RAID arrays.
+[    4.221729] md: autorun ...
+[    4.221815] md: ... autorun DONE.
+[    4.547383] EXT4-fs (vda1): recovery complete
+[    4.575234] EXT4-fs (vda1): mounted filesystem with ordered data mode. Quota mode: none.
+[    4.576209] VFS: Mounted root (ext4 filesystem) on device 253:1.
+[    4.582252] devtmpfs: mounted
+[    4.631556] Freeing unused kernel image (initmem) memory: 1288K
+[    4.632473] Write protecting the kernel read-only data: 24576k
+[    4.637760] Freeing unused kernel image (text/rodata gap) memory: 2032K
+[    4.639846] Freeing unused kernel image (rodata/data gap) memory: 704K
+[    4.640705] Run /sbin/init as init process
+[    4.755596] random: fast init done
 SELinux:  Could not open policy file <= /etc/selinux/targeted/policy/policy.33:  No such file or directory
-[    5.159203] systemd[1]: systemd 252.39-1~deb12u2 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
-[    5.160611] systemd[1]: Detected virtualization qemu.
-[    5.161561] systemd[1]: Detected architecture x86-64.
+[    5.009171] systemd[1]: systemd 252.39-1~deb12u2 running in system mode (+PAM +AUDIT +SELINUX +APPARMOR +IMA +SMACK +SECCOMP +GCRYPT -GNUTLS +OPENSSL +ACL +BLKID +CURL +ELFUTILS +FIDO2 +IDN2 -IDN +IPTC +KMOD +LIBCRYPTSETUP +LIBFDISK +PCRE2 -PWQUALITY +P11KIT +QRENCODE +TPM2 +BZIP2 +LZ4 +XZ +ZLIB +ZSTD -BPF_FRAMEWORK -XKBCOMMON +UTMP +SYSVINIT default-hierarchy=unified)
+[    5.010854] systemd[1]: Detected virtualization qemu.
+[    5.011341] systemd[1]: Detected architecture x86-64.
 
 Welcome to Debian GNU/Linux 12 (bookworm)!
 
-[    5.176840] systemd[1]: Hostname set to <ubuntu>.
-[    5.301894] (sd-executor) (111) used greatest stack depth: 14008 bytes left
-[    6.516765] systemd-debug-g (114) used greatest stack depth: 13600 bytes left
-[    6.715688] systemd-fstab-g (115) used greatest stack depth: 13488 bytes left
-[    7.753027] systemd[1]: Queued start job for default target graphical.target.
-[    7.790492] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
+[    5.022684] systemd[1]: Hostname set to <ubuntu>.
+[    6.327200] systemd-cryptse (113) used greatest stack depth: 14208 bytes left
+[    6.355337] systemd-debug-g (114) used greatest stack depth: 13416 bytes left
+[    7.527606] systemd[1]: Queued start job for default target graphical.target.
+[    7.562313] systemd[1]: Created slice system-getty.slice - Slice /system/getty.
 [  OK  ] Created slice system-getty.slice - Slice /system/getty.
-[    7.798992] systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
+[    7.571130] systemd[1]: Created slice system-modprobe.slice - Slice /system/modprobe.
 [  OK  ] Created slice system-modprobe.slice - Slice /system/modprobe.
-[    7.803252] systemd[1]: Created slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
+[    7.575847] systemd[1]: Created slice system-systemd\x2dfsck.slice - Slice /system/systemd-fsck.
 [  OK  ] Created slice system-systemd\x2dfsc…lice - Slice /system/systemd-fsck.
-[    7.808784] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
+[    7.581299] systemd[1]: Started systemd-ask-password-console.path - Dispatch Password Requests to Console Directory Watch.
 [  OK  ] Started systemd-ask-password-consol…quests to Console Directory Watch.
-[    7.810987] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
+[    7.583584] systemd[1]: Started systemd-ask-password-wall.path - Forward Password Requests to Wall Directory Watch.
 [  OK  ] Started systemd-ask-password-wall.p… Requests to Wall Directory Watch.
-[    7.818029] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
+[    7.602424] systemd[1]: Set up automount proc-sys-fs-binfmt_misc.automount - Arbitrary Executable File Formats File System Automount Point.
 [  OK  ] Set up automount proc-sys-fs-binfmt…rmats File System Automount Point.
-[    7.820927] systemd[1]: Expecting device dev-vda2.device - /dev/vda2...
+[    7.610556] systemd[1]: Expecting device dev-vda2.device - /dev/vda2...
          Expecting device dev-vda2.device - /dev/vda2...
-[    7.824048] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
+[    7.614824] systemd[1]: Reached target cryptsetup.target - Local Encrypted Volumes.
 [  OK  ] Reached target cryptsetup.target - Local Encrypted Volumes.
-[    7.827134] systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
+[    7.620186] systemd[1]: Reached target integritysetup.target - Local Integrity Protected Volumes.
 [  OK  ] Reached target integritysetup.targe…Local Integrity Protected Volumes.
-[    7.829533] systemd[1]: Reached target paths.target - Path Units.
+[    7.625568] systemd[1]: Reached target paths.target - Path Units.
 [  OK  ] Reached target paths.target - Path Units.
-[    7.831091] systemd[1]: Reached target remote-fs.target - Remote File Systems.
+[    7.630477] systemd[1]: Reached target remote-fs.target - Remote File Systems.
 [  OK  ] Reached target remote-fs.target - Remote File Systems.
-[    7.832896] systemd[1]: Reached target slices.target - Slice Units.
+[    7.632800] systemd[1]: Reached target slices.target - Slice Units.
 [  OK  ] Reached target slices.target - Slice Units.
-[    7.834162] systemd[1]: Reached target swap.target - Swaps.
+[    7.637691] systemd[1]: Reached target swap.target - Swaps.
 [  OK  ] Reached target swap.target - Swaps.
-[    7.837189] systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
+[    7.641449] systemd[1]: Reached target veritysetup.target - Local Verity Protected Volumes.
 [  OK  ] Reached target veritysetup.target - Local Verity Protected Volumes.
-[    7.842487] systemd[1]: Listening on systemd-fsckd.socket - fsck to fsckd communication Socket.
+[    7.655701] systemd[1]: Listening on systemd-fsckd.socket - fsck to fsckd communication Socket.
 [  OK  ] Listening on systemd-fsckd.socket -…sck to fsckd communication Socket.
-[    7.845835] systemd[1]: Listening on systemd-initctl.socket - initctl Compatibility Named Pipe.
+[    7.661445] systemd[1]: Listening on systemd-initctl.socket - initctl Compatibility Named Pipe.
 [  OK  ] Listening on systemd-initctl.socket… initctl Compatibility Named Pipe.
-[    7.856307] systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
+[    7.673687] systemd[1]: Listening on systemd-journald-audit.socket - Journal Audit Socket.
 [  OK  ] Listening on systemd-journald-audit.socket - Journal Audit Socket.
-[    7.860647] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
+[    7.679459] systemd[1]: Listening on systemd-journald-dev-log.socket - Journal Socket (/dev/log).
 [  OK  ] Listening on systemd-journald-dev-l…ocket - Journal Socket (/dev/log).
-[    7.865754] systemd[1]: Listening on systemd-journald.socket - Journal Socket.
+[    7.683470] systemd[1]: Listening on systemd-journald.socket - Journal Socket.
 [  OK  ] Listening on systemd-journald.socket - Journal Socket.
-[    7.872713] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
+[    7.689323] systemd[1]: Listening on systemd-udevd-control.socket - udev Control Socket.
 [  OK  ] Listening on systemd-udevd-control.socket - udev Control Socket.
-[    7.877343] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
+[    7.693813] systemd[1]: Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
 [  OK  ] Listening on systemd-udevd-kernel.socket - udev Kernel Socket.
-[    7.879045] systemd[1]: Reached target sockets.target - Socket Units.
+[    7.697350] systemd[1]: Reached target sockets.target - Socket Units.
 [  OK  ] Reached target sockets.target - Socket Units.
-[    7.902557] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
+[    7.724713] systemd[1]: Mounting dev-hugepages.mount - Huge Pages File System...
          Mounting dev-hugepages.mount - Huge Pages File System...
-[    7.931819] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
+[    7.751342] systemd[1]: Mounting dev-mqueue.mount - POSIX Message Queue File System...
          Mounting dev-mqueue.mount - POSIX Message Queue File System...
-[    7.965273] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
+[    7.787414] systemd[1]: Mounting sys-kernel-debug.mount - Kernel Debug File System...
          Mounting sys-kernel-debug.mount - Kernel Debug File System...
-[    8.018804] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
+[    7.844426] systemd[1]: Mounting sys-kernel-tracing.mount - Kernel Trace File System...
          Mounting sys-kernel-tracing.mount - Kernel Trace File System...
-[    8.026589] systemd[1]: kmod-static-nodes.service - Create List of Static Device Nodes was skipped because of an unmet condition check (ConditionFileNotEmpty=/lib/modules/5.18.0-rc3-00050-g8c02da6fb5e6/modules.devname).
-[    8.107293] systemd[1]: Starting modprobe@configfs.service - Load Kernel Module configfs...
+[    7.861866] systemd[1]: kmod-static-nodes.service - Create List of Static Device Nodes was skipped because of an unmet condition check (ConditionFileNotEmpty=/lib/modules/5.18.0-rc3-00050-g8c02da6fb5e6/modules.devname).
+[    7.929076] systemd[1]: Starting modprobe@configfs.service - Load Kernel Module configfs...
          Starting modprobe@configfs.service - Load Kernel Module configfs...
-[    8.155156] systemd[1]: Starting modprobe@dm_mod.service - Load Kernel Module dm_mod...
+[    7.978813] systemd[1]: Starting modprobe@dm_mod.service - Load Kernel Module dm_mod...
          Starting modprobe@dm_mod.service - Load Kernel Module dm_mod...
-[    8.258984] systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
+[    8.031521] systemd[1]: Starting modprobe@efi_pstore.service - Load Kernel Module efi_pstore...
          Starting modprobe@efi_pstore.servic…- Load Kernel Module efi_pstore...
-[    8.469031] systemd[1]: Starting modprobe@fuse.service - Load Kernel Module fuse...
+[    8.158609] systemd[1]: Starting modprobe@fuse.service - Load Kernel Module fuse...
          Starting modprobe@fuse.service - Load Kernel Module fuse...
-[    8.606138] systemd[1]: Starting modprobe@loop.service - Load Kernel Module loop...
+[    8.375177] systemd[1]: Starting modprobe@loop.service - Load Kernel Module loop...
          Starting modprobe@loop.service - Load Kernel Module loop...
-[    8.628337] systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathIsReadWrite=!/).
-[    8.648616] systemd[1]: systemd-journald.service: unit configures an IP firewall, but the local system does not support BPF/cgroup firewalling.
-[    8.648893] systemd[1]: (This warning is only shown for the first unit using IP firewalling.)
-[    8.724146] systemd[1]: Starting systemd-journald.service - Journal Service...
+[    8.395146] systemd[1]: systemd-fsck-root.service - File System Check on Root Device was skipped because of an unmet condition check (ConditionPathIsReadWrite=!/).
+[    8.417870] systemd[1]: systemd-journald.service: unit configures an IP firewall, but the local system does not support BPF/cgroup firewalling.
+[    8.421400] systemd[1]: (This warning is only shown for the first unit using IP firewalling.)
+[    8.456471] systemd[1]: Starting systemd-journald.service - Journal Service...
          Starting systemd-journald.service - Journal Service...
-[    8.787306] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
+[    8.517035] systemd[1]: Starting systemd-modules-load.service - Load Kernel Modules...
          Starting systemd-modules-load.service - Load Kernel Modules...
-[    8.857802] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
+[    8.578282] systemd[1]: Starting systemd-remount-fs.service - Remount Root and Kernel File Systems...
          Starting systemd-remount-fs.service…nt Root and Kernel File Systems...
-[    8.913612] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
+[    8.663279] systemd[1]: Starting systemd-udev-trigger.service - Coldplug All udev Devices...
          Starting systemd-udev-trigger.service - Coldplug All udev Devices...
-[    9.201074] systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
+[    8.801088] systemd[1]: Mounted dev-hugepages.mount - Huge Pages File System.
 [  OK  ] Mounted dev-hugepages.mount - Huge Pages File System.
-[    9.218941] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
+[    8.858179] systemd[1]: Mounted dev-mqueue.mount - POSIX Message Queue File System.
 [  OK  ] Mounted dev-mqueue.mount - POSIX Message Queue File System.
-[    9.235540] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
+[    8.886295] systemd[1]: Mounted sys-kernel-debug.mount - Kernel Debug File System.
 [  OK  ] Mounted sys-kernel-debug.mount - Kernel Debug File System.
-[    9.249033] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
+[    8.904366] systemd[1]: Mounted sys-kernel-tracing.mount - Kernel Trace File System.
 [  OK  ] Mounted sys-kernel-tracing.mount - Kernel Trace File System.
-[    9.328081] systemd[1]: modprobe@configfs.service: Deactivated successfully.
-[    9.349706] systemd[1]: Finished modprobe@configfs.service - Load Kernel Module configfs.
+[    8.974567] systemd[1]: modprobe@configfs.service: Deactivated successfully.
+[    9.047310] systemd[1]: Finished modprobe@configfs.service - Load Kernel Module configfs.
 [  OK  ] Finished modprobe@configfs.service - Load Kernel Module configfs.
-[    9.404031] systemd[1]: modprobe@dm_mod.service: Deactivated successfully.
-[    9.420487] systemd[1]: Finished modprobe@dm_mod.service - Load Kernel Module dm_mod.
+[    9.155917] systemd[1]: modprobe@dm_mod.service: Deactivated successfully.
+[    9.169195] systemd[1]: Finished modprobe@dm_mod.service - Load Kernel Module dm_mod.
 [  OK  ] Finished modprobe@dm_mod.service - Load Kernel Module dm_mod.
-[    9.442916] systemd[1]: modprobe@efi_pstore.service: Deactivated successfully.
-[    9.455516] systemd[1]: Finished modprobe@efi_pstore.service - Load Kernel Module efi_pstore.
+[    9.203143] systemd[1]: modprobe@efi_pstore.service: Deactivated successfully.
+[    9.216481] systemd[1]: Finished modprobe@efi_pstore.service - Load Kernel Module efi_pstore.
 [  OK  ] Finished modprobe@efi_pstore.service - Load Kernel Module efi_pstore.
-[    9.480777] systemd[1]: modprobe@fuse.service: Deactivated successfully.
-[    9.491904] systemd[1]: Finished modprobe@fuse.service - Load Kernel Module fuse.
+[    9.251327] systemd[1]: modprobe@fuse.service: Deactivated successfully.
+[    9.262905] systemd[1]: Finished modprobe@fuse.service - Load Kernel Module fuse.
 [  OK  ] Finished modprobe@fuse.service - Load Kernel Module fuse.
-[    9.527653] systemd[1]: modprobe@loop.service: Deactivated successfully.
-[    9.537013] systemd[1]: Finished modprobe@loop.service - Load Kernel Module loop.
+[    9.289558] systemd[1]: modprobe@loop.service: Deactivated successfully.
+[    9.306576] systemd[1]: Finished modprobe@loop.service - Load Kernel Module loop.
 [  OK  ] Finished modprobe@loop.service - Load Kernel Module loop.
-[    9.568715] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
-[    9.570888] EXT4-fs (vda1): re-mounted. Quota mode: none.
+[    9.324609] EXT4-fs (vda1): re-mounted. Quota mode: none.
+[    9.336258] systemd[1]: Finished systemd-modules-load.service - Load Kernel Modules.
 [  OK  ] Finished systemd-modules-load.service - Load Kernel Modules.
-[    9.639712] systemd[1]: sys-fs-fuse-connections.mount - FUSE Control File System was skipped because of an unmet condition check (ConditionPathExists=/sys/fs/fuse/connections).
-[    9.646178] systemd[1]: sys-kernel-config.mount - Kernel Configuration File System was skipped because of an unmet condition check (ConditionPathExists=/sys/kernel/config).
-[    9.653623] systemd[1]: systemd-repart.service - Repartition Root Disk was skipped because no trigger condition checks were met.
-[    9.692926] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
-         Starting systemd-sysctl.service - Apply Kernel Variables...
-[    9.725883] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
+[    9.415925] systemd[1]: Finished systemd-remount-fs.service - Remount Root and Kernel File Systems.
 [  OK  ] Finished systemd-remount-fs.service…ount Root and Kernel File Systems.
-[    9.816192] systemd[1]: systemd-firstboot.service - First Boot Wizard was skipped because of an unmet condition check (ConditionFirstBoot=yes).
-[    9.821856] systemd[1]: systemd-pstore.service - Platform Persistent Storage Archival was skipped because of an unmet condition check (ConditionDirectoryNotEmpty=/sys/fs/pstore).
-[    9.880507] systemd[1]: Starting systemd-random-seed.service - Load/Save Random Seed...
+[    9.435200] systemd[1]: sys-fs-fuse-connections.mount - FUSE Control File System was skipped because of an unmet condition check (ConditionPathExists=/sys/fs/fuse/connections).
+[    9.442211] systemd[1]: sys-kernel-config.mount - Kernel Configuration File System was skipped because of an unmet condition check (ConditionPathExists=/sys/kernel/config).
+[    9.446899] systemd[1]: systemd-firstboot.service - First Boot Wizard was skipped because of an unmet condition check (ConditionFirstBoot=yes).
+[    9.450102] systemd[1]: systemd-pstore.service - Platform Persistent Storage Archival was skipped because of an unmet condition check (ConditionDirectoryNotEmpty=/sys/fs/pstore).
+[    9.492992] systemd[1]: Starting systemd-random-seed.service - Load/Save Random Seed...
          Starting systemd-random-seed.service - Load/Save Random Seed...
-[    9.942837] systemd[1]: Starting systemd-sysusers.service - Create System Users...
+[    9.508452] systemd[1]: systemd-repart.service - Repartition Root Disk was skipped because no trigger condition checks were met.
+[    9.559305] systemd[1]: Starting systemd-sysctl.service - Apply Kernel Variables...
+         Starting systemd-sysctl.service - Apply Kernel Variables...
+[    9.674468] systemd[1]: Starting systemd-sysusers.service - Create System Users...
          Starting systemd-sysusers.service - Create System Users...
-[   10.350874] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
+[   10.417863] systemd[1]: Finished systemd-sysctl.service - Apply Kernel Variables.
 [  OK  ] Finished systemd-sysctl.service - Apply Kernel Variables.
-[   10.706004] systemd[1]: Finished systemd-sysusers.service - Create System Users.
+[   10.509334] systemd[1]: Finished systemd-sysusers.service - Create System Users.
 [  OK  ] Finished systemd-sysusers.service - Create System Users.
-[   10.772648] systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
+[   10.563520] systemd[1]: Starting systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev...
          Starting systemd-tmpfiles-setup-dev…ate Static Device Nodes in /dev...
-[   11.443772] random: crng init done
-[   11.532034] systemd-tmpfile (147) used greatest stack depth: 13240 bytes left
-[   11.546762] systemd[1]: Finished systemd-tmpfiles-setup-dev.service - Create Static Device Nodes in /dev.
-[  OK  ] Finished systemd-tmpfiles-setup-dev…reate Static Device Nodes in /dev.
-[   11.562527] systemd[1]: Reached target local-fs-pre.target - Preparation for Local File Systems.
-[  OK  ] Reached target local-fs-pre.target …reparation for Local File Systems.
-[   11.565910] systemd[1]: Reached target local-fs.target - Local File Systems.
-[  OK  ] Reached target local-fs.target - Local File Systems.
-[   11.607325] systemd[1]: Mounting pks\x2dthesis\x2denv.mount - /pks-thesis-env...
-         Mounting pks\x2dthesis\x2denv.mount - /pks-thesis-env...
-[   11.667639] systemd[1]: Starting systemd-binfmt.service - Set Up Additional Binary Formats...
-         Starting systemd-binfmt.service - Set Up Additional Binary Formats...
-[   11.719678] systemd[1]: Starting systemd-udevd.service - Rule-based Manager for Device Events and Files...
-         Starting systemd-udevd.service - Ru…ger for Device Events and Files...
-[   11.750604] systemd[1]: Started systemd-journald.service - Journal Service.
+[   10.945346] random: crng init done
+[   11.047482] systemd[1]: Started systemd-journald.service - Journal Service.
 [  OK  ] Started systemd-journald.service - Journal Service.
-[  OK  ] Finished systemd-random-seed.service - Load/Save Random Seed.
          Starting systemd-journal-flush.serv…h Journal to Persistent Storage...
+[  OK  ] Finished systemd-random-seed.service - Load/Save Random Seed.
+[   11.313728] systemd-tmpfile (148) used greatest stack depth: 13408 bytes left
+[  OK  ] Finished systemd-tmpfiles-setup-dev…reate Static Device Nodes in /dev.
+[  OK  ] Reached target local-fs-pre.target …reparation for Local File Systems.
+[  OK  ] Reached target local-fs.target - Local File Systems.
+         Mounting pks\x2dthesis\x2denv.mount - /pks-thesis-env...
+         Starting systemd-binfmt.service - Set Up Additional Binary Formats...
+         Starting systemd-udevd.service - Ru…ger for Device Events and Files...
+[   11.649586] systemd-journald[135]: Received client request to flush runtime journal.
+[   11.698118] systemd-journald[135]: File /var/log/journal/ac822316fa7b4edcbfa866b26c31db82/system.journal corrupted or uncleanly shut down, renaming and replacing.
 [  OK  ] Mounted pks\x2dthesis\x2denv.mount - /pks-thesis-env.
          Mounting proc-sys-fs-binfmt_misc.mo…utable File Formats File System...
-[   12.543697] systemd-journald[135]: Received client request to flush runtime journal.
-[   12.566219] systemd-journald[135]: File /var/log/journal/ac822316fa7b4edcbfa866b26c31db82/system.journal corrupted or uncleanly shut down, renaming and replacing.
 [  OK  ] Mounted proc-sys-fs-binfmt_misc.mou…ecutable File Formats File System.
 [  OK  ] Finished systemd-binfmt.service - Set Up Additional Binary Formats.
 [  OK  ] Finished systemd-udev-trigger.service - Coldplug All udev Devices.
          Starting ifupdown-pre.service - Hel…ynchronize boot up for ifupdown...
-[  OK  ] Finished ifupdown-pre.service - Hel… synchronize boot up for ifupdown.
-         Starting networking.service - Raise network interfaces...
-[  OK  ] Started systemd-udevd.service - Rul…nager for Device Events and Files.
 [  OK  ] Finished systemd-journal-flush.serv…ush Journal to Persistent Storage.
          Starting systemd-tmpfiles-setup.ser…te System Files and Directories...
-[   15.904240] e1000e 0000:00:02.0 enp0s2: renamed from eth0
-[*     ] (1 of 3) Job systemd-tmpfiles-setup…vice/start running (8s / no limit)
-M[K[**    ] (1 of 3) Job systemd-tmpfiles-setup…ice/start running (10s / no limit)
-M[K[  OK  ] Found device dev-vda2.device - /dev/vda2.
-[K[  OK  ] Finished systemd-tmpfiles-setup.ser…eate System Files and Directories.
+[  OK  ] Started systemd-udevd.service - Rul…nager for Device Events and Files.
+[  OK  ] Finished ifupdown-pre.service - Hel… synchronize boot up for ifupdown.
+         Starting networking.service - Raise network interfaces...
+[   15.560698] e1000e 0000:00:02.0 enp0s2: renamed from eth0
+[  OK  ] Finished systemd-tmpfiles-setup.ser…eate System Files and Directories.
+[   16.564880] ip (183) used greatest stack depth: 13304 bytes left
+[  OK  ] Found device dev-vda2.device - /dev/vda2.
 [  OK  ] Listening on systemd-rfkill.socket …l Switch Status /dev/rfkill Watch.
          Starting systemd-fsck@dev-vda2.serv… File System Check on /dev/vda2...
          Starting systemd-update-utmp.servic…rd System Boot/Shutdown in UTMP...
 [  OK  ] Started systemd-fsckd.service - Fil…tem Check Daemon to report status.
 [  OK  ] Finished systemd-update-utmp.servic…cord System Boot/Shutdown in UTMP.
+[  OK  ] Finished networking.service - Raise network interfaces.
+[  OK  ] Reached target network.target - Network.
 [  OK  ] Reached target sysinit.target - System Initialization.
 [  OK  ] Started apt-daily.timer - Daily apt download activities.
 [  OK  ] Started apt-daily-upgrade.timer - D… apt upgrade and clean activities.
@@ -602,172 +597,170 @@ Welcome to Debian GNU/Linux 12 (bookworm)!
 [  OK  ] Started cron.service - Regular background program processing daemon.
          Starting e2scrub_reap.service - Rem…e ext4 Metadata Check Snapshots...
          Starting getty-static.service - get…us and logind are not available...
-[  OK  ] Finished networking.service - Raise network interfaces.
-[  OK  ] Reached target network.target - Network.
          Starting systemd-user-sessions.service - Permit User Sessions...
 [  OK  ] Finished systemd-user-sessions.service - Permit User Sessions.
 [  OK  ] Started getty@tty1.service - Getty on tty1.
 [  OK  ] Started getty@tty2.service - Getty on tty2.
 [  OK  ] Started getty@tty3.service - Getty on tty3.
-[  OK  ] Started getty@tty4.service - Getty on tty4.
 [  OK  ] Finished systemd-fsck@dev-vda2.serv… - File System Check on /dev/vda2.
          Mounting mnt-protected.mount - /mnt/protected...
+[  OK  ] Started getty@tty4.service - Getty on tty4.
+[   22.180419] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
 [  OK  ] Started getty@tty5.service - Getty on tty5.
-[  OK  ] Started getty@tty6.service - Getty on tty6.
-[  OK  ] Finished getty-static.service - get…dbus and logind are not available.
-[   23.043796] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
 [  OK  ] Mounted mnt-protected.mount - /mnt/protected.
-[   23.105872] e2scrub_all (217) used greatest stack depth: 13168 bytes left
+[   22.392504] e2scrub_all (221) used greatest stack depth: 13104 bytes left
+[  OK  ] Started getty@tty6.service - Getty on tty6.
 [  OK  ] Finished e2scrub_reap.service - Rem…ine ext4 Metadata Check Snapshots.
+[  OK  ] Finished getty-static.service - get…dbus and logind are not available.
 [  OK  ] Reached target getty.target - Login Prompts.
 [  OK  ] Reached target multi-user.target - Multi-User System.
 [  OK  ] Reached target graphical.target - Graphical Interface.
          Starting pks-autorun.service - PKS Evaluation Automated Test Runner...
          Starting systemd-update-utmp-runlev… Record Runlevel Change in UTMP...
 [  OK  ] Finished systemd-update-utmp-runlev… - Record Runlevel Change in UTMP.
-[   23.662125] pks-autorun.sh[234]: HB autorun: reached (cmdline: root=/dev/vda1 rw console=ttyS0 nokaslr pcache_pks=on pks_run=test pks_auto=test panic=1 systemd.mask=serial-getty@ttyS0.service SYSTEMD_COLORS=0)
-[   23.891750] pks-autorun.sh[234]: HB autorun: target=test
-[   24.082680] pks-autorun.sh[234]: HB autorun: 9p_mounted=yes ws=/pks-thesis-env common.sh=yes
-[   24.744737] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
-[   24.839010] pks-autorun.sh[234]: HB autorun: protected_mounted=yes mode=on label=on
-[   24.903567] pks-autorun.sh[234]: HB autorun: dispatch target=test
-[  208.586478] pks-autorun.sh[260]: STATUS node=fsx variant=on verdict=PASS ops=10000 errors=0
-[  209.058603] pks-autorun.sh[283]: [RUN]	check_defaults
-[  209.133783] pks-autorun.sh[283]: [OK]
-[  209.136795] pks-autorun.sh[283]: [RUN]	single
-[  209.143900] pks-autorun.sh[283]: [OK]
-[  209.148457] pks-autorun.sh[283]: [RUN]	context_switch
-[  209.152417] pks-autorun.sh[283]: do_context_switch: Parent: Waiting for child
-[  209.160684] pks-autorun.sh[284]: do_context_switch: Child: running on cpu 0...
-[  209.163076] pks-autorun.sh[284]: do_context_switch: Child: Tell parent to go
-[  209.166102] pks-autorun.sh[283]: do_context_switch: Parent: running on cpu 0
-[  209.169897] pks-autorun.sh[283]: do_context_switch: Parent: Signaling child
-[  209.173704] pks-autorun.sh[284]: do_context_switch: Child: Waiting for parent...
-[  209.176572] pks-autorun.sh[284]: do_context_switch: Child: Checking result
-[  209.178025] pks-autorun.sh[284]: do_context_switch: Child: Result (P) PASS
-[  209.182799] pks-autorun.sh[283]: do_context_switch: Parent: exiting with rc (P) 0
-[  209.188312] pks-autorun.sh[283]: [OK]
-[  209.191113] pks-autorun.sh[283]: [RUN]	exception
-[  209.195906] pks-autorun.sh[283]: [OK]
-[  209.198057] pks-autorun.sh[283]: [RUN]	exception_update
-[  209.206514] pks-autorun.sh[283]: [OK]
-[  209.208801] pks-autorun.sh[283]: [RUN]	run_all
-[  209.213036] pks-autorun.sh[283]: [SKIP] Test not supported
-[  209.485838] pks-autorun.sh[287]: [Oct10 08:32] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[  209.492706] pks-autorun.sh[287]: [  +0.000188] pks_test:pks_write_file:635: Begin...
-[  209.495967] pks-autorun.sh[287]: [  +0.000089] pks_test:pks_write_file:657: check defaults test: 0x55555564
-[  209.498775] pks-autorun.sh[287]: [  +0.000513] pks_test:check_pkey_settings:501: cpu 2 0x55555564
-[  209.502127] pks-autorun.sh[287]: [  +0.000171] pks_test:check_pkey_settings:501: cpu 0 0x55555564
-[  209.504192] pks-autorun.sh[287]: [  -0.001049] pks_test:check_pkey_settings:501: cpu 1 0x55555564
-[  209.508067] pks-autorun.sh[287]: [  +0.002062] pks_test:check_pkey_settings:501: cpu 3 0x55555564
-[  209.513172] pks-autorun.sh[287]: [  +0.000375] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.516262] pks-autorun.sh[287]: [  +0.000053] pks_test:debug_result:107: Test complete [0]: PASS
-[  209.520771] pks-autorun.sh[287]: [  +0.000214] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test PASS
-[  209.524438] pks-autorun.sh[287]: [  +0.001732] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[  209.526772] pks-autorun.sh[287]: [  +0.000044] pks_test:pks_write_file:635: Begin...
-[  209.528973] pks-autorun.sh[287]: [  +0.000027] pks_test:pks_write_file:661: Single key
-[  209.532383] pks-autorun.sh[287]: [  +0.000132] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000003f0dfd64
-[  209.536180] pks-autorun.sh[287]: [  +0.000050] pks_test:set_ctx_data:371: Setting context data; 00000000d042808b
-[  209.539864] pks-autorun.sh[287]: [  +0.000400] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000d042808b
-[  209.543559] pks-autorun.sh[287]: [  +0.001824] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000d042808b
-[  209.546856] pks-autorun.sh[287]: [  +0.000229] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.551307] pks-autorun.sh[287]: [  +0.000031] pks_test:debug_result:107: Test complete [1]: PASS
-[  209.556121] pks-autorun.sh[287]: [  +0.000075] pks_test:debug_session:95: Freeing session ctx 00000000d042808b; unlock 0; crash 0; last test PASS
-[  209.561892] pks-autorun.sh[287]: [  +0.006268] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[  209.569553] pks-autorun.sh[287]: [  +0.007765] pks_test:pks_write_file:635: Begin...
-[  209.573233] pks-autorun.sh[287]: [  +0.000041] pks_test:pks_write_file:661: Single key
-[  209.576893] pks-autorun.sh[287]: [  +0.000053] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000000a08d45d
-[  209.580981] pks-autorun.sh[287]: [  +0.000017] pks_test:set_ctx_data:371: Setting context data; 00000000d042808b
-[  209.585496] pks-autorun.sh[287]: [  +0.000023] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000d042808b
-[  209.589175] pks-autorun.sh[287]: [  +0.000049] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000d042808b
-[  209.592746] pks-autorun.sh[287]: [  +0.000058] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.597585] pks-autorun.sh[287]: [  +0.000022] pks_test:debug_result:107: Test complete [1]: PASS
-[  209.601054] pks-autorun.sh[287]: [  +0.000049] pks_test:pks_write_file:635: Begin...
-[  209.605942] pks-autorun.sh[287]: [  +0.000023] pks_test:pks_write_file:665: Arming Context switch test
-[  209.609110] pks-autorun.sh[287]: [  +0.000049] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000086ddb553
-[  209.616362] pks-autorun.sh[287]: [  +0.000033] pks_test:set_ctx_data:368: Context data already set
-[  209.619653] pks-autorun.sh[287]: [  +0.000052] pks_test:set_ctx_data:371: Setting context data; 0000000075e5c9de
-[  209.624090] pks-autorun.sh[287]: [  +0.000045] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.629298] pks-autorun.sh[287]: [  +0.000023] pks_test:debug_result:107: Test complete [2]: PASS
-[  209.632656] pks-autorun.sh[287]: [  +0.002910] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[  209.638385] pks-autorun.sh[287]: [  +0.000082] pks_test:pks_write_file:635: Begin...
-[  209.643389] pks-autorun.sh[287]: [  +0.000017] pks_test:pks_write_file:661: Single key
-[  209.646976] pks-autorun.sh[287]: [  +0.000059] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000008d780346
-[  209.652005] pks-autorun.sh[287]: [  +0.000016] pks_test:set_ctx_data:371: Setting context data; 00000000d042808b
-[  209.656349] pks-autorun.sh[287]: [  +0.000047] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000d042808b
-[  209.657891] pks-autorun.sh[287]: [  +0.000209] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000d042808b
-[  209.660783] pks-autorun.sh[287]: [  +0.000056] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.666465] pks-autorun.sh[287]: [  +0.000021] pks_test:debug_result:107: Test complete [1]: PASS
-[  209.671305] pks-autorun.sh[287]: [  +0.001249] pks_test:pks_write_file:635: Begin...
-[  209.673968] pks-autorun.sh[287]: [  +0.000059] pks_test:pks_write_file:669: Checking Context switch test
-[  209.677252] pks-autorun.sh[287]: [  +0.000046] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.680516] pks-autorun.sh[287]: [  +0.000011] pks_test:debug_result:107: Test complete [3]: PASS
-[  209.685308] pks-autorun.sh[287]: [  +0.001705] pks_test:debug_session:95: Freeing session ctx 00000000d042808b; unlock 0; crash 0; last test PASS
-[  209.689417] pks-autorun.sh[287]: [  +0.000256] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[  209.692697] pks-autorun.sh[287]: [  +0.000038] pks_test:pks_write_file:635: Begin...
-[  209.696170] pks-autorun.sh[287]: [  +0.000043] pks_test:pks_write_file:673: Exception checking
-[  209.699790] pks-autorun.sh[287]: [  +0.001729] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000002ab96dbc
-[  209.705033] pks-autorun.sh[287]: [  +0.000045] pks_test:set_ctx_data:371: Setting context data; 00000000d042808b
-[  209.706990] pks-autorun.sh[287]: [  +0.000070] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000d042808b
-[  209.711636] pks-autorun.sh[287]: [  +0.000204] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.715378] pks-autorun.sh[287]: [  +0.000022] pks_test:debug_result:107: Test complete [4]: PASS
-[  209.718721] pks-autorun.sh[287]: [  +0.000061] pks_test:debug_session:95: Freeing session ctx 00000000d042808b; unlock 0; crash 0; last test PASS
-[  209.721062] pks-autorun.sh[287]: [  +0.002656] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[  209.725324] pks-autorun.sh[287]: [  +0.000905] pks_test:pks_write_file:635: Begin...
-[  209.728770] pks-autorun.sh[287]: [  +0.000048] pks_test:pks_write_file:677: Fault clear test
-[  209.731705] pks-autorun.sh[287]: [  +0.000056] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000f8130fb0
-[  209.735453] pks-autorun.sh[287]: [  +0.000028] pks_test:set_ctx_data:371: Setting context data; 00000000d042808b
-[  209.738410] pks-autorun.sh[287]: [  +0.000057] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 00000000d042808b
-[  209.741397] pks-autorun.sh[287]: [  +0.000041] pks_test:handle_update_exception:171: Updating pkey 1 during exception
-[  209.745546] pks-autorun.sh[287]: [  +0.000126] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.749154] pks-autorun.sh[287]: [  +0.000022] pks_test:debug_result:107: Test complete [5]: PASS
-[  209.752554] pks-autorun.sh[287]: [  +0.000056] pks_test:debug_session:95: Freeing session ctx 00000000d042808b; unlock 0; crash 0; last test PASS
-[  209.754845] pks-autorun.sh[287]: [  +0.002129] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[  209.757599] pks-autorun.sh[287]: [  +0.000232] pks_test:pks_write_file:635: Begin...
-[  209.760941] pks-autorun.sh[287]: [  +0.000056] pks_test:pks_write_file:687: Unknown test
-[  209.765142] pks-autorun.sh[287]: [  +0.000027] pks_test:pks_write_file:694: Clearing crash test arm
-[  209.768457] pks-autorun.sh[287]: [  +0.000010] pks_test:debug_result:107: Test complete [6]: FAIL
-[  209.770779] pks-autorun.sh[287]: [  +0.000077] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
-[  209.775027] pks-autorun.sh[287]: [  +0.008845] pks_test:debug_session:95: Freeing session ctx 0000000075e5c9de; unlock 0; crash 0; last test PASS
-[  209.779030] pks-autorun.sh[283]: 	Debug output command (approximate start time):
-[  209.782923] pks-autorun.sh[283]: 		dmesg -H --since '2026-10-10 8:32:24' | grep pks_test
-[  209.789413] pks-autorun.sh[279]: STATUS node=pks-unit variant=on verdict=PASS
-[  210.154698] pks-autorun.sh[292]: ================================================================
-[  210.160626] pks-autorun.sh[292]:  PKS Page-Cache Protection Contract Verifier
-[  210.163064] pks-autorun.sh[292]: ================================================================
-[  210.166441] pks-autorun.sh[292]: [INFO] Connected to DebugFS: pool [0x170000, 0x180000), scopes=209522
-[  210.169598] pks-autorun.sh[292]: ==> [Suite 1] Supported VFS System-Call Scoping Verification
-[  210.172451] pks-autorun.sh[292]:     [PASS] write(2) scoped cleanly (+1 begin, +1 end)
-[  210.174044] pks-autorun.sh[292]:     [PASS] pwrite(2) scoped cleanly (+1 begin, +1 end)
-[  210.177368] pks-autorun.sh[292]:     [PASS] writev(2) scoped cleanly (+1 begin, +1 end)
-[  210.180845] pks-autorun.sh[292]:     [PASS] ftruncate(2) scoped cleanly (+1 begin, +1 end)
-[  210.183814] pks-autorun.sh[292]:     [PASS] fallocate(2) scoped cleanly (+1 begin, +1 end)
-[  210.185951] pks-autorun.sh[292]:     [PASS] read(2) executed with 0 write-scope toggles (read-path parity confirmed)
-[  210.189454] pks-autorun.sh[292]:     [PASS] Total scope balance verified: 209527 entries == 209527 exits (leak-free invariant)
-[  210.192583] pks-autorun.sh[292]: ==> [Suite 2] Static Pool Page-Cache Allocation Verification
-[  210.195066] pks-autorun.sh[292]:     [INFO] Pool PFN range: [0x170000, 0x180000)
-[  210.430539] pks-autorun.sh[292]:     [INFO] Inspected 1024 resident pages: 1024 in static pool, 0 outside
-[  210.433289] pks-autorun.sh[292]:     [PASS] 100% of resident page-cache folios reside strictly in the PKS static pool
-[  210.436627] pks-autorun.sh[292]: ==> [Suite 3] Fail-Closed Rejection Matrix
-[  210.613018] pks-autorun.sh[292]:     [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP
-[  210.617903] pks-autorun.sh[292]:     [PASS] open(O_DIRECT) rejected with -EOPNOTSUPP
-[  210.625027] pks-autorun.sh[292]:     [PASS] splice(pipe -> protected file) rejected with -EOPNOTSUPP
-[  210.629611] pks-autorun.sh[292]:     [FAIL] sendfile(protected file -> /dev/null) was permitted on a protected file (fail-closed breach)
-[  210.633135] pks-autorun.sh[292]:     [PASS] copy_file_range(protected -> protected) rejected with -EOPNOTSUPP
-[  210.638771] pks-autorun.sh[292]:     [PASS] AIO pwrite completion rejected with -EOPNOTSUPP
-[  210.658342] pks-autorun.sh[292]:     [PASS] ioctl(EXT4_IOC_MOVE_EXT) rejected with -EOPNOTSUPP
-[  210.663372] pks-autorun.sh[292]: ==> [Suite 4] Permitted-Operation Positive Controls (no false rejections)
-[  210.752353] pks-autorun.sh[292]:     [PASS] buffered write/fsync/read round-trip preserved 8192 bytes intact
-[  210.760214] pks-autorun.sh[292]:     [PASS] ftruncate grow/shrink updates file size correctly (65536 -> 1024)
-[  210.765825] pks-autorun.sh[292]:     [PASS] MAP_SHARED|PROT_READ permitted (read-only consumers unaffected)
-[  210.771390] pks-autorun.sh[292]:     [PASS] MAP_PRIVATE|PROT_READ permitted (execve / dynamic-linking path intact)
-[  210.773025] pks-autorun.sh[292]:     [PASS] mprotect(+PROT_WRITE) blocked (errno=13: Permission denied); VM_MAYWRITE strip confirmed
-[  210.775968] pks-autorun.sh[292]: ================================================================
-[  210.779648] pks-autorun.sh[292]:  [FAIL] One or more contract assertions failed
-[  210.782391] pks-autorun.sh[292]: ================================================================
-[  210.804718] pks-autorun.sh[288]: STATUS node=sanity variant=on verdict=FAIL rc=1
-[  210.827588] pks-autorun.sh[234]: HB autorun: done; powering off
-[  213.648281] e1000e: EEE TX LPI TIMER: 00000000
-[  213.655358] ACPI: PM: Preparing to enter system sleep state S5
-[  213.658228] reboot: Power down
-### exec/qemu exit=0 elapsed=214s
+[   22.971606] pks-autorun.sh[237]: HB autorun: reached (cmdline: root=/dev/vda1 rw console=ttyS0 nokaslr pcache_pks=on pks_run=test pks_auto=test panic=1 systemd.mask=serial-getty@ttyS0.service SYSTEMD_COLORS=0)
+[   23.204453] pks-autorun.sh[237]: HB autorun: target=test
+[   23.379576] pks-autorun.sh[237]: HB autorun: 9p_mounted=yes ws=/pks-thesis-env common.sh=yes
+[   24.013188] EXT4-fs (vda2): mounted filesystem with ordered data mode. Quota mode: none.
+[   24.096395] pks-autorun.sh[237]: HB autorun: protected_mounted=yes mode=on label=on
+[   24.162435] pks-autorun.sh[237]: HB autorun: dispatch target=test
+[  186.925041] pks-autorun.sh[264]: STATUS node=fsx variant=on verdict=PASS ops=10000 errors=0
+[  187.376504] pks-autorun.sh[286]: [RUN]	check_defaults
+[  187.451582] pks-autorun.sh[286]: [OK]
+[  187.457320] pks-autorun.sh[286]: [RUN]	single
+[  187.459834] pks-autorun.sh[286]: [OK]
+[  187.462075] pks-autorun.sh[286]: [RUN]	context_switch
+[  187.465322] pks-autorun.sh[286]: do_context_switch: Parent: Waiting for child
+[  187.472456] pks-autorun.sh[287]: do_context_switch: Child: running on cpu 0...
+[  187.476842] pks-autorun.sh[287]: do_context_switch: Child: Tell parent to go
+[  187.479599] pks-autorun.sh[286]: do_context_switch: Parent: running on cpu 0
+[  187.482734] pks-autorun.sh[286]: do_context_switch: Parent: Signaling child
+[  187.486046] pks-autorun.sh[287]: do_context_switch: Child: Waiting for parent...
+[  187.488634] pks-autorun.sh[287]: do_context_switch: Child: Checking result
+[  187.491475] pks-autorun.sh[287]: do_context_switch: Child: Result (P) PASS
+[  187.494115] pks-autorun.sh[286]: do_context_switch: Parent: exiting with rc (P) 0
+[  187.497136] pks-autorun.sh[286]: [OK]
+[  187.499570] pks-autorun.sh[286]: [RUN]	exception
+[  187.501854] pks-autorun.sh[286]: [OK]
+[  187.505851] pks-autorun.sh[286]: [RUN]	exception_update
+[  187.509772] pks-autorun.sh[286]: [OK]
+[  187.511977] pks-autorun.sh[286]: [RUN]	run_all
+[  187.514794] pks-autorun.sh[286]: [SKIP] Test not supported
+[  187.766253] pks-autorun.sh[290]: [Oct10 09:37] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  187.772570] pks-autorun.sh[290]: [  +0.001087] pks_test:pks_write_file:635: Begin...
+[  187.774714] pks-autorun.sh[290]: [  +0.000094] pks_test:pks_write_file:657: check defaults test: 0x55555564
+[  187.779141] pks-autorun.sh[290]: [  +0.000097] pks_test:check_pkey_settings:501: cpu 0 0x55555564
+[  187.782350] pks-autorun.sh[290]: [  +0.000280] pks_test:check_pkey_settings:501: cpu 3 0x55555564
+[  187.785473] pks-autorun.sh[290]: [  -0.000349] pks_test:check_pkey_settings:501: cpu 2 0x55555564
+[  187.789495] pks-autorun.sh[290]: [  +0.002077] pks_test:check_pkey_settings:501: cpu 1 0x55555564
+[  187.792922] pks-autorun.sh[290]: [  +0.000040] pks_test:pks_write_file:694: Clearing crash test arm
+[  187.796387] pks-autorun.sh[290]: [  +0.000039] pks_test:debug_result:107: Test complete [0]: PASS
+[  187.800095] pks-autorun.sh[290]: [  +0.000231] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test PASS
+[  187.802170] pks-autorun.sh[290]: [  +0.001191] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  187.805577] pks-autorun.sh[290]: [  +0.000000] pks_test:pks_write_file:635: Begin...
+[  187.812143] pks-autorun.sh[290]: [  +0.000000] pks_test:pks_write_file:661: Single key
+[  187.815907] pks-autorun.sh[290]: [  +0.000000] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000eff350fc
+[  187.819067] pks-autorun.sh[290]: [  +0.000000] pks_test:set_ctx_data:371: Setting context data; 0000000039ee0668
+[  187.822238] pks-autorun.sh[290]: [  +0.000000] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 0000000039ee0668
+[  187.825193] pks-autorun.sh[290]: [  +0.001110] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 0000000039ee0668
+[  187.828326] pks-autorun.sh[290]: [  +0.000088] pks_test:pks_write_file:694: Clearing crash test arm
+[  187.831189] pks-autorun.sh[290]: [  +0.000022] pks_test:debug_result:107: Test complete [1]: PASS
+[  187.834494] pks-autorun.sh[290]: [  +0.000061] pks_test:debug_session:95: Freeing session ctx 0000000039ee0668; unlock 0; crash 0; last test PASS
+[  187.839866] pks-autorun.sh[290]: [  +0.007205] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  187.843937] pks-autorun.sh[290]: [  +0.008168] pks_test:pks_write_file:635: Begin...
+[  187.846426] pks-autorun.sh[290]: [  +0.000037] pks_test:pks_write_file:661: Single key
+[  187.849487] pks-autorun.sh[290]: [  +0.000047] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000ae7befff
+[  187.852747] pks-autorun.sh[290]: [  +0.000015] pks_test:set_ctx_data:371: Setting context data; 000000003bc1680e
+[  187.855633] pks-autorun.sh[290]: [  +0.000028] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000003bc1680e
+[  187.859101] pks-autorun.sh[290]: [  +0.000047] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000003bc1680e
+[  187.862629] pks-autorun.sh[290]: [  +0.000047] pks_test:pks_write_file:694: Clearing crash test arm
+[  187.866855] pks-autorun.sh[290]: [  +0.000019] pks_test:debug_result:107: Test complete [1]: PASS
+[  187.869188] pks-autorun.sh[290]: [  +0.000279] pks_test:pks_write_file:635: Begin...
+[  187.873211] pks-autorun.sh[290]: [  +0.000040] pks_test:pks_write_file:665: Arming Context switch test
+[  187.875828] pks-autorun.sh[290]: [  +0.000059] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000000772948d
+[  187.879208] pks-autorun.sh[290]: [  +0.000039] pks_test:set_ctx_data:368: Context data already set
+[  187.882338] pks-autorun.sh[290]: [  +0.000049] pks_test:set_ctx_data:371: Setting context data; 000000000072c650
+[  187.885404] pks-autorun.sh[290]: [  +0.000037] pks_test:pks_write_file:694: Clearing crash test arm
+[  187.889246] pks-autorun.sh[290]: [  +0.000024] pks_test:debug_result:107: Test complete [2]: PASS
+[  187.894888] pks-autorun.sh[290]: [  +0.001439] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  187.897371] pks-autorun.sh[290]: [  +0.000892] pks_test:pks_write_file:635: Begin...
+[  187.900170] pks-autorun.sh[290]: [  +0.000033] pks_test:pks_write_file:661: Single key
+[  187.903583] pks-autorun.sh[290]: [  +0.000047] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000005f4b391
+[  187.907391] pks-autorun.sh[290]: [  +0.000015] pks_test:set_ctx_data:371: Setting context data; 000000003bc1680e
+[  187.911188] pks-autorun.sh[290]: [  +0.000020] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000003bc1680e
+[  187.914849] pks-autorun.sh[290]: [  +0.000104] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000003bc1680e
+[  187.918283] pks-autorun.sh[290]: [  +0.000163] pks_test:pks_write_file:694: Clearing crash test arm
+[  187.922040] pks-autorun.sh[290]: [  +0.000026] pks_test:debug_result:107: Test complete [1]: PASS
+[  187.925250] pks-autorun.sh[290]: [  +0.000420] pks_test:pks_write_file:635: Begin...
+[  187.928280] pks-autorun.sh[290]: [  +0.000039] pks_test:pks_write_file:669: Checking Context switch test
+[  187.932176] pks-autorun.sh[290]: [  +0.000931] pks_test:pks_write_file:694: Clearing crash test arm
+[  187.934809] pks-autorun.sh[290]: [  +0.000034] pks_test:debug_result:107: Test complete [3]: PASS
+[  187.938578] pks-autorun.sh[290]: [  +0.001565] pks_test:debug_session:95: Freeing session ctx 000000003bc1680e; unlock 0; crash 0; last test PASS
+[  187.943394] pks-autorun.sh[290]: [  +0.000242] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  187.947737] pks-autorun.sh[290]: [  +0.000038] pks_test:pks_write_file:635: Begin...
+[  187.950385] pks-autorun.sh[290]: [  +0.000045] pks_test:pks_write_file:673: Exception checking
+[  187.953315] pks-autorun.sh[290]: [  +0.000043] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000006c7b7664
+[  187.956388] pks-autorun.sh[290]: [  +0.000032] pks_test:set_ctx_data:371: Setting context data; 000000003bc1680e
+[  187.959111] pks-autorun.sh[290]: [  +0.001089] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000003bc1680e
+[  187.961275] pks-autorun.sh[290]: [  +0.000214] pks_test:pks_write_file:694: Clearing crash test arm
+[  187.964504] pks-autorun.sh[290]: [  +0.000022] pks_test:debug_result:107: Test complete [4]: PASS
+[  187.967302] pks-autorun.sh[290]: [  +0.001215] pks_test:debug_session:95: Freeing session ctx 000000003bc1680e; unlock 0; crash 0; last test PASS
+[  187.971247] pks-autorun.sh[290]: [  +0.000267] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  187.974551] pks-autorun.sh[290]: [  +0.000038] pks_test:pks_write_file:635: Begin...
+[  187.978214] pks-autorun.sh[290]: [  +0.000034] pks_test:pks_write_file:677: Fault clear test
+[  187.981124] pks-autorun.sh[290]: [  +0.000042] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000003992304f
+[  187.983447] pks-autorun.sh[290]: [  +0.000024] pks_test:set_ctx_data:371: Setting context data; 000000003bc1680e
+[  187.985708] pks-autorun.sh[290]: [  +0.000065] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000003bc1680e
+[  187.989490] pks-autorun.sh[290]: [  +0.000034] pks_test:handle_update_exception:171: Updating pkey 1 during exception
+[  187.992615] pks-autorun.sh[290]: [  +0.000135] pks_test:pks_write_file:694: Clearing crash test arm
+[  187.995511] pks-autorun.sh[290]: [  +0.000917] pks_test:debug_result:107: Test complete [5]: PASS
+[  187.998788] pks-autorun.sh[290]: [  +0.000067] pks_test:debug_session:95: Freeing session ctx 000000003bc1680e; unlock 0; crash 0; last test PASS
+[  188.002744] pks-autorun.sh[290]: [  +0.001148] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  188.006239] pks-autorun.sh[290]: [  +0.000420] pks_test:pks_write_file:635: Begin...
+[  188.009356] pks-autorun.sh[290]: [  +0.000059] pks_test:pks_write_file:687: Unknown test
+[  188.013285] pks-autorun.sh[290]: [  +0.000018] pks_test:pks_write_file:694: Clearing crash test arm
+[  188.016255] pks-autorun.sh[290]: [  +0.000010] pks_test:debug_result:107: Test complete [6]: FAIL
+[  188.019563] pks-autorun.sh[290]: [  +0.000078] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  188.023804] pks-autorun.sh[290]: [  +0.002980] pks_test:debug_session:95: Freeing session ctx 000000000072c650; unlock 0; crash 0; last test PASS
+[  188.027255] pks-autorun.sh[286]: 	Debug output command (approximate start time):
+[  188.030342] pks-autorun.sh[286]: 		dmesg -H --since '2026-10-10 9:37:16' | grep pks_test
+[  188.036828] pks-autorun.sh[282]: STATUS node=pks-unit variant=on verdict=PASS
+[  188.335073] pks-autorun.sh[295]: ================================================================
+[  188.339859] pks-autorun.sh[295]:  PKS Page-Cache Protection Contract Verifier
+[  188.343135] pks-autorun.sh[295]: ================================================================
+[  188.346233] pks-autorun.sh[295]: [INFO] Connected to DebugFS: pool [0x170000, 0x180000), scopes=216028
+[  188.349369] pks-autorun.sh[295]: ==> [Suite 1] Supported VFS System-Call Scoping Verification
+[  188.352016] pks-autorun.sh[295]:     [PASS] write(2) scoped cleanly (+1 begin, +1 end)
+[  188.355155] pks-autorun.sh[295]:     [PASS] pwrite(2) scoped cleanly (+1 begin, +1 end)
+[  188.358442] pks-autorun.sh[295]:     [PASS] writev(2) scoped cleanly (+1 begin, +1 end)
+[  188.361668] pks-autorun.sh[295]:     [PASS] ftruncate(2) scoped cleanly (+1 begin, +1 end)
+[  188.365132] pks-autorun.sh[295]:     [PASS] fallocate(2) scoped cleanly (+1 begin, +1 end)
+[  188.368376] pks-autorun.sh[295]:     [PASS] read(2) executed with 0 write-scope toggles (read-path parity confirmed)
+[  188.371471] pks-autorun.sh[295]:     [PASS] Total scope balance verified: 216033 entries == 216033 exits (leak-free invariant)
+[  188.374648] pks-autorun.sh[295]: ==> [Suite 2] Static Pool Page-Cache Allocation Verification
+[  188.377465] pks-autorun.sh[295]:     [INFO] Pool PFN range: [0x170000, 0x180000)
+[  188.589681] pks-autorun.sh[295]:     [INFO] Inspected 1024 resident pages: 1024 in static pool, 0 outside
+[  188.593366] pks-autorun.sh[295]:     [PASS] 100% of resident page-cache folios reside strictly in the PKS static pool
+[  188.597017] pks-autorun.sh[295]: ==> [Suite 3] Fail-Closed Rejection Matrix
+[  188.685316] pks-autorun.sh[295]:     [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP
+[  188.694730] pks-autorun.sh[295]:     [PASS] open(O_DIRECT) rejected with -EOPNOTSUPP
+[  188.699185] pks-autorun.sh[295]:     [PASS] splice(pipe -> protected file) rejected with -EOPNOTSUPP
+[  188.702137] pks-autorun.sh[295]:     [FAIL] sendfile(protected file -> /dev/null) was permitted on a protected file (fail-closed breach)
+[  188.705476] pks-autorun.sh[295]:     [PASS] copy_file_range(protected -> protected) rejected with -EOPNOTSUPP
+[  188.710748] pks-autorun.sh[295]:     [PASS] AIO pwrite completion rejected with -EOPNOTSUPP
+[  188.730539] pks-autorun.sh[295]:     [PASS] ioctl(EXT4_IOC_MOVE_EXT) rejected with -EOPNOTSUPP
+[  188.736981] pks-autorun.sh[295]: ==> [Suite 4] Permitted-Operation Positive Controls (no false rejections)
+[  188.825390] pks-autorun.sh[295]:     [PASS] buffered write/fsync/read round-trip preserved 8192 bytes intact
+[  188.837272] pks-autorun.sh[295]:     [PASS] ftruncate grow/shrink updates file size correctly (65536 -> 1024)
+[  188.840340] pks-autorun.sh[295]:     [PASS] MAP_SHARED|PROT_READ permitted (read-only consumers unaffected)
+[  188.843600] pks-autorun.sh[295]:     [PASS] MAP_PRIVATE|PROT_READ permitted (execve / dynamic-linking path intact)
+[  188.849265] pks-autorun.sh[295]:     [PASS] mprotect(+PROT_WRITE) blocked (errno=13: Permission denied); VM_MAYWRITE strip confirmed
+[  188.854393] pks-autorun.sh[295]: ================================================================
+[  188.857144] pks-autorun.sh[295]:  [FAIL] One or more contract assertions failed
+[  188.858686] pks-autorun.sh[295]: ================================================================
+[  188.877557] pks-autorun.sh[291]: STATUS node=sanity variant=on verdict=FAIL rc=1
+[  188.891313] pks-autorun.sh[237]: HB autorun: done; powering off
+[  191.664890] e1000e: EEE TX LPI TIMER: 00000000
+[  191.673667] ACPI: PM: Preparing to enter system sleep state S5
+[  191.677809] reboot: Power down
+### exec/qemu exit=0 elapsed=193s

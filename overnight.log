@@ -120,3 +120,57 @@
  OVERALL: FAIL (3/6 passing, 3 failing)
 ========================================================================================
 make: *** [Makefile:49: test] Error 1
+[WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
+[DONE] Preflight recorded (tcg) -> results/preflight.json
+========================================================================================
+ [test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics
+ Leaves: fsx, pks-unit, sanity | Modes: off, on | Executor: qemu
+========================================================================================
+ [fsx-off]            pcache_pks=off  ... PASS (ops=10000 errors=0)
+ [pks-unit-off]       pcache_pks=off  ... PASS (ok)
+     [PASS] check_defaults
+     [PASS] single
+     [PASS] context_switch
+     [PASS] exception
+     [PASS] exception_update
+     [SKIP] run_all
+ [sanity-off]         pcache_pks=off  ... PASS (note=not_applicable_when_off)
+ [fsx-on]             pcache_pks=on   ... PASS (ops=10000 errors=0)
+ [pks-unit-on]        pcache_pks=on   ... PASS (ok)
+     [PASS] check_defaults
+     [PASS] single
+     [PASS] context_switch
+     [PASS] exception
+     [PASS] exception_update
+     [SKIP] run_all
+ [sanity-on]          pcache_pks=on   ... FAIL (rc=1)
+     [PASS] write(2) scoped cleanly (+1 begin, +1 end)
+     [PASS] pwrite(2) scoped cleanly (+1 begin, +1 end)
+     [PASS] writev(2) scoped cleanly (+1 begin, +1 end)
+     [PASS] ftruncate(2) scoped cleanly (+1 begin, +1 end)
+     [PASS] fallocate(2) scoped cleanly (+1 begin, +1 end)
+     [PASS] read(2) executed with 0 write-scope toggles (read-path parity confirmed)
+     [PASS] Total scope balance verified: 216033 entries == 216033 exits (leak-free invariant)
+     [PASS] 100% of resident page-cache folios reside strictly in the PKS static pool
+     [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP
+     [PASS] open(O_DIRECT) rejected with -EOPNOTSUPP
+     [PASS] splice(pipe -> protected file) rejected with -EOPNOTSUPP
+     [FAIL] sendfile(protected file -> /dev/null) was permitted on a protected file (fail-closed breach)
+     [PASS] copy_file_range(protected -> protected) rejected with -EOPNOTSUPP
+     [PASS] AIO pwrite completion rejected with -EOPNOTSUPP
+     [PASS] ioctl(EXT4_IOC_MOVE_EXT) rejected with -EOPNOTSUPP
+     [PASS] buffered write/fsync/read round-trip preserved 8192 bytes intact
+     [PASS] ftruncate grow/shrink updates file size correctly (65536 -> 1024)
+     [PASS] MAP_SHARED|PROT_READ permitted (read-only consumers unaffected)
+     [PASS] MAP_PRIVATE|PROT_READ permitted (execve / dynamic-linking path intact)
+     [PASS] mprotect(+PROT_WRITE) blocked (errno=13: Permission denied); VM_MAYWRITE strip confirmed
+     [FAIL] One or more contract assertions failed
+----------------------------------------------------------------------------------------
+ Test            pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
+----------------------------------------------------------------------------------------
+ fsx             PASS (ops=10000 errors=0)             PASS (ops=10000 errors=0)    
+ pks-unit        PASS (ok)                              PASS (ok)                     
+ sanity          PASS (note=not_applicable_when_off)   FAIL (rc=1)                  
+----------------------------------------------------------------------------------------
+ OVERALL: FAIL (1/3 leaves passing, 2 failing)
+========================================================================================

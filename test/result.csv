@@ -5,4 +5,4 @@ sanity,off,PASS,note=not_applicable_when_off
 fsx,on,PASS,ops=10000 errors=0
 pks-unit,on,PASS,ok
 sanity,on,FAIL,rc=1
-test,all,FAIL,passed=3_failed=3
+test,all,FAIL,passed=1_failed=2_of=3
