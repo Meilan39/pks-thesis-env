@@ -109,9 +109,11 @@ report_leaf() {
 
 # report_check <description> <verdict>
 # One indented per-check diagnostic line beneath a leaf's live line, e.g.:
-#        mmap(PROT_WRITE) rejected                             PASS
+#        [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP
 # Used by axis runners that parse a leaf's per-check output out of the transcript.
-# PASS is green, FAIL red, anything else (SKIP/INFO) yellow.
+# The verdict leads in a fixed-width colored tag so the column stays aligned no
+# matter how long the free-text description is (trailing verdicts drifted badly
+# once descriptions ran past the field width). PASS green, FAIL red, else yellow.
 report_check() {
     local color
     case "$2" in
@@ -119,7 +121,7 @@ report_check() {
         FAIL) color="$C_RED" ;;
         *)    color="$C_YELLOW" ;;
     esac
-    printf '      %-56s %b%s%b\n' "$1" "$color" "$2" "$C_RESET"
+    printf '     %b[%-4s]%b %s\n' "$color" "$2" "$C_RESET" "$1"
 }
 
 # report_compare_head <left-title> <off-title> <on-title>

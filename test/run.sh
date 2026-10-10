@@ -28,8 +28,6 @@ report_banner \
     "[test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics" \
     "Leaves: fsx, pks-unit, sanity | Modes: off, on | Executor: ${EXECUTOR:-qemu}"
 
-pass_count=0
-fail_count=0
 # Per-leaf verdict/detail, indexed in lockstep with COMPLIANCE_LEAVES.
 V_OFF=(); D_OFF=()
 V_ON=();  D_ON=()
@@ -96,12 +94,6 @@ harvest_leaf() {
         V_ON[$idx]="$verdict";  D_ON[$idx]="$details"
     fi
 
-    if [ "$verdict" = "PASS" ]; then
-        pass_count=$((pass_count + 1))
-    else
-        fail_count=$((fail_count + 1))
-    fi
-
     echo "$leaf,$variant,$verdict,$details" >> "$AXIS_CSV"
     report_leaf "[${leaf}-${variant}]" "pcache_pks=${variant}" "$verdict" "$details"
     emit_leaf_checks "$raw_log" "$leaf"
@@ -123,10 +115,25 @@ done
 # ------------------------------------------------------------------------------
 # 4. Summary Table Footer
 # ------------------------------------------------------------------------------
-overall="PASS"
-[ "$fail_count" -gt 0 ] && overall="FAIL"
+# Count at the leaf (test) level, not per leaf-variant run: each compliance leaf
+# is one test, and it passes only if it holds under both baseline (off) and
+# hardware-PKS (on). This reports e.g. "2/3 leaves passing" rather than inflating
+# the denominator by scoring the same leaf once per mode.
+leaves_total=${#COMPLIANCE_LEAVES[@]}
+leaves_passed=0
+idx=0
+for leaf in "${COMPLIANCE_LEAVES[@]}"; do
+    if verdict_is_pass "${V_OFF[$idx]}" off && verdict_is_pass "${V_ON[$idx]}" on; then
+        leaves_passed=$((leaves_passed + 1))
+    fi
+    idx=$((idx + 1))
+done
+leaves_failed=$((leaves_total - leaves_passed))
 
-echo "test,all,$overall,passed=${pass_count}_failed=${fail_count}" >> "$AXIS_CSV"
+overall="PASS"
+[ "$leaves_failed" -gt 0 ] && overall="FAIL"
+
+echo "test,all,$overall,passed=${leaves_passed}_failed=${leaves_failed}_of=${leaves_total}" >> "$AXIS_CSV"
 
 report_compare_head "Test" "pcache_pks=off (Baseline)" "pcache_pks=on (Hardware PKS)"
 idx=0
@@ -137,7 +144,7 @@ for leaf in "${COMPLIANCE_LEAVES[@]}"; do
     idx=$((idx + 1))
 done
 report_hrule
-report_overall "$overall" "$pass_count/6 passing, $fail_count failing"
+report_overall "$overall" "${leaves_passed}/${leaves_total} leaves passing, ${leaves_failed} failing"
 report_rule
 
 [ "$overall" = "PASS" ]
