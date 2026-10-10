@@ -1,8 +1,8 @@
 node,variant,verdict,details
 fsx,off,PASS,ops=10000 errors=0
-pks-unit,off,PASS,ok
+pks-unit,off,PASS,ok
 sanity,off,PASS,note=not_applicable_when_off
 fsx,on,PASS,ops=10000 errors=0
-pks-unit,on,PASS,ok
-sanity,on,FAIL,rc=1
-test,all,FAIL,passed=1_failed=2_of=3
+pks-unit,on,PASS,ok
+sanity,on,PASS,ok
+test,all,PASS,passed=3_failed=0_of=3

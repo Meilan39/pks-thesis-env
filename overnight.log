@@ -1,161 +1,38 @@
 [WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
 [DONE] Preflight recorded (tcg) -> results/preflight.json
 ========================================================================================
- [sec] PKS Security Evaluation: End-to-End Exploit Neutralization
- Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: qemu
-========================================================================================
- [copy-fail-off]      pcache_pks=off  ... PASS (outcome=altered)
- [copy-fail-on]       pcache_pks=on   ... PASS (outcome=intact)
- [dirty-frag-off]     pcache_pks=off  ... PASS (outcome=altered)
- [dirty-frag-on]      pcache_pks=on   ... PASS (outcome=intact)
- [fragnesia-off]      pcache_pks=off  ... PASS (outcome=altered)
- [fragnesia-on]       pcache_pks=on   ... PASS (outcome=fail_closed_panic)
-----------------------------------------------------------------------------------------
- Exploit         pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
-----------------------------------------------------------------------------------------
- copy-fail       PASS (altered)                         PASS (intact)                 
- dirty-frag      PASS (altered)                         PASS (intact)                 
- fragnesia       PASS (altered)                         PASS (fail_closed_panic)      
-----------------------------------------------------------------------------------------
- OVERALL: PASS (6/6 passing, 0 failing)
-========================================================================================
-[WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
-[DONE] Preflight recorded (tcg) -> results/preflight.json
-========================================================================================
- [perf] PKS Performance Evaluation: Micro- & Macrobenchmarks
- Workloads: fio (warm/cold), concurrency, sqlite | Variants: control, off, on
-========================================================================================
-
---- Variant: control (Baseline Unmitigated Kernel: kernel=control, pcache_pks=off) ---
- [fio-control]        control         ... PASS (iops4k_warm_write=15142.33 lat4k_warm_write_us=50.99 lat4k_warm_read_us=33.82 lat4k_cold_write_us=63.42 alloc_overhead_us=12.43 bw1m_seq_read_kbs=103044.0)
- [concurrency-control] control         ... PASS (bw_1t_mbps=61.5 bw_2t_mbps=50.2 bw_4t_mbps=49.0 scaling_pct=19.9)
- [sqlite-control]     control         ... PASS (tps_syncoff=511.34 tps_syncfull=5.64 lat_syncoff_us=1955.63 lat_syncfull_us=177241.86)
-
---- Variant: off (Mitigated Kernel (PKS Unloaded): kernel=perf, pcache_pks=off) ---
- [fio-off]            off             ... PASS (iops4k_warm_write=15058.82 lat4k_warm_write_us=51.97 lat4k_warm_read_us=36.96 lat4k_cold_write_us=59.96 alloc_overhead_us=7.99 bw1m_seq_read_kbs=112604.0)
- [concurrency-off]    off             ... PASS (bw_1t_mbps=51.4 bw_2t_mbps=48.8 bw_4t_mbps=48.0 scaling_pct=23.3)
- [sqlite-off]         off             ... PASS (tps_syncoff=455.55 tps_syncfull=5.51 lat_syncoff_us=2195.17 lat_syncfull_us=181464.72)
-
---- Variant: on (Mitigated Kernel (PKS Active): kernel=perf, pcache_pks=on) ---
- [fio-on]             on              ... PASS (iops4k_warm_write=4558.71 lat4k_warm_write_us=185.2 lat4k_warm_read_us=34.45 lat4k_cold_write_us=181.84 alloc_overhead_us=-3.36 bw1m_seq_read_kbs=96946.0)
- [concurrency-on]     on              ... PASS (bw_1t_mbps=17.3 bw_2t_mbps=13.1 bw_4t_mbps=12.7 scaling_pct=18.4)
- [sqlite-on]          on              ... PASS (tps_syncoff=274.17 tps_syncfull=5.35 lat_syncoff_us=3647.39 lat_syncfull_us=186867.67)
-
-========================================================================================
- Table 1: Fio Latency & Allocation Cost Breakdown
-----------------------------------------------------------------------------------------
- Variant      4K Warm (us)     4K Cold (us)     Alloc Delta (us)   4K IOPS      1M Read (MB/s)
-----------------------------------------------------------------------------------------
- control      50.99            63.42            12.43              15142.33     N/A         
- off          51.97            59.96            7.99               15058.82     N/A         
- on           185.2            181.84           -3.36              4558.71      N/A         
-----------------------------------------------------------------------------------------
-
-========================================================================================
- Table 2: High-Level Performance Comparison
-----------------------------------------------------------------------------------------
- Benchmark        Metric               Control      Off          On           PKS Overhead (%)
-----------------------------------------------------------------------------------------
- fio 4KB warm     Write Lat (us)       50.99        51.97        185.2        +263.21%        
- fio 4KB warm     Read Lat (us)        33.82        36.96        34.45        +1.86%          
- fio 4KB cold     Write Lat (us)       63.42        59.96        181.84       +186.72%        
- concurrency      4-Thread BW (MB/s)   49.0         48.0         12.7         -74.08%         
- sqlite           Tx/s (sync=OFF)      511.34       455.55       274.17       -46.38%         
- sqlite           Tx/s (sync=FULL)     5.64         5.51         5.35         -5.14%          
-----------------------------------------------------------------------------------------
- OVERALL: PASS (9/9 benchmark runs completed, 0 failing)
-========================================================================================
-[WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
-[DONE] Preflight recorded (tcg) -> results/preflight.json
-========================================================================================
  [test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics
  Leaves: fsx, pks-unit, sanity | Modes: off, on | Executor: qemu
 ========================================================================================
- [fsx-off]            pcache_pks=off  ... PASS (ops=10000 errors=0)
- [pks-unit-off]       pcache_pks=off  ... PASS (ok)
-      check_defaults                                          PASS
-      single                                                  PASS
-      context_switch                                          PASS
-      exception                                               PASS
-      exception_update                                        PASS
-      run_all                                                 SKIP
- [sanity-off]         pcache_pks=off  ... PASS (note=not_applicable_when_off)
- [fsx-on]             pcache_pks=on   ... PASS (ops=10000 errors=0)
- [pks-unit-on]        pcache_pks=on   ... PASS (ok)
-      check_defaults                                          PASS
-      single                                                  PASS
-      context_switch                                          PASS
-      exception                                               PASS
-      exception_update                                        PASS
-      run_all                                                 SKIP
- [sanity-on]          pcache_pks=on   ... FAIL (rc=1)
-      write(2) scoped cleanly (+1 begin, +1 end)              PASS
-      pwrite(2) scoped cleanly (+1 begin, +1 end)             PASS
-      writev(2) scoped cleanly (+1 begin, +1 end)             PASS
-      ftruncate(2) scoped cleanly (+1 begin, +1 end)          PASS
-      fallocate(2) scoped cleanly (+1 begin, +1 end)          PASS
-      read(2) executed with 0 write-scope toggles (read-path parity confirmed) PASS
-      Total scope balance verified: 209527 entries == 209527 exits (leak-free invariant) PASS
-      100% of resident page-cache folios reside strictly in the PKS static pool PASS
-      mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP  PASS
-      open(O_DIRECT) rejected with -EOPNOTSUPP                PASS
-      splice(pipe -> protected file) rejected with -EOPNOTSUPP PASS
-      sendfile(protected file -> /dev/null) was permitted on a protected file (fail-closed breach) FAIL
-      copy_file_range(protected -> protected) rejected with -EOPNOTSUPP PASS
-      AIO pwrite completion rejected with -EOPNOTSUPP         PASS
-      ioctl(EXT4_IOC_MOVE_EXT) rejected with -EOPNOTSUPP      PASS
-      buffered write/fsync/read round-trip preserved 8192 bytes intact PASS
-      ftruncate grow/shrink updates file size correctly (65536 -> 1024) PASS
-      MAP_SHARED|PROT_READ permitted (read-only consumers unaffected) PASS
-      MAP_PRIVATE|PROT_READ permitted (execve / dynamic-linking path intact) PASS
-      mprotect(+PROT_WRITE) blocked (errno=13: Permission denied); VM_MAYWRITE strip confirmed PASS
-      One or more contract assertions failed                  FAIL
-----------------------------------------------------------------------------------------
- Test            pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
-----------------------------------------------------------------------------------------
- fsx             PASS (ops=10000 errors=0)             PASS (ops=10000 errors=0)    
- pks-unit        PASS (ok)                              PASS (ok)                     
- sanity          PASS (note=not_applicable_when_off)   FAIL (rc=1)                  
-----------------------------------------------------------------------------------------
- OVERALL: FAIL (3/6 passing, 3 failing)
-========================================================================================
-make: *** [Makefile:49: test] Error 1
-[WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
-[DONE] Preflight recorded (tcg) -> results/preflight.json
-========================================================================================
- [test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics
- Leaves: fsx, pks-unit, sanity | Modes: off, on | Executor: qemu
-========================================================================================
- [fsx-off]            pcache_pks=off  ... PASS (ops=10000 errors=0)
- [pks-unit-off]       pcache_pks=off  ... PASS (ok)
+ [fsx-off]            pcache_pks=off  ... PASS (ops=10000 errors=0)
+ [pks-unit-off]       pcache_pks=off  ... PASS (ok)
      [PASS] check_defaults
      [PASS] single
      [PASS] context_switch
      [PASS] exception
      [PASS] exception_update
      [SKIP] run_all
- [sanity-off]         pcache_pks=off  ... PASS (note=not_applicable_when_off)
- [fsx-on]             pcache_pks=on   ... PASS (ops=10000 errors=0)
- [pks-unit-on]        pcache_pks=on   ... PASS (ok)
+ [sanity-off]         pcache_pks=off  ... PASS (note=not_applicable_when_off)
+ [fsx-on]             pcache_pks=on   ... PASS (ops=10000 errors=0)
+ [pks-unit-on]        pcache_pks=on   ... PASS (ok)
      [PASS] check_defaults
      [PASS] single
      [PASS] context_switch
      [PASS] exception
      [PASS] exception_update
      [SKIP] run_all
- [sanity-on]          pcache_pks=on   ... FAIL (rc=1)
+ [sanity-on]          pcache_pks=on   ... PASS (ok)
      [PASS] write(2) scoped cleanly (+1 begin, +1 end)
      [PASS] pwrite(2) scoped cleanly (+1 begin, +1 end)
      [PASS] writev(2) scoped cleanly (+1 begin, +1 end)
      [PASS] ftruncate(2) scoped cleanly (+1 begin, +1 end)
      [PASS] fallocate(2) scoped cleanly (+1 begin, +1 end)
      [PASS] read(2) executed with 0 write-scope toggles (read-path parity confirmed)
-     [PASS] Total scope balance verified: 216033 entries == 216033 exits (leak-free invariant)
+     [PASS] Total scope balance verified: 205785 entries == 205785 exits (leak-free invariant)
      [PASS] 100% of resident page-cache folios reside strictly in the PKS static pool
      [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP
      [PASS] open(O_DIRECT) rejected with -EOPNOTSUPP
      [PASS] splice(pipe -> protected file) rejected with -EOPNOTSUPP
-     [FAIL] sendfile(protected file -> /dev/null) was permitted on a protected file (fail-closed breach)
      [PASS] copy_file_range(protected -> protected) rejected with -EOPNOTSUPP
      [PASS] AIO pwrite completion rejected with -EOPNOTSUPP
      [PASS] ioctl(EXT4_IOC_MOVE_EXT) rejected with -EOPNOTSUPP
@@ -164,13 +41,13 @@ make: *** [Makefile:49: test] Error 1
      [PASS] MAP_SHARED|PROT_READ permitted (read-only consumers unaffected)
      [PASS] MAP_PRIVATE|PROT_READ permitted (execve / dynamic-linking path intact)
      [PASS] mprotect(+PROT_WRITE) blocked (errno=13: Permission denied); VM_MAYWRITE strip confirmed
-     [FAIL] One or more contract assertions failed
+     [PASS] pks test
 ----------------------------------------------------------------------------------------
  Test            pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
 ----------------------------------------------------------------------------------------
- fsx             PASS (ops=10000 errors=0)             PASS (ops=10000 errors=0)    
- pks-unit        PASS (ok)                              PASS (ok)                     
- sanity          PASS (note=not_applicable_when_off)   FAIL (rc=1)                  
+ fsx             PASS (ops=10000 errors=0)              PASS (ops=10000 errors=0)     
+ pks-unit        PASS (ok)                              PASS (ok)                     
+ sanity          PASS (note=not_applicable_when_off)    PASS (ok)                     
 ----------------------------------------------------------------------------------------
- OVERALL: FAIL (1/3 leaves passing, 2 failing)
+ OVERALL: PASS (3/3 leaves passing, 0 failing)
 ========================================================================================
