@@ -1,6 +1,6 @@
 Benchmark,Metric,control,off,on,Overhead_vs_control
-fio 4KB warm,Write Lat (us),50.99,51.97,185.2,+263.21%
-fio 4KB warm,Read Lat (us),33.82,36.96,34.45,+1.86%
-fio 4KB cold,Write Lat (us),63.42,59.96,181.84,+186.72%
-sqlite,Tx/s (sync=OFF),511.34,455.55,274.17,-46.38%
-sqlite,Tx/s (sync=FULL),5.64,5.51,5.35,-5.14%
+fio 4KB warm,Write Lat (us),33.55,34.93,150.24,+347.81%
+fio 4KB warm,Read Lat (us),25.28,26.27,26.42,+4.51%
+fio 4KB cold,Write Lat (us),56.75,61.24,177.16,+212.18%
+sqlite,Tx/s (sync=OFF),553.94,511.94,295.9,-46.58%
+sqlite,Tx/s (sync=FULL),5.53,5.63,5.41,-2.17%
