@@ -62,11 +62,8 @@ run_and_harvest() {
     local variant="$1"
     local kernel_variant="$2"
     local pks_mode="$3"
-    local desc="$4"
     local raw_log="$SCRIPT_DIR/raw-${variant}.log"
 
-    echo ""
-    echo "--- Variant: $variant ($desc: kernel=$kernel_variant, pcache_pks=$pks_mode) ---"
     "$EXECUTOR_SCRIPT" "$kernel_variant" "$pks_mode" perf "$raw_log" >/dev/null
 
     for leaf in "${PERF_LEAVES[@]}"; do
@@ -90,9 +87,9 @@ run_and_harvest() {
     done
 }
 
-run_and_harvest control control off "Baseline Unmitigated Kernel"
-run_and_harvest off     perf    off "Mitigated Kernel (PKS Unloaded)"
-run_and_harvest on      perf    on  "Mitigated Kernel (PKS Active)"
+run_and_harvest control control off
+run_and_harvest off     perf    off
+run_and_harvest on      perf    on
 
 # ------------------------------------------------------------------------------
 # Summary tables & analysis
