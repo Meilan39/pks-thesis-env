@@ -276,46 +276,60 @@ def plot_figure1(fio_data: List[Dict], out_dir: Path):
 
 def plot_figure2(fio_data: List[Dict], out_dir: Path):
     """Figure 2: Cold vs. Warm Cache Scaling (Allocator Overhead Isolation)."""
+    warm_ctrl, cold_ctrl = {}, {}
     warm_mit, cold_mit = {}, {}
     for d in fio_data:
-        if d["syscall"] != "write" or d["kernel_variant"] != "mitigated_on":
+        if d["syscall"] != "write":
             continue
+        v = d["kernel_variant"]
         bs = d["block_size_bytes"]
-        if d["cache_state"] == "warm":
-            warm_mit[bs] = d["latency_ns"] / 1000.0
-        elif d["cache_state"] == "cold":
-            cold_mit[bs] = d["latency_ns"] / 1000.0
+        lat_us = d["latency_ns"] / 1000.0
+        if v == "baseline_control":
+            if d["cache_state"] == "warm":
+                warm_ctrl[bs] = lat_us
+            elif d["cache_state"] == "cold":
+                cold_ctrl[bs] = lat_us
+        elif v == "mitigated_on":
+            if d["cache_state"] == "warm":
+                warm_mit[bs] = lat_us
+            elif d["cache_state"] == "cold":
+                cold_mit[bs] = lat_us
 
-    bs_keys = sorted(set(warm_mit.keys()) & set(cold_mit.keys()))
-    if not bs_keys:
+    common_keys = sorted(set(warm_ctrl.keys()) & set(cold_ctrl.keys()) & set(warm_mit.keys()) & set(cold_mit.keys()))
+    if not common_keys:
         return
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
     xticks = [512, 4096, 65536, 262144, 1048576]
     xticklabels = [format_bytes(x) for x in xticks]
 
-    # Panel (a): Warm vs Cold
-    ax1.plot(bs_keys, [warm_mit[k] for k in bs_keys], marker="o", color="#1f77b4", label="Warm Cache (Overwrite)")
-    ax1.plot(bs_keys, [cold_mit[k] for k in bs_keys], marker="s", color="#d62728", label="Cold Cache (First-Touch Allocation)")
+    # Panel (a): 4-Curve Latency: Warm vs Cold across Control and Mitigated
+    ax1.plot(common_keys, [warm_ctrl[k] for k in common_keys], marker="o", linestyle="-", color="#7f7f7f", label="Control (Warm Overwrite)")
+    ax1.plot(common_keys, [cold_ctrl[k] for k in common_keys], marker="s", linestyle="--", color="#1f77b4", label="Control (Cold Allocation)")
+    ax1.plot(common_keys, [warm_mit[k] for k in common_keys], marker="^", linestyle="-", color="#ff7f0e", label="Mitigated PKS (Warm Overwrite)")
+    ax1.plot(common_keys, [cold_mit[k] for k in common_keys], marker="d", linestyle="--", color="#d62728", label="Mitigated PKS (Cold Allocation)")
     ax1.set_xscale("log", base=2)
     ax1.set_xlabel("Operation Size (Bytes)")
     ax1.set_ylabel("Mean System-Call Latency (µs)")
-    ax1.set_title("(a) Write Latency: Cold vs. Warm")
+    ax1.set_title("(a) Write Latency: Cold vs. Warm Scaling")
     ax1.grid(True)
-    ax1.legend()
+    ax1.legend(fontsize=9)
     ax1.set_xticks(xticks)
     ax1.set_xticklabels(xticklabels)
 
-    # Panel (b): Allocation Delta
-    deltas = [cold_mit[k] - warm_mit[k] for k in bs_keys]
-    ax2.plot(bs_keys, deltas, marker="^", color="#9467bd", label="Allocation Delta (Cold - Warm)")
+    # Panel (b): Allocation Delta Comparison (Cold - Warm)
+    ctrl_deltas = [cold_ctrl[k] - warm_ctrl[k] for k in common_keys]
+    mit_deltas = [cold_mit[k] - warm_mit[k] for k in common_keys]
+
+    ax2.plot(common_keys, ctrl_deltas, marker="s", linestyle="--", color="#1f77b4", label="Control (Buddy Allocator Delta)")
+    ax2.plot(common_keys, mit_deltas, marker="d", linestyle="-", color="#d62728", label="Mitigated (Static Pool Delta)")
     ax2.axhline(0, color="gray", linestyle=":", linewidth=1.5, alpha=0.7)
     ax2.set_xscale("log", base=2)
     ax2.set_xlabel("Operation Size (Bytes)")
-    ax2.set_ylabel("Isolated Allocation Latency (µs)")
-    ax2.set_title("(b) Static Pool Allocation Cost")
+    ax2.set_ylabel("First-Touch Allocation Delta (µs)")
+    ax2.set_title("(b) First-Touch Allocation Cost (Cold − Warm)")
     ax2.grid(True)
-    ax2.legend()
+    ax2.legend(fontsize=9)
     ax2.set_xticks(xticks)
     ax2.set_xticklabels(xticklabels)
 
