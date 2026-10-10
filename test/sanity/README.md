@@ -29,17 +29,18 @@ Confirms that each mutation syscall opens and closes a thread-local write scope,
 Writes a 4 MiB file, maps it read-only, forces page-cache residency, and walks `/proc/self/pagemap` to resolve each resident page's physical PFN. **Every** resident folio must fall within `[pool_start_pfn, pool_end_pfn)`. Requires root (for `pagemap` PFNs) and the DebugFS pool bounds; otherwise skipped.
 
 ### Suite 3 — Fail-closed rejection matrix
-Confirms that every uncoordinated or foreign write path is refused with `-EOPNOTSUPP`. A rejection with any other errno, or an operation that is **permitted**, is a failure.
+Confirms that every uncoordinated or foreign path that would **write into** a protected file is refused with `-EOPNOTSUPP`. A rejection with any other errno, or such an operation that is **permitted**, is a failure.
+
+The mechanism gates **writes only** — reads are never disabled. Reading a protected file is therefore always allowed, *including* zero-copy transfers that merely use a protected file as their read source (e.g. `sendfile(protected -> sink)` or `splice` reading out of a protected file). Those read paths are not part of this matrix; read-path behaviour is covered by Suite 1 check 6 (`pread()` opens no write scope) and Suite 4 (buffered read round-trip, read-only mappings). Only the *destination* direction of a zero-copy transfer is a write and appears below.
 
 | Check | Operation | Threat it closes |
 | :--- | :--- | :--- |
 | 1 | `mmap(PROT_WRITE, MAP_SHARED)` | direct user-space writes into protected folios |
 | 2 | `open(O_DIRECT)` | page-cache-bypassing unbuffered I/O |
-| 3 | `splice(pipe -> file)` | zero-copy pipeline writing the page cache |
-| 4 | `sendfile(file -> sink)` | zero-copy reference of a protected source |
-| 5 | `copy_file_range()` | in-kernel copy pipeline across protected inodes |
-| 6 | AIO `io_submit(PWRITE)` | async submission decoupled from execution context (shared with `io_uring`/io-wq) |
-| 7 | `ioctl(EXT4_IOC_MOVE_EXT)` | online defragmentation relocating protected extents |
+| 3 | `splice(pipe -> file)` | zero-copy pipeline writing into the page cache |
+| 4 | `copy_file_range(-> protected)` | in-kernel copy pipeline writing a protected destination |
+| 5 | AIO `io_submit(PWRITE)` | async submission decoupled from execution context (shared with `io_uring`/io-wq) |
+| 6 | `ioctl(EXT4_IOC_MOVE_EXT)` | online defragmentation relocating protected extents |
 
 AIO represents the asynchronous class; `io_uring` is rejected by the same code path and is not re-tested to keep the harness dependency-free. Kernel-internal `__kernel_write()` rejection is not reachable from user space and is covered by the in-kernel path, not here.
 

@@ -13,10 +13,15 @@
 //   Suite 2  Static-pool residency           every resident folio of a
 //                                             protected file lies inside the
 //                                             pre-tagged PMD-aligned pool.
-//   Suite 3  Fail-closed rejection matrix     mmap(PROT_WRITE), O_DIRECT,
-//                                             splice, sendfile, copy_file_range,
-//                                             AIO, and EXT4_IOC_MOVE_EXT are all
-//                                             rejected with -EOPNOTSUPP.
+//   Suite 3  Fail-closed rejection matrix     writes/mutations *into* a
+//                                             protected file -- mmap(PROT_WRITE),
+//                                             O_DIRECT, splice, copy_file_range,
+//                                             AIO, EXT4_IOC_MOVE_EXT -- are
+//                                             rejected with -EOPNOTSUPP. Only
+//                                             writes are gated, so reads (incl.
+//                                             zero-copy reads out of a protected
+//                                             file, e.g. sendfile as source) are
+//                                             always permitted and not tested here.
 //   Suite 4  Permitted-operation controls     buffered I/O, truncation, and
 //                                             read-only mappings still work, and
 //                                             a private mapping cannot be
@@ -44,7 +49,6 @@
 #include <inttypes.h>
 
 #ifdef __linux__
-#include <sys/sendfile.h>
 #include <sys/syscall.h>
 #include <linux/ioctl.h>
 #include <linux/aio_abi.h>
@@ -422,35 +426,6 @@ static int check_splice_rejected(int fd)
 #endif
 }
 
-// sendfile(2): zero-copy reference of the protected file as a source.
-static int check_sendfile_rejected(const char *test_file)
-{
-#ifdef __linux__
-	int src = open(test_file, O_RDONLY);
-	if (src < 0) {
-		printf("    [SKIP] sendfile: reopen failed (%s)\n", strerror(errno));
-		return 0;
-	}
-	int sink = open("/dev/null", O_WRONLY);
-	if (sink < 0) {
-		printf("    [SKIP] sendfile: /dev/null open failed (%s)\n", strerror(errno));
-		close(src);
-		return 0;
-	}
-	off_t off = 0;
-	errno = 0;
-	ssize_t s = sendfile(sink, src, &off, 10);
-	int rc = expect_rejected("sendfile(protected file -> /dev/null)", s >= 0, errno);
-	close(src);
-	close(sink);
-	return rc;
-#else
-	(void)test_file;
-	printf("    [SKIP] sendfile unavailable at build time\n");
-	return 0;
-#endif
-}
-
 // copy_file_range(2): in-kernel copy pipeline across protected inodes.
 static int check_copy_file_range_rejected(const char *mount_dir, int src_fd)
 {
@@ -608,7 +583,6 @@ static int test_fail_closed_policy(const char *test_file, const char *mount_dir)
 
 	// 3-7. Zero-copy pipelines, async submission, and online defrag.
 	rc |= check_splice_rejected(fd);
-	rc |= check_sendfile_rejected(test_file);
 	rc |= check_copy_file_range_rejected(mount_dir, fd);
 	rc |= check_aio_rejected(fd);
 	rc |= check_move_ext_rejected(mount_dir, fd);
