@@ -30,25 +30,26 @@ if [ ! -x "$TEST_BIN" ] && [ -f "$SCRIPT_DIR/test_pks.c" ]; then
     gcc -O2 -Wall -o "$TEST_BIN" "$SCRIPT_DIR/test_pks.c" -lpthread 2>/dev/null || true
 fi
 
-LOG_FILE="/tmp/pks-unit_${VARIANT}.log"
-
 # ------------------------------------------------------------------------------
 # 1. Execute Upstream PKS Selftest
 # ------------------------------------------------------------------------------
-# Execute selftest; userspace exit code and assertions reflect pass/fail
+# Stream [RUN]/[OK]/[FAIL] straight to stdout -> serial -> test/raw-<variant>.log
+# (captured by the axis runner); no redirect and no scratch file. stdbuf -oL keeps
+# the lines live. test_pks exits nonzero iff any selftest failed (sticky-fail in
+# run_all), so the exit code alone is the verdict.
 test_rc=127
 if [ -x "$TEST_BIN" ] && [ -e "$RUN_PKS_TRIGGER" ]; then
-    "$TEST_BIN" -d > "$LOG_FILE" 2>&1
+    stdbuf -oL -eL "$TEST_BIN" -d
     test_rc=$?
 fi
 
 # ------------------------------------------------------------------------------
 # 2. Verdict Evaluation
 # ------------------------------------------------------------------------------
-# Userspace [OK] assertions and binary exit code 0 indicate test suite pass.
-# An intentional negative kernel test case ([6]: Unknown test) emits a FAIL line
-# in dmesg, which is safely distinguished from userspace test failures.
-if [ "$test_rc" -eq 0 ] && grep -q '\[OK\]' "$LOG_FILE" 2>/dev/null; then
+# The binary's exit code is authoritative; the [RUN]/[OK]/[FAIL] detail is now in
+# the raw transcript for auditing. (A debug build's intentional negative case
+# [6]: Unknown test emits a dmesg FAIL that does not affect this userspace rc.)
+if [ "$test_rc" -eq 0 ]; then
     emit_status pks-unit "$VARIANT" PASS
 elif [ ! -e "$RUN_PKS_TRIGGER" ]; then
     emit_status pks-unit "$VARIANT" FAIL note=no_debugfs_trigger

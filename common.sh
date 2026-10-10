@@ -107,6 +107,21 @@ report_leaf() {
         "$1" "$2" "$color" "$3" "$C_RESET" "$4"
 }
 
+# report_check <description> <verdict>
+# One indented per-check diagnostic line beneath a leaf's live line, e.g.:
+#        mmap(PROT_WRITE) rejected                             PASS
+# Used by axis runners that parse a leaf's per-check output out of the transcript.
+# PASS is green, FAIL red, anything else (SKIP/INFO) yellow.
+report_check() {
+    local color
+    case "$2" in
+        PASS) color="$C_GREEN" ;;
+        FAIL) color="$C_RED" ;;
+        *)    color="$C_YELLOW" ;;
+    esac
+    printf '      %-56s %b%s%b\n' "$1" "$color" "$2" "$C_RESET"
+}
+
 # report_compare_head <left-title> <off-title> <on-title>
 # Opens the off-vs-on summary table (rule, header row, rule).
 report_compare_head() {

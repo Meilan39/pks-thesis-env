@@ -34,6 +34,43 @@ fail_count=0
 V_OFF=(); D_OFF=()
 V_ON=();  D_ON=()
 
+# Parses a leaf's per-check diagnostics out of the serial transcript and prints
+# them indented beneath its live line. The leaves are dumb: their binaries stream
+# raw [PASS]/[FAIL]/[SKIP] lines (sanity) or [RUN]+[OK]/[FAIL] pairs (pks-unit),
+# and this axis is where that stream is turned into a readable per-check report --
+# e.g. "mmap(PROT_WRITE) rejected ... FAIL" -- not an opaque pass count.
+#
+# A leaf's check lines are the ones preceding its own STATUS node=<leaf> line
+# (and after any prior leaf's STATUS), so they are buffered and flushed only when
+# the matching STATUS is seen. The leading "[ts] pks-autorun.sh[pid]: " journal
+# prefix is stripped. Nothing prints for leaves that emit no checks (e.g. fsx).
+emit_leaf_checks() {
+    local raw_log="$1"
+    local leaf="$2"
+
+    local verdict desc
+    while IFS=$'\t' read -r verdict desc; do
+        [ -n "$verdict" ] && report_check "$desc" "$verdict"
+    done < <(awk -v leaf="$leaf" '
+        function strip(s){ sub(/^\[[^]]*\][ ]+[^:]*:[ ]+/, "", s); return s }
+        {
+            l = strip($0)
+            if (l ~ /^STATUS node=/) {
+                n = l; sub(/^STATUS node=/, "", n); sub(/[ ].*/, "", n)
+                if (n == leaf) for (i = 0; i < nb; i++) print buf[i]
+                nb = 0; pend = ""; next
+            }
+            if (l ~ /\[RUN\]/)  { pend = l; sub(/.*\[RUN\][ \t]*/, "", pend); next }
+            if (l ~ /\[OK\]/)   { buf[nb++] = "PASS\t" (pend != "" ? pend : "pks test"); pend = ""; next }
+            if (l ~ /\[PASS\]/) { d = l; sub(/.*\[PASS\][ \t]*/, "", d); buf[nb++] = "PASS\t" d; next }
+            if (l ~ /\[FAIL\]/) { d = l; sub(/.*\[FAIL\][ \t]*/, "", d)
+                                  buf[nb++] = "FAIL\t" (pend != "" ? pend : d); pend = ""; next }
+            if (l ~ /\[SKIP\]/) { d = l; sub(/.*\[SKIP\][ \t]*/, "", d)
+                                  buf[nb++] = "SKIP\t" (pend != "" ? pend : d); pend = ""; next }
+        }
+    ' "$raw_log" 2>/dev/null)
+}
+
 # Harvests one leaf verdict/detail from a transcript into the per-mode arrays at
 # the given index, tallies the global counters, prints its live line, and records
 # the CSV row.
@@ -67,6 +104,7 @@ harvest_leaf() {
 
     echo "$leaf,$variant,$verdict,$details" >> "$AXIS_CSV"
     report_leaf "[${leaf}-${variant}]" "pcache_pks=${variant}" "$verdict" "$details"
+    emit_leaf_checks "$raw_log" "$leaf"
 }
 
 # ------------------------------------------------------------------------------

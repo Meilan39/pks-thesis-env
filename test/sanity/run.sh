@@ -36,25 +36,27 @@ if [ ! -x "$SANITY_BIN" ] && [ -f "$SCRIPT_DIR/pks_sanity_test.c" ]; then
     gcc -O2 -Wall -o "$SANITY_BIN" "$SCRIPT_DIR/pks_sanity_test.c" 2>/dev/null || true
 fi
 
-LOG_FILE="/tmp/sanity_${VARIANT}.log"
-
 # ------------------------------------------------------------------------------
 # 1. Execute Sanity Test Suite
 # ------------------------------------------------------------------------------
+# Stream the harness output straight to stdout: systemd forwards it to the serial
+# console, which the axis runner captures into test/raw-<variant>.log. No redirect
+# and no scratch file -- the transcript IS the per-check record. stdbuf -oL keeps
+# the [PASS]/[FAIL]/[SKIP] lines live and ordered. The binary's exit code is the
+# verdict: pks_sanity_test returns nonzero iff any contract assertion failed.
+rc=127
 if [ -x "$SANITY_BIN" ]; then
-    "$SANITY_BIN" > "$LOG_FILE" 2>&1 || true
+    stdbuf -oL -eL "$SANITY_BIN"
+    rc=$?
 fi
 
 # ------------------------------------------------------------------------------
 # 2. Verdict Evaluation
 # ------------------------------------------------------------------------------
-pass_count=$(grep -c '\[PASS\]' "$LOG_FILE" 2>/dev/null || echo 0)
-fail_count=$(grep -c '\[FAIL\]' "$LOG_FILE" 2>/dev/null || echo 0)
-
-if [ "$pass_count" -eq 0 ] && [ "$fail_count" -eq 0 ]; then
-    emit_status sanity "$VARIANT" FAIL note=no_output
-elif [ "$fail_count" -eq 0 ]; then
-    emit_status sanity "$VARIANT" PASS passed="$pass_count"
+if [ "$rc" -eq 127 ]; then
+    emit_status sanity "$VARIANT" FAIL note=harness_absent
+elif [ "$rc" -eq 0 ]; then
+    emit_status sanity "$VARIANT" PASS
 else
-    emit_status sanity "$VARIANT" FAIL passed="$pass_count" failed="$fail_count"
+    emit_status sanity "$VARIANT" FAIL rc="$rc"
 fi
