@@ -1,15 +1,10 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# perf/fio/run.sh - Synchronous Block I/O Microbenchmark (Warm & Cold Sweeps)
+# perf/fio/run.sh - Synchronous block I/O microbenchmark (warm & cold sweeps)
 # ==============================================================================
-# Evaluates single-threaded read and write latency across block sizes from 512B
-# to 1MB under synchronous, page-cached I/O.
-#
-# Workload:
-# 1. Warm Sweep: sequential write followed by sequential read on in-cache file
-# 2. Cold Sweep: page cache dropped between runs to measure physical I/O latency
-#
-# Emits real 4KiB warm read/write latencies parsed from fio JSON output.
+# Single-threaded read/write latency across 512B-1MB block sizes under
+# synchronous, page-cached I/O: a warm sweep (in-cache file) and a cold sweep
+# (caches dropped between runs). Emits the 4KiB latencies parsed from fio JSON.
 # ==============================================================================
 set -u
 
@@ -28,7 +23,7 @@ RAW_DIR="$SCRIPT_DIR/raw/$VARIANT"
 mkdir -p "$RAW_DIR" 2>/dev/null || true
 
 # ------------------------------------------------------------------------------
-# 1. Dependency Validation
+# Dependencies
 # ------------------------------------------------------------------------------
 if ! command -v fio >/dev/null 2>&1; then
     emit_status fio "$VARIANT" FAIL note=fio_missing
@@ -38,7 +33,7 @@ fi
 BLOCK_SIZES="512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576"
 
 # ------------------------------------------------------------------------------
-# 2. Warm I/O Sweep (In-Memory Page Cache)
+# Warm sweep (in-cache)
 # ------------------------------------------------------------------------------
 WARM_FILE="$TARGET_DIR/fio_warm.dat"
 dd if=/dev/urandom of="$WARM_FILE" bs=1M count=32 status=none conv=fsync 2>/dev/null || true
@@ -75,7 +70,7 @@ done
 rm -f "$WARM_FILE"
 
 # ------------------------------------------------------------------------------
-# 3. Cold I/O Sweep (Drop Caches)
+# Cold sweep (caches dropped)
 # ------------------------------------------------------------------------------
 COLD_FILE="$TARGET_DIR/fio_cold.dat"
 for bs in $BLOCK_SIZES; do
@@ -100,7 +95,7 @@ done
 rm -f "$COLD_FILE"
 
 # ------------------------------------------------------------------------------
-# 4. Telemetry Extraction and Verdict
+# Extract telemetry & emit
 # ------------------------------------------------------------------------------
 extract_metric() {
     local json_file="$1"

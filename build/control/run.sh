@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# build/control/run.sh - Compile the pristine upstream baseline kernel.
+# ==============================================================================
+# build/control/run.sh - Build the pristine upstream baseline kernel
+# ==============================================================================
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

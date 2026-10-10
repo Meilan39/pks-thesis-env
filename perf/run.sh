@@ -24,12 +24,12 @@ PERF_LEAVES=(fio concurrency sqlite)
 AXIS_CSV="$SCRIPT_DIR/result.csv"
 
 # ------------------------------------------------------------------------------
-# 1. Output Initialization
+# Reset axis CSV
 # ------------------------------------------------------------------------------
 echo "node,variant,verdict,details" > "$AXIS_CSV"
 
 # ------------------------------------------------------------------------------
-# 2. Header Banner
+# Console banner
 # ------------------------------------------------------------------------------
 report_banner \
     "[perf] PKS Performance Evaluation: Micro- & Macrobenchmarks" \
@@ -53,7 +53,7 @@ except Exception:
 }
 
 # ------------------------------------------------------------------------------
-# 3. Consolidated Variant Execution
+# Run each variant, harvest leaves
 # ------------------------------------------------------------------------------
 pass_count=0
 fail_count=0
@@ -95,7 +95,7 @@ run_and_harvest off     perf    off "Mitigated Kernel (PKS Unloaded)"
 run_and_harvest on      perf    on  "Mitigated Kernel (PKS Active)"
 
 # ------------------------------------------------------------------------------
-# 4. Summary Tables & Analysis
+# Summary tables & analysis
 # ------------------------------------------------------------------------------
 echo ""
 report_rule
@@ -142,7 +142,7 @@ get_detail() {
     printf '%s\n' "$l" | tr ', ' '\n\n' | sed -n "s/^${field}=//p" | head -n1
 }
 
-# 1. fio warm write lat
+# fio warm write lat
 f_w_c=$(get_detail fio control lat4k_warm_write_us)
 f_w_off=$(get_detail fio off lat4k_warm_write_us)
 f_w_on=$(get_detail fio on lat4k_warm_write_us)
@@ -150,7 +150,7 @@ f_w_ovh=$(calc_overhead "$f_w_c" "$f_w_on")
 printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
     "fio 4KB warm" "Write Lat (us)" "${f_w_c:-N/A}" "${f_w_off:-N/A}" "${f_w_on:-N/A}" "$f_w_ovh"
 
-# 2. fio warm read lat
+# fio warm read lat
 f_r_c=$(get_detail fio control lat4k_warm_read_us)
 f_r_off=$(get_detail fio off lat4k_warm_read_us)
 f_r_on=$(get_detail fio on lat4k_warm_read_us)
@@ -158,7 +158,7 @@ f_r_ovh=$(calc_overhead "$f_r_c" "$f_r_on")
 printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
     "fio 4KB warm" "Read Lat (us)" "${f_r_c:-N/A}" "${f_r_off:-N/A}" "${f_r_on:-N/A}" "$f_r_ovh"
 
-# 3. fio cold write lat
+# fio cold write lat
 f_c_c=$(get_detail fio control lat4k_cold_write_us)
 f_c_off=$(get_detail fio off lat4k_cold_write_us)
 f_c_on=$(get_detail fio on lat4k_cold_write_us)
@@ -166,7 +166,7 @@ f_c_ovh=$(calc_overhead "$f_c_c" "$f_c_on")
 printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
     "fio 4KB cold" "Write Lat (us)" "${f_c_c:-N/A}" "${f_c_off:-N/A}" "${f_c_on:-N/A}" "$f_c_ovh"
 
-# 4. concurrency 4-thread bw
+# concurrency 4-thread bw
 c_4_c=$(get_detail concurrency control bw_4t_mbps)
 c_4_off=$(get_detail concurrency off bw_4t_mbps)
 c_4_on=$(get_detail concurrency on bw_4t_mbps)
@@ -174,7 +174,7 @@ c_4_ovh=$(calc_overhead "$c_4_c" "$c_4_on")
 printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
     "concurrency" "4-Thread BW (MB/s)" "${c_4_c:-N/A}" "${c_4_off:-N/A}" "${c_4_on:-N/A}" "$c_4_ovh"
 
-# 5. sqlite sync=OFF
+# sqlite sync=OFF
 s_off_c=$(get_detail sqlite control tps_syncoff)
 s_off_off=$(get_detail sqlite off tps_syncoff)
 s_off_on=$(get_detail sqlite on tps_syncoff)
@@ -182,7 +182,7 @@ s_off_ovh=$(calc_overhead "$s_off_c" "$s_off_on")
 printf " %-16s %-20s %-12s %-12s %-12s %-16s\n" \
     "sqlite" "Tx/s (sync=OFF)" "${s_off_c:-N/A}" "${s_off_off:-N/A}" "${s_off_on:-N/A}" "$s_off_ovh"
 
-# 6. sqlite sync=FULL
+# sqlite sync=FULL
 s_full_c=$(get_detail sqlite control tps_syncfull)
 s_full_off=$(get_detail sqlite off tps_syncfull)
 s_full_on=$(get_detail sqlite on tps_syncfull)

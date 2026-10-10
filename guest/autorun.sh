@@ -1,17 +1,17 @@
 #!/usr/bin/env bash
-# guest/autorun.sh - In-guest workload dispatcher.
-# Executed once at boot via systemd (pks-autorun.service).
-#
-# Determines the execution target and experimental variant from /proc/cmdline,
-# mounts required filesystems (9p workspace, protected ext4 volume, debugfs),
-# invokes the appropriate workload leaves, and powers down the virtual machine.
-# All results are streamed over serial as STATUS lines; no persistent result files
-# are written in-guest to ensure crash resilience.
+# ==============================================================================
+# guest/autorun.sh - In-guest workload dispatcher (systemd, once at boot)
+# ==============================================================================
+# Resolves the target and variant from /proc/cmdline, mounts the needed
+# filesystems (9p workspace, protected ext4, debugfs), runs the matching leaves,
+# and powers off. Results stream over serial as STATUS lines; nothing is written
+# in-guest, for crash resilience.
+# ==============================================================================
 set -u
 
-# ==============================================================================
-# 1. Heartbeat & Helper Functions
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Heartbeat & helpers
+# ------------------------------------------------------------------------------
 hb() {
     echo "HB autorun: $*"
 }
@@ -25,10 +25,10 @@ cmd_val() {
 
 hb "reached (cmdline: $CMDLINE)"
 
-# ==============================================================================
-# 2. Target Resolution
-# ==============================================================================
-# Target is specified via kernel cmdline (QEMU), or overridden by /mnt/protected/.pks-run (baremetal).
+# ------------------------------------------------------------------------------
+# Resolve target
+# ------------------------------------------------------------------------------
+# From kernel cmdline (QEMU), or overridden by /mnt/protected/.pks-run (baremetal).
 TARGET="$(cmd_val pks_run)"
 if [ -z "$TARGET" ]; then
     TARGET="$(cmd_val pks_auto)"
@@ -44,9 +44,9 @@ if [ -z "$TARGET" ] || [ "$TARGET" = "shell" ]; then
 fi
 hb "target=$TARGET"
 
-# ==============================================================================
-# 3. Mount 9p Workspace
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Mount 9p workspace
+# ------------------------------------------------------------------------------
 if ! mountpoint -q /pks-thesis-env 2>/dev/null; then
     mkdir -p /pks-thesis-env
     mount -t 9p -o trans=virtio,version=9p2000.L,nofail pks_env /pks-thesis-env 2>/dev/null || true
@@ -59,9 +59,9 @@ fi
 
 hb "9p_mounted=$(mountpoint -q /pks-thesis-env && echo yes || echo no) ws=$WORKSPACE_DIR common.sh=$([ -f "$WORKSPACE_DIR/common.sh" ] && echo yes || echo no)"
 
-# ==============================================================================
-# 4. Experimental Variant Detection
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Detect variant
+# ------------------------------------------------------------------------------
 MODE="off"
 if printf '%s' "$CMDLINE" | grep -q 'pcache_pks=on'; then
     MODE="on"
@@ -72,9 +72,9 @@ if printf '%s' "$CMDLINE" | grep -q 'pcache_control=1'; then
     LABEL="control"
 fi
 
-# ==============================================================================
-# 5. Protected Partition & DebugFS Mounting
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Mount protected partition & debugfs
+# ------------------------------------------------------------------------------
 if [ -b /dev/vda2 ]; then
     mkdir -p /mnt/protected
     if [ "$MODE" = "on" ]; then
@@ -94,14 +94,14 @@ fi
 
 hb "protected_mounted=$(mountpoint -q /mnt/protected && echo yes || echo no) mode=$MODE label=$LABEL pks_opt=$(grep -q '/mnt/protected.*pks_pagecache' /proc/mounts 2>/dev/null && echo yes || echo no)"
 
-# Mount debugfs for the security introspection kernel
+# debugfs for the security introspection kernel
 if ! mountpoint -q /sys/kernel/debug 2>/dev/null; then
     mount -t debugfs none /sys/kernel/debug 2>/dev/null || true
 fi
 
-# ==============================================================================
-# 6. Workload Dispatch & Shutdown
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Dispatch workload & shut down
+# ------------------------------------------------------------------------------
 run_axis() {
     local axis_dir="$1"
     local found=0

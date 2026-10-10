@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# disk/run.sh - Provisions the persistent guest image (once) and refreshes packages
-# and the in-guest autorun service on subsequent invocations.
-#
-# The thesis workspace is shared live over virtio-9p, so workspace changes do not
-# require disk rebuilds. The autorun script is installed into the image rootfs
-# because it runs before the 9p filesystem is mounted.
+# ==============================================================================
+# disk/run.sh - Provision the guest image (once), else refresh it
+# ==============================================================================
+# The workspace is shared live over virtio-9p, so workspace edits need no disk
+# rebuild. autorun.sh is copied into the rootfs because it runs before 9p mounts.
+# ==============================================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -24,9 +24,9 @@ mkdir -p "$REPO_ROOT/images"
 # Required guest packages: compilers, fio, sqlite3, and test utilities.
 PACKAGES="build-essential python3 fio sqlite3 libsqlite3-dev libcap-dev libc6-dev sudo coreutils procps"
 
-# ==============================================================================
-# Helper Functions: Virtual Filesystems and Chroot Management
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Helpers: virtual filesystems & chroot
+# ------------------------------------------------------------------------------
 mount_chroot_binds() {
     local mount_point="$1"
     for dir in dev proc sys; do
@@ -69,9 +69,9 @@ install_autorun() {
         "$mount_point/etc/systemd/system/multi-user.target.wants/pks-autorun.service"
 }
 
-# ==============================================================================
-# Provisioning & Refresh Pipelines
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Provisioning & refresh pipelines
+# ------------------------------------------------------------------------------
 provision() {
     require_cmds qemu-img debootstrap sfdisk losetup mkfs.ext4 sudo
 
@@ -144,9 +144,9 @@ refresh_image() {
     return "$rc"
 }
 
-# ==============================================================================
-# Execution Dispatch
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Execution dispatch
+# ------------------------------------------------------------------------------
 if [ ! -f "$DISK_IMG" ]; then
     log_info "[disk] provisioning $SUITE image (one-time, initial setup)..."
     start_time=$(date +%s)

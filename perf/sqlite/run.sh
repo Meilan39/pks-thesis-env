@@ -1,14 +1,10 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# perf/sqlite/run.sh - SQLite Rollback-Journal Macrobenchmark
+# perf/sqlite/run.sh - SQLite rollback-journal macrobenchmark
 # ==============================================================================
-# Evaluates real-world database transaction throughput and latency using SQLite
-# in classic rollback-journal mode.
-#
-# Workload:
-# 1. synchronous=FULL (500 txns): fsync on every commit, bound by storage flush
-# 2. synchronous=OFF  (5000 txns): pure page-cache write and truncate path,
-#    isolated to measure CPU/PKS permission switching overhead
+# Real-world DB transaction throughput/latency in classic rollback-journal mode:
+# synchronous=FULL (500 txns, fsync-bound) and synchronous=OFF (5000 txns, pure
+# page-cache write/truncate path isolating CPU/PKS switching overhead).
 # ==============================================================================
 set -u
 
@@ -26,7 +22,7 @@ fi
 BENCH_SCRIPT="$SCRIPT_DIR/sqlite_bench.sh"
 
 # ------------------------------------------------------------------------------
-# 1. Dependency Validation
+# Dependencies
 # ------------------------------------------------------------------------------
 if [ ! -x "$BENCH_SCRIPT" ] || ! command -v sqlite3 >/dev/null 2>&1; then
     emit_status sqlite "$VARIANT" FAIL note=sqlite_missing
@@ -34,7 +30,7 @@ if [ ! -x "$BENCH_SCRIPT" ] || ! command -v sqlite3 >/dev/null 2>&1; then
 fi
 
 # ------------------------------------------------------------------------------
-# 2. Benchmark Execution
+# Run benchmark
 # ------------------------------------------------------------------------------
 TMP_FULL="/tmp/sqlite_${VARIANT}_FULL.json"
 TMP_OFF="/tmp/sqlite_${VARIANT}_OFF.json"
@@ -46,7 +42,7 @@ TMP_OFF="/tmp/sqlite_${VARIANT}_OFF.json"
 "$BENCH_SCRIPT" "$TARGET_DIR" OFF "$TMP_OFF" 5000 >/dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# 3. Telemetry Extraction and Verdict
+# Extract telemetry & emit
 # ------------------------------------------------------------------------------
 extract_field() {
     local json_file="$1"

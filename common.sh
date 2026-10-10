@@ -1,26 +1,21 @@
 #!/usr/bin/env bash
-# common.sh - Shared logging, console reporting, STATUS node protocol, and rollup.
+# ==============================================================================
+# common.sh - Shared logging, console reporting, STATUS protocol, and rollup
+# ==============================================================================
+# Sourced by host orchestrators and in-guest runners. Sets no shell options
+# (each script owns its own) and is the sole owner of ANSI styling: callers use
+# the log_* / report_* helpers and never emit color themselves.
 #
-# Sourced by both host orchestrators and in-guest runners.
-# Does NOT set shell options (each script owns its own strictness settings).
-#
-# THE NODE CONTRACT:
-#   Every node directory contains a run.sh and generates a result.log.
-#   A leaf run.sh emits on stdout one line per observed result:
-#       STATUS node=<name> variant=<control|off|on> verdict=<V> [k=v]...
-#   where V is in {PASS, FAIL, NEUTRALIZED, VULNERABLE, PENDING}.
-#     - PASS, NEUTRALIZED : Successful passing state
-#     - FAIL, VULNERABLE  : Failure or unmitigated state
-#     - PENDING           : Pre-exploit marker resolved from panic transcripts
-#
-# Only lines beginning with 'STATUS ' are parsed into machine-readable summaries.
-#
-# All terminal styling is owned here: scripts call the log_* and report_*
-# helpers and never emit ANSI color codes themselves.
+# Node contract: a leaf run.sh prints one line per observed result,
+#   STATUS node=<name> variant=<control|off|on> verdict=<V> [k=v]...
+# with V in {PASS, FAIL, NEUTRALIZED, VULNERABLE, PENDING} (PASS/NEUTRALIZED
+# pass; FAIL/VULNERABLE fail; PENDING is resolved later from a panic transcript).
+# Only 'STATUS ' lines are parsed into machine-readable summaries.
+# ==============================================================================
 
-# ==============================================================================
-# 1. Terminal Color & Logging Utilities
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Terminal color & logging
+# ------------------------------------------------------------------------------
 if [ -t 1 ]; then
     C_RESET='\033[0m'
     C_RED='\033[31m'
@@ -65,13 +60,10 @@ require_cmds() {
     done
 }
 
-# ==============================================================================
-# 2. Axis Console Report Formatting
-# ==============================================================================
-# The three evaluation axes (test, sec, perf) share one console report layout:
-# an 88-column banner, a live per-leaf stream, and a summary footer. These
-# helpers own every width and color decision so that axis scripts stay free of
-# ANSI codes and render identically.
+# ------------------------------------------------------------------------------
+# Axis console report formatting
+# ------------------------------------------------------------------------------
+# One shared layout for all three axes: 88-col banner, per-leaf stream, footer.
 REPORT_WIDTH=88
 
 # Draws an 88-column rule out of a single repeated character.
@@ -82,7 +74,7 @@ _report_rule_char() {
 report_rule()  { _report_rule_char '='; }  # heavy banner rule
 report_hrule() { _report_rule_char '-'; }  # light section rule
 
-# Maps a verdict to its terminal color (passing is green, everything else red).
+# Maps a verdict to its color (passing green, everything else red).
 _verdict_color() {
     case "$1" in
         PASS|NEUTRALIZED) printf '%s' "$C_GREEN" ;;
@@ -99,7 +91,7 @@ report_banner() {
 }
 
 # report_leaf <tag> <mode-label> <verdict> <detail>
-# One live line per leaf, e.g.:  [fsx-off]  pcache_pks=off  ... PASS (ops=10000)
+# One live line per leaf, e.g.: [fsx-off]  pcache_pks=off  ... PASS (ops=10000)
 report_leaf() {
     local color
     color="$(_verdict_color "$3")"
@@ -108,12 +100,9 @@ report_leaf() {
 }
 
 # report_check <description> <verdict>
-# One indented per-check diagnostic line beneath a leaf's live line, e.g.:
-#        [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP
-# Used by axis runners that parse a leaf's per-check output out of the transcript.
-# The verdict leads in a fixed-width colored tag so the column stays aligned no
-# matter how long the free-text description is (trailing verdicts drifted badly
-# once descriptions ran past the field width). PASS green, FAIL red, else yellow.
+# Indented per-check line beneath a leaf, e.g. "[PASS] mmap ... rejected". The
+# verdict leads in a fixed-width colored tag so the column stays aligned for any
+# description length. PASS green, FAIL red, else yellow.
 report_check() {
     local color
     case "$2" in
@@ -125,7 +114,6 @@ report_check() {
 }
 
 # report_compare_head <left-title> <off-title> <on-title>
-# Opens the off-vs-on summary table (rule, header row, rule).
 report_compare_head() {
     report_hrule
     printf ' %-15s %-38s %-30s\n' "$1" "$2" "$3"
@@ -149,17 +137,17 @@ report_overall() {
     printf ' OVERALL: %b%s%b (%s)\n' "$color" "$1" "$C_RESET" "$2"
 }
 
-# ==============================================================================
-# 3. Kernel Panic & Security Signatures
-# ==============================================================================
-# Signatures used to classify fail-closed security events from kernel transcripts.
+# ------------------------------------------------------------------------------
+# Kernel panic & security signatures
+# ------------------------------------------------------------------------------
+# Classify fail-closed security events from kernel transcripts.
 PKS_ACTIVE_REGEX="${PKS_ACTIVE_REGEX:-pcache_pks: initialized}"
 PKS_PANIC_REGEX="${PKS_PANIC_REGEX:-Kernel panic|unable to handle .*page fault|BUG: |Oops|general protection|protection key}"
 PKS_SUPPRESS_REGEX="${PKS_SUPPRESS_REGEX:-pcache_pks: (unauthorized write trapped|softirq store suppressed)}"
 
-# ==============================================================================
-# 4. STATUS Protocol Formatting & Parsing
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# STATUS protocol: emit & parse
+# ------------------------------------------------------------------------------
 emit_status() {
     local node="$1"
     local variant="$2"
@@ -180,11 +168,12 @@ status_field() {
     printf '%s\n' "$line" | tr ' ' '\n' | sed -n "s/^${field_key}=//p" | head -n1
 }
 
-# Returns the trailing "k=v k=v ..." detail of a STATUS line (empty if none).
+# Trailing "k=v k=v ..." detail of a STATUS line (empty if none).
 status_detail_tail() {
     printf '%s\n' "$1" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//'
 }
 
+# Pass predicate: PASS/NEUTRALIZED pass; VULNERABLE passes only under off.
 verdict_is_pass() {
     local verdict="$1"
     local variant="${2:-}"
@@ -206,15 +195,15 @@ verdict_is_pass() {
     esac
 }
 
-# Extracts STATUS lines from plain logs or serial transcripts containing terminal codes/journal prefixes.
+# Extract STATUS lines from a plain log or a serial transcript (codes/prefixes).
 _status_lines() {
     local file_path="$1"
     grep -aoE 'STATUS node=.*' "$file_path" 2>/dev/null
 }
 
-# ==============================================================================
-# 5. Status Rollup
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Status rollup
+# ------------------------------------------------------------------------------
 rollup() {
     local destination_log="$1"
     local rollup_label="$2"

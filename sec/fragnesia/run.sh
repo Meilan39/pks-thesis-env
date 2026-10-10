@@ -1,20 +1,19 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# sec/fragnesia/run.sh - Softirq/Workqueue Page-Cache Write Neutralization
+# sec/fragnesia/run.sh - Softirq/workqueue page-cache write neutralization
 # ==============================================================================
-# Builds the PoC from exp.c if needed, writes a unique marker into the protected
-# victim file, drops caches to force a real page-cache re-fault, runs the
-# unprivileged PoC as testuser, and reports whether the marker survived. Under
-# pcache_pks=on the unauthorized store is trapped and the attacking task is killed
-# without crashing the system, keeping the marker intact; under off the marker is
-# overwritten.
+# Builds the PoC if needed, seeds a marker in the protected victim file, drops
+# caches to force a real page-cache re-fault, runs it as testuser, and reports
+# whether the marker survived. Under on the unauthorized store is trapped and the
+# attacking task is killed without crashing the system, keeping the marker
+# intact; under off the marker is overwritten.
 # ==============================================================================
 set -u
 
 cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
 # ------------------------------------------------------------------------------
-# 1. Static Constants
+# Constants
 # ------------------------------------------------------------------------------
 TARGET_FILE="/mnt/protected/victim_file"
 EXPLOIT_BIN="./exp"
@@ -22,7 +21,7 @@ EXPLOIT_SRC="./exp.c"
 CLEAN_MARKER="PKS_CLEAN_MARKER_fragnesia_DO_NOT_OVERWRITE"
 
 # ------------------------------------------------------------------------------
-# 2. Precondition Checks
+# Preconditions
 # ------------------------------------------------------------------------------
 [ "$(id -u)" -eq 0 ]    || { echo "error: root privileges required"; exit 1; }
 id testuser &>/dev/null || { echo "error: testuser account required"; exit 1; }
@@ -30,7 +29,7 @@ id testuser &>/dev/null || { echo "error: testuser account required"; exit 1; }
 [ -x "$EXPLOIT_BIN" ]   || gcc -O2 -Wall -pthread -o "$EXPLOIT_BIN" "$EXPLOIT_SRC" || { echo "error: build failed"; exit 1; }
 
 # ------------------------------------------------------------------------------
-# 3. Target Preparation
+# Prepare victim file
 # ------------------------------------------------------------------------------
 printf '%s\n' "$CLEAN_MARKER" > "$TARGET_FILE"
 head -c 65536 /dev/zero >> "$TARGET_FILE" 2>/dev/null || true
@@ -40,12 +39,12 @@ echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
 cat "$TARGET_FILE" > /dev/null 2>&1 || true
 
 # ------------------------------------------------------------------------------
-# 4. Exploit Execution
+# Run exploit
 # ------------------------------------------------------------------------------
 su -s /bin/bash testuser -c "'$EXPLOIT_BIN'" || true
 
 # ------------------------------------------------------------------------------
-# 5. Marker Inspection
+# Inspect marker
 # ------------------------------------------------------------------------------
 if grep -qF "$CLEAN_MARKER" <(head -c 256 "$TARGET_FILE" 2>/dev/null); then
     echo "marker=intact"

@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-# preflight.sh - Verify host dependencies, detect execution substrate, and record
-# environmental provenance.
-# Executed before all top-level workflow targets. Fails fast on missing dependencies.
+# ==============================================================================
+# preflight.sh - Host dependency check, substrate detection, provenance record
+# ==============================================================================
+# Runs before every top-level axis; fails fast on a missing dependency.
+# ==============================================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -11,14 +13,14 @@ source "$REPO_ROOT/common.sh"
 RESULTS_DIR="$REPO_ROOT/results"
 mkdir -p "$RESULTS_DIR"
 
-# ==============================================================================
-# 1. Host Dependency Verification
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Host dependencies
+# ------------------------------------------------------------------------------
 require_cmds "${QEMU_BIN:-qemu-system-x86_64}" python3 gcc
 
-# ==============================================================================
-# 2. Execution Substrate Detection
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Detect execution substrate
+# ------------------------------------------------------------------------------
 substrate="tcg"
 if [ -e /dev/kvm ] && [ -w /dev/kvm ]; then
     if grep -qw pks /proc/cpuinfo 2>/dev/null; then
@@ -40,9 +42,9 @@ case "$substrate" in
         ;;
 esac
 
-# ==============================================================================
-# 3. Environmental Provenance Record
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Provenance record
+# ------------------------------------------------------------------------------
 host_kernel="$(uname -sr 2>/dev/null || echo unknown)"
 cpu_model="$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | cut -d: -f2- | sed 's/^ *//' || echo unknown)"
 qemu_version="$("${QEMU_BIN:-qemu-system-x86_64}" --version 2>/dev/null | head -n1 || echo unknown)"
@@ -60,4 +62,3 @@ cat > "$RESULTS_DIR/preflight.json" <<EOF
 EOF
 
 log_done "Preflight recorded ($substrate) -> results/preflight.json"
-

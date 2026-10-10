@@ -1,12 +1,9 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# test/fsx/run.sh - File System Exerciser (fsx) Stress & Integrity Test
+# test/fsx/run.sh - Randomized filesystem exerciser (fsx), 10,000 ops
 # ==============================================================================
-# Executes 10,000 randomized filesystem operations (read, write, truncate, hole
-# punch). Under Intel PKS ('on'), shared writable mmap is rejected by kernel
-# policy (-EOPNOTSUPP), so MAPWRITE is disabled via -W to avoid spurious aborts.
-#
-# fsx aborts nonzero on any data mismatch; its exit code is authoritative.
+# fsx aborts nonzero on any data mismatch, so its exit code is authoritative.
+# Under PKS 'on', writable mmap is rejected (-EOPNOTSUPP), so -W drops MAPWRITE.
 # ==============================================================================
 set -u
 
@@ -17,12 +14,12 @@ source "$REPO_ROOT/common.sh"
 VARIANT="${1:-on}"
 FSX_BIN="$SCRIPT_DIR/fsx"
 
-# Ensure fsx binary is compiled (or recompiled if source was modified)
+# Compile if missing or stale
 if [ ! -x "$FSX_BIN" ] || [ "$SCRIPT_DIR/fsx.c" -nt "$FSX_BIN" ]; then
     gcc -O2 -Wall -D_GNU_SOURCE -o "$FSX_BIN" "$SCRIPT_DIR/fsx.c" 2>/dev/null || true
 fi
 
-# Target evaluation mount (default to /mnt/protected, fallback to /tmp)
+# Protected mount, or /tmp if absent
 TARGET_DIR="/mnt/protected"
 if [ ! -d "$TARGET_DIR" ]; then
     TARGET_DIR="/tmp"
@@ -32,17 +29,17 @@ LOG_FILE="/tmp/fsx_${VARIANT}.log"
 TEST_FILE="$TARGET_DIR/fsx_${VARIANT}.dat"
 rm -f "$TEST_FILE"
 
-# Number of randomized operations (default 10,000; overrideable via FSX_NUM_OPS)
+# Op count (override with FSX_NUM_OPS)
 NUM_OPS="${FSX_NUM_OPS:-10000}"
 
-# Pass -W to disable MAPWRITE operations when running against PKS protected mounts
+# -W drops MAPWRITE under PKS, where writable mmap is rejected
 EXTRA_FLAGS=""
 if [ "$VARIANT" = "on" ]; then
     EXTRA_FLAGS="-W"
 fi
 
 # ------------------------------------------------------------------------------
-# 1. Execute fsx Stress Run
+# Execute fsx stress run
 # ------------------------------------------------------------------------------
 fsx_rc=0
 if [ -x "$FSX_BIN" ]; then
@@ -54,7 +51,7 @@ fi
 rm -f "$TEST_FILE"
 
 # ------------------------------------------------------------------------------
-# 2. Verdict Evaluation
+# Resolve verdict
 # ------------------------------------------------------------------------------
 if [ "$fsx_rc" -eq 127 ]; then
     emit_status fsx "$VARIANT" FAIL note=harness_absent

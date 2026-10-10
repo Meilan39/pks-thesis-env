@@ -18,13 +18,13 @@ SECURITY_LEAVES=(copy-fail dirty-frag fragnesia)
 AXIS_CSV="$SCRIPT_DIR/result.csv"
 
 # ------------------------------------------------------------------------------
-# 1. Output Initialization
+# Reset axis CSV
 # ------------------------------------------------------------------------------
 rm -f "$AXIS_CSV" "$SCRIPT_DIR"/*/result.csv
 echo "node,variant,verdict,outcome" > "$AXIS_CSV"
 
 # ------------------------------------------------------------------------------
-# 2. Header Banner
+# Console banner
 # ------------------------------------------------------------------------------
 report_banner \
     "[sec] PKS Security Evaluation: End-to-End Exploit Neutralization" \
@@ -36,10 +36,9 @@ fail_count=0
 leaf_verdict_off=""; leaf_outcome_off=""
 leaf_verdict_on="";  leaf_outcome_on=""
 
-# Resolves the marker outcome for one leaf/mode, tallies counters, prints the
-# live line, records the CSV row, and stashes the result for the summary table.
-# The 'off' baseline passes when the marker was altered (a real vulnerability);
-# 'on' passes when the marker survived or a PKS-attributable panic trapped the store.
+# Resolves one leaf/mode: outcome from the victim-file marker, or fail_closed_panic
+# when a PKS-attributable panic trapped the store under 'on'. off passes when the
+# marker was altered (a real exploit); on passes when it survived or panicked.
 resolve_leaf() {
     local leaf="$1"
     local variant="$2"
@@ -80,7 +79,7 @@ resolve_leaf() {
 }
 
 # ------------------------------------------------------------------------------
-# 3. Execution & Evaluation Loop
+# Boot each leaf per mode, resolve
 # ------------------------------------------------------------------------------
 TABLE_ROWS=()
 for leaf in "${SECURITY_LEAVES[@]}"; do
@@ -96,7 +95,7 @@ for leaf in "${SECURITY_LEAVES[@]}"; do
 done
 
 # ------------------------------------------------------------------------------
-# 4. Summary Table Footer
+# Summary footer
 # ------------------------------------------------------------------------------
 overall="PASS"
 [ "$fail_count" -gt 0 ] && overall="FAIL"

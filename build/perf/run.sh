@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# build/perf/run.sh - Compile the mitigated performance kernel (PKS, no debug).
+# ==============================================================================
+# build/perf/run.sh - Build the mitigated performance kernel (PKS, no debug)
+# ==============================================================================
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-# build/sec/run.sh - Compile the security diagnostic kernel (PKS + introspection).
+# ==============================================================================
+# build/sec/run.sh - Build the security diagnostic kernel (PKS + introspection)
+# ==============================================================================
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

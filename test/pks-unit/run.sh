@@ -1,19 +1,11 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# test/pks-unit/run.sh - Upstream x86 PKS Architectural Selftest
+# test/pks-unit/run.sh - Upstream x86 PKS architectural selftest
 # ==============================================================================
-# Executes Intel's upstream kernel selftest (tools/testing/selftests/x86/test_pks)
-# triggered via /sys/kernel/debug/x86/run_pks.
-#
-# Validates core hardware PKS capabilities:
-# - Default key permissions (check_defaults)
-# - Single key allocation and write protection (single)
-# - Context switching across threads (context_switch)
-# - Exception handling and fault callbacks (exception, exception_update)
-#
-# Keyed off userspace [OK] assertions and exit code 0. An intentional negative
-# kernel test case ([6]: Unknown test) emits a FAIL line in dmesg, which is
-# safely distinguished from userspace test failures.
+# Runs Intel's tools/testing/selftests/x86/test_pks via /sys/kernel/debug/x86/
+# run_pks: default-key perms, allocation/write-protect, context switching, and
+# exception/fault-callback handling. test_pks exits nonzero iff any case failed
+# (sticky-fail in run_all), so its exit code is the verdict.
 # ==============================================================================
 set -u
 
@@ -25,18 +17,16 @@ VARIANT="${1:-on}"
 TEST_BIN="$SCRIPT_DIR/test_pks"
 RUN_PKS_TRIGGER="/sys/kernel/debug/x86/run_pks"
 
-# Compile test binary if absent
+# Compile if absent
 if [ ! -x "$TEST_BIN" ] && [ -f "$SCRIPT_DIR/test_pks.c" ]; then
     gcc -O2 -Wall -o "$TEST_BIN" "$SCRIPT_DIR/test_pks.c" -lpthread 2>/dev/null || true
 fi
 
 # ------------------------------------------------------------------------------
-# 1. Execute Upstream PKS Selftest
+# Execute selftest
 # ------------------------------------------------------------------------------
-# Stream [RUN]/[OK]/[FAIL] straight to stdout -> serial -> test/raw-<variant>.log
-# (captured by the axis runner); no redirect and no scratch file. stdbuf -oL keeps
-# the lines live. test_pks exits nonzero iff any selftest failed (sticky-fail in
-# run_all), so the exit code alone is the verdict.
+# Stream [RUN]/[OK]/[FAIL] straight to serial (captured by the axis runner); no
+# redirect, no scratch file. stdbuf -oL keeps the lines live.
 test_rc=127
 if [ -x "$TEST_BIN" ] && [ -e "$RUN_PKS_TRIGGER" ]; then
     stdbuf -oL -eL "$TEST_BIN" -d
@@ -44,11 +34,10 @@ if [ -x "$TEST_BIN" ] && [ -e "$RUN_PKS_TRIGGER" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# 2. Verdict Evaluation
+# Resolve verdict
 # ------------------------------------------------------------------------------
-# The binary's exit code is authoritative; the [RUN]/[OK]/[FAIL] detail is now in
-# the raw transcript for auditing. (A debug build's intentional negative case
-# [6]: Unknown test emits a dmesg FAIL that does not affect this userspace rc.)
+# A debug build's intentional negative case ([6]: Unknown test) emits a dmesg
+# FAIL that does not affect this userspace rc.
 if [ "$test_rc" -eq 0 ]; then
     emit_status pks-unit "$VARIANT" PASS
 elif [ ! -e "$RUN_PKS_TRIGGER" ]; then

@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
-# build/build_kernel.sh - Shared kernel build routine, sourced by the build leaves.
-# Configures via checked-in fragments (configs/) merged onto defconfig,
-# compiles bzImage, and emits one STATUS line reflecting the real outcome.
+# ==============================================================================
+# build/build_kernel.sh - Shared kernel build routine (sourced by build leaves)
+# ==============================================================================
+# Merges configs/ fragments onto defconfig, compiles bzImage, and emits one
+# STATUS line with the real outcome.
 #
-# Usage:
 #   build_kernel <variant> <kernel_tree>
-#     variant     : control | sec | perf (selects configs/<variant>.config)
-#     kernel_tree : path to the kernel source directory
-# Output image:
-#   <kernel_tree>/build_<variant>/arch/x86/boot/bzImage
+#     variant     : control | sec | perf  (selects configs/<variant>.config)
+#     kernel_tree : kernel source directory
+#   output: <kernel_tree>/build_<variant>/arch/x86/boot/bzImage
+# ==============================================================================
 
 build_kernel() {
     local variant="$1"
@@ -25,9 +26,9 @@ build_kernel() {
     local raw_log="$repo_root/build/${variant}/raw.log"
     mkdir -p "$(dirname "$raw_log")"
 
-    # ==========================================================================
-    # 1. Input Validation and Dependency Verification
-    # ==========================================================================
+    # --------------------------------------------------------------------------
+    # Validate inputs & dependencies
+    # --------------------------------------------------------------------------
     require_cmds make gcc bc flex bison
 
     if [ ! -d "$kernel_dir" ]; then
@@ -39,25 +40,25 @@ build_kernel() {
     start_time=$(date +%s)
     log_info "[build-$variant] configure + compile ($kernel_dir) -> $raw_log"
 
-    # ==========================================================================
-    # 2. Kernel Configuration & Build Pipeline
-    # ==========================================================================
+    # --------------------------------------------------------------------------
+    # Configure & compile
+    # --------------------------------------------------------------------------
     (
         set -e
         cd "$kernel_dir"
 
-        # Generate base defconfig and kvm guest configuration
+        # Base defconfig + kvm guest config
         make O="$out_dir" defconfig
         make O="$out_dir" kvm_guest.config || true
 
-        # Merge common and variant-specific kconfig fragments
+        # Merge common + variant fragments
         ./scripts/kconfig/merge_config.sh -m -O "$out_dir" "$out_dir/.config" \
             "$repo_root/configs/common.config" \
             "$repo_root/configs/${variant}.config"
 
         make O="$out_dir" olddefconfig
 
-        # Validate that PKS configuration is accepted for non-control builds
+        # Non-control builds must keep the PKS config (tree actually carries the patches)
         if [ "$variant" != "control" ]; then
             if ! grep -q '^CONFIG_PCACHE_PKS=y' "$out_dir/.config"; then
                 echo "error: CONFIG_PCACHE_PKS=y was dropped by kconfig. Kernel tree lacks PKS patches." >&2
@@ -72,9 +73,9 @@ build_kernel() {
         make O="$out_dir" -j"$jobs" bzImage
     ) >> "$raw_log" 2>&1 || true
 
-    # ==========================================================================
-    # 3. Artifact Validation & Status Emission
-    # ==========================================================================
+    # --------------------------------------------------------------------------
+    # Validate artifact & emit status
+    # --------------------------------------------------------------------------
     local bz_image="$out_dir/arch/x86/boot/bzImage"
     local elapsed_secs=$(( $(date +%s) - start_time ))
 
@@ -88,4 +89,3 @@ build_kernel() {
         log_fail "[build-$variant] failed; see $raw_log"
     fi
 }
-

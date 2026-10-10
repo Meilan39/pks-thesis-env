@@ -20,7 +20,7 @@ if [ ! -d "$TARGET_DIR" ]; then
 fi
 
 # ------------------------------------------------------------------------------
-# 1. Dependency Validation
+# Dependencies
 # ------------------------------------------------------------------------------
 if ! command -v fio >/dev/null 2>&1; then
     emit_status concurrency "$VARIANT" FAIL note=fio_missing
@@ -28,7 +28,7 @@ if ! command -v fio >/dev/null 2>&1; then
 fi
 
 # ------------------------------------------------------------------------------
-# 2. Concurrency Sweep (1, 2, 4 Threads)
+# Concurrency sweep (1, 2, 4 threads)
 # ------------------------------------------------------------------------------
 TMP_PREFIX="/tmp/concur_${VARIANT}"
 
@@ -60,7 +60,7 @@ for num_jobs in 1 2 4; do
 done
 
 # ------------------------------------------------------------------------------
-# 3. Telemetry Extraction and Verdict
+# Extract telemetry & emit
 # ------------------------------------------------------------------------------
 extract_bw_mbps() {
     local json_file="$1"

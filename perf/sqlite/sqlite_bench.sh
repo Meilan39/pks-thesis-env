@@ -30,7 +30,7 @@ rm -f "$DB_FILE" "${DB_FILE}-journal"
 echo "[INFO] Running SQLite benchmark (synchronous=$SYNC_MODE, transactions=$TX_COUNT) on $TARGET_DIR..."
 
 # ------------------------------------------------------------------------------
-# 1. Timed Transaction Execution
+# Timed transaction execution
 # ------------------------------------------------------------------------------
 START_NS=$(date +%s%N)
 {
@@ -53,7 +53,7 @@ fi
 rm -f "$DB_FILE" "${DB_FILE}-journal"
 
 # ------------------------------------------------------------------------------
-# 2. Metrics Calculation and JSON Export
+# Compute metrics & export JSON
 # ------------------------------------------------------------------------------
 python3 -c "
 import json

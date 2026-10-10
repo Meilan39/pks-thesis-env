@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# test/run.sh - Compliance & Integrity Evaluation Runner
+# test/run.sh - Compliance axis aggregator
 # ==============================================================================
-# Boots the guest once per mode (off, on), harvests the three compliance leaves
-# (fsx, pks-unit, sanity) from each serial transcript, and renders the
-# shared axis console report. Structured rows are appended to test/result.csv.
+# Boots the guest once per mode (off, on), harvests the three leaves (fsx,
+# pks-unit, sanity) from each serial transcript, renders the console report, and
+# appends rows to test/result.csv.
 # ==============================================================================
 set -u
 
@@ -17,12 +17,12 @@ COMPLIANCE_LEAVES=(fsx pks-unit sanity)
 AXIS_CSV="$SCRIPT_DIR/result.csv"
 
 # ------------------------------------------------------------------------------
-# 1. Output Initialization
+# Reset axis CSV
 # ------------------------------------------------------------------------------
 echo "node,variant,verdict,details" > "$AXIS_CSV"
 
 # ------------------------------------------------------------------------------
-# 2. Header Banner
+# Console banner
 # ------------------------------------------------------------------------------
 report_banner \
     "[test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics" \
@@ -32,16 +32,10 @@ report_banner \
 V_OFF=(); D_OFF=()
 V_ON=();  D_ON=()
 
-# Parses a leaf's per-check diagnostics out of the serial transcript and prints
-# them indented beneath its live line. The leaves are dumb: their binaries stream
-# raw [PASS]/[FAIL]/[SKIP] lines (sanity) or [RUN]+[OK]/[FAIL] pairs (pks-unit),
-# and this axis is where that stream is turned into a readable per-check report --
-# e.g. "mmap(PROT_WRITE) rejected ... FAIL" -- not an opaque pass count.
-#
-# A leaf's check lines are the ones preceding its own STATUS node=<leaf> line
-# (and after any prior leaf's STATUS), so they are buffered and flushed only when
-# the matching STATUS is seen. The leading "[ts] pks-autorun.sh[pid]: " journal
-# prefix is stripped. Nothing prints for leaves that emit no checks (e.g. fsx).
+# Renders a leaf's streamed check lines as an indented per-check report. Leaves
+# stream raw [PASS]/[FAIL]/[SKIP] (sanity) or [RUN]+[OK]/[FAIL] (pks-unit); we
+# buffer the lines before each STATUS node=<leaf> and flush them at that
+# boundary, stripping the "[ts] pks-autorun.sh[pid]:" journal prefix.
 emit_leaf_checks() {
     local raw_log="$1"
     local leaf="$2"
@@ -69,9 +63,8 @@ emit_leaf_checks() {
     ' "$raw_log" 2>/dev/null)
 }
 
-# Harvests one leaf verdict/detail from a transcript into the per-mode arrays at
-# the given index, tallies the global counters, prints its live line, and records
-# the CSV row.
+# Harvests one leaf's verdict/detail from the transcript into the per-mode
+# arrays, writes its CSV row, prints its live line, and renders its checks.
 harvest_leaf() {
     local raw_log="$1"
     local leaf="$2"
@@ -100,7 +93,7 @@ harvest_leaf() {
 }
 
 # ------------------------------------------------------------------------------
-# 3. Execution & Evaluation Loop
+# Boot each mode, harvest its leaves
 # ------------------------------------------------------------------------------
 for variant in off on; do
     raw_log="$SCRIPT_DIR/raw-${variant}.log"
@@ -113,12 +106,10 @@ for variant in off on; do
 done
 
 # ------------------------------------------------------------------------------
-# 4. Summary Table Footer
+# Summary footer
 # ------------------------------------------------------------------------------
-# Count at the leaf (test) level, not per leaf-variant run: each compliance leaf
-# is one test, and it passes only if it holds under both baseline (off) and
-# hardware-PKS (on). This reports e.g. "2/3 leaves passing" rather than inflating
-# the denominator by scoring the same leaf once per mode.
+# Count at the leaf level, not per leaf-variant: each leaf is one test and passes
+# only if it holds under both off and on (e.g. "2/3 leaves passing").
 leaves_total=${#COMPLIANCE_LEAVES[@]}
 leaves_passed=0
 idx=0

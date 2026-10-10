@@ -1,27 +1,28 @@
 #!/usr/bin/env bash
-# exec/qemu.sh - QEMU substrate adapter implementing the executor contract:
-#
+# ==============================================================================
+# exec/qemu.sh - QEMU substrate adapter (executor contract)
+# ==============================================================================
 #     exec/qemu.sh <kernel_variant> <pks_mode> <target> [transcript_out]
 #
-# Parameters:
 #   kernel_variant : control | sec | perf (selects the bzImage)
 #   pks_mode       : on | off (pcache_pks=; ignored for control)
 #   target         : shell             -> interactive serial console, OR
 #                    test | sec | perf -> in-guest axis (all leaves), OR
 #                    <axis>/<leaf>     -> one in-guest leaf (e.g. sec/copy-fail)
-#   transcript_out : host path for the raw serial transcript (headless execution only)
+#   transcript_out : host path for the raw serial transcript (headless only)
 #
-# Boots headless, streams serial output live to the transcript file, and returns.
+# Boots headless, streams serial output live to the transcript, and returns.
 # Never fabricates output; fails fast if required artifacts are missing.
+# ==============================================================================
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/common.sh"
 
-# ==============================================================================
-# 1. Parameter Parsing and Default Configuration
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Parameters & defaults
+# ------------------------------------------------------------------------------
 KERNEL_VARIANT="${1:-perf}"
 PKS_MODE="${2:-on}"
 TARGET="${3:-shell}"
@@ -36,9 +37,9 @@ SMP="${SMP:-4}"
 MEM="${MEM:-4096}"
 BATCH_TIMEOUT_SEC="${BATCH_TIMEOUT_SEC:-0}"
 
-# ==============================================================================
-# 2. Kernel & Artifact Validation
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Kernel & artifact validation
+# ------------------------------------------------------------------------------
 if [ "$KERNEL_VARIANT" = "control" ]; then
     KERNEL_IMG="${KERNEL_IMG:-$CONTROL_KERNEL_DIR/build_control/arch/x86/boot/bzImage}"
 else
@@ -49,24 +50,24 @@ fi
 [ -f "$DISK_IMG" ]   || die "Disk image not found: $DISK_IMG (run 'make disk' first)."
 command -v "$QEMU_BIN" >/dev/null 2>&1 || die "$QEMU_BIN not found."
 
-# ==============================================================================
-# 3. CPU Accelerator and Filesystem Virtualization
-# ==============================================================================
-# Emulated TCG CPU configuration with PKS capability
+# ------------------------------------------------------------------------------
+# CPU accelerator & filesystem virtualization
+# ------------------------------------------------------------------------------
+# Emulated TCG CPU with PKS capability.
 ACCEL=("-cpu" "max,pks=on" "-accel" "tcg")
 
-# If real KVM with hardware PKS is available on the host, utilize host passthrough
+# Prefer host passthrough when real KVM with hardware PKS is available.
 if [ -e /dev/kvm ] && [ -w /dev/kvm ] && grep -qw pks /proc/cpuinfo 2>/dev/null; then
     ACCEL=("-cpu" "host" "-enable-kvm")
 fi
 
 VIRTFS=("-virtfs" "local,path=${REPO_ROOT},mount_tag=pks_env,security_model=none")
 
-# ==============================================================================
-# 4. Kernel Command-Line Formulation
-# ==============================================================================
-# Panic is the expected fail-closed behavior for security tests, so panic=1 and
-# -no-reboot ensure the VM halts cleanly and exits QEMU with transcript intact.
+# ------------------------------------------------------------------------------
+# Kernel command line
+# ------------------------------------------------------------------------------
+# Panic is the expected fail-closed behavior for security tests, so panic=1 plus
+# -no-reboot halt the VM cleanly and exit QEMU with the transcript intact.
 CMDLINE="root=/dev/vda1 rw console=ttyS0 nokaslr"
 if [ "$KERNEL_VARIANT" = "control" ]; then
     CMDLINE="$CMDLINE pcache_control=1"
@@ -84,27 +85,25 @@ COMMON_ARGS=(
     "${VIRTFS[@]}"
 )
 
-# ==============================================================================
-# 5. Interactive Console Mode
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Interactive console mode
+# ------------------------------------------------------------------------------
 if [ "$TARGET" = "shell" ]; then
     log_info "Interactive console (kernel=$KERNEL_VARIANT mode=$PKS_MODE). Press Ctrl-A X to exit."
     exec "$QEMU_BIN" "${COMMON_ARGS[@]}" -nographic -serial mon:stdio -append "$CMDLINE quiet"
 fi
 
-# ==============================================================================
-# 6. Headless Execution & Serial Capture
-# ==============================================================================
+# ------------------------------------------------------------------------------
+# Headless execution & serial capture
+# ------------------------------------------------------------------------------
 if [ -z "$TRANSCRIPT_PATH" ]; then
     die "Headless run requires a transcript path (argument 4)."
 fi
 
 mkdir -p "$(dirname "$TRANSCRIPT_PATH")"
-# SYSTEMD_COLORS=0 reaches PID 1 via init's environment (the kernel forwards any
-# unrecognized name=value cmdline token there), disabling all of systemd's boot
-# colorization -- the green [ OK ] status and [0;1;39m unit highlights that would
-# otherwise litter the captured serial transcript. Headless only; interactive
-# `shell` sessions (above) keep their color.
+# SYSTEMD_COLORS=0 reaches PID 1 via init's environment (the kernel forwards
+# unrecognized name=value cmdline tokens there), stripping systemd's boot color
+# from the transcript. Headless only; the interactive `shell` path keeps color.
 CMDLINE="$CMDLINE pks_run=${TARGET} pks_auto=${TARGET} panic=1 systemd.mask=serial-getty@ttyS0.service SYSTEMD_COLORS=0"
 
 TIMEOUT=()
@@ -124,7 +123,7 @@ QEMU_ARGV=(
     -append "$CMDLINE"
 )
 
-# Record command line for offline reproduction
+# Record the command line for offline reproduction.
 {
     printf '### exec/qemu argv:\n'
     printf '%q ' "${QEMU_ARGV[@]}"
@@ -133,7 +132,7 @@ QEMU_ARGV=(
 
 start_time=$(date +%s)
 
-# Execute QEMU without allowing nonzero exit code to trigger set -e prematurely
+# Run QEMU without letting a nonzero exit trip set -e prematurely.
 if "${TIMEOUT[@]}" "${QEMU_ARGV[@]}" </dev/null >> "$TRANSCRIPT_PATH" 2>&1; then
     qemu_rc=0
 else
@@ -143,20 +142,15 @@ fi
 elapsed_secs=$(( $(date +%s) - start_time ))
 echo "### exec/qemu exit=$qemu_rc elapsed=${elapsed_secs}s" >> "$TRANSCRIPT_PATH"
 
-# ==============================================================================
-# 7. Diagnostic Validation
-# ==============================================================================
-# The full serial transcript is already saved verbatim at TRANSCRIPT_PATH, so we
-# never echo it to the console -- doing so is what bled every boot into the axis
-# logs. (The prior check tested for a '^STATUS ' line, but transcript lines carry
-# a "[ts] pks-autorun.sh[pid]: " journal prefix, so that anchor matched nothing on
-# any axis and the dump fired on every run.) A run is flagged -- one concise line,
-# no dump -- only when QEMU itself failed (timeout / abnormal exit) or the guest
-# emitted no serial output at all. Normal outcomes, including expected fail-closed
-# panics, exit 0 with ample output and are left silent; the axis runner resolves
-# the actual verdict from the saved transcript.
+# ------------------------------------------------------------------------------
+# Diagnostic validation
+# ------------------------------------------------------------------------------
+# The transcript is saved verbatim at TRANSCRIPT_PATH and never echoed (echoing
+# it is what bled every boot into the axis logs). Flag a run -- one line, no dump
+# -- only on real trouble: QEMU failed (timeout / abnormal exit) or the guest
+# emitted nothing. Expected fail-closed panics exit 0 with output and stay
+# silent; the axis runner resolves the verdict from the transcript.
 guest_bytes=$({ grep -vE '^### ' "$TRANSCRIPT_PATH" 2>/dev/null || true; } | wc -c | tr -d ' ')
 if [ "$qemu_rc" -ne 0 ] || [ "$guest_bytes" -eq 0 ]; then
     log_warn "[exec/qemu] run suspect: exit=$qemu_rc elapsed=${elapsed_secs}s guest_bytes=$guest_bytes; see $TRANSCRIPT_PATH"
 fi
-
