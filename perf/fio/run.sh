@@ -32,18 +32,34 @@ fi
 
 BLOCK_SIZES="512 1024 2048 4096 8192 16384 32768 65536 131072 262144 524288 1048576"
 
+# Tune dirty ratios to avoid writeback stalls during 32MB microbenchmark bursts
+ORIG_DIRTY_BG="$(cat /proc/sys/vm/dirty_background_ratio 2>/dev/null || echo 10)"
+ORIG_DIRTY_RATIO="$(cat /proc/sys/vm/dirty_ratio 2>/dev/null || echo 20)"
+echo 50 > /proc/sys/vm/dirty_background_ratio 2>/dev/null || true
+echo 80 > /proc/sys/vm/dirty_ratio 2>/dev/null || true
+cleanup_dirty() {
+    echo "$ORIG_DIRTY_BG" > /proc/sys/vm/dirty_background_ratio 2>/dev/null || true
+    echo "$ORIG_DIRTY_RATIO" > /proc/sys/vm/dirty_ratio 2>/dev/null || true
+}
+trap cleanup_dirty EXIT
+
 # ------------------------------------------------------------------------------
-# Warm sweep (in-cache)
+# Warm sweep: in-cache overwrite
 # ------------------------------------------------------------------------------
+# Pre-populate the 32MB file in memory using fast zeroing
 WARM_FILE="$TARGET_DIR/fio_warm.dat"
-dd if=/dev/urandom of="$WARM_FILE" bs=1M count=32 status=none conv=fsync 2>/dev/null || true
+dd if=/dev/zero of="$WARM_FILE" bs=1M count=32 status=none 2>/dev/null || true
+sync
 
 for bs in $BLOCK_SIZES; do
+    # Invalidate=0 and overwrite=1 ensure fio modifies cached pages in place
     fio --name=warm_write \
         --ioengine=sync \
         --direct=0 \
         --buffered=1 \
         --rw=write \
+        --overwrite=1 \
+        --invalidate=0 \
         --bs="$bs" \
         --size=32m \
         --filename="$WARM_FILE" \
@@ -58,6 +74,7 @@ for bs in $BLOCK_SIZES; do
         --direct=0 \
         --buffered=1 \
         --rw=read \
+        --invalidate=0 \
         --bs="$bs" \
         --size=32m \
         --filename="$WARM_FILE" \
@@ -66,11 +83,14 @@ for bs in $BLOCK_SIZES; do
         --group_reporting=1 \
         --output-format=json \
         --output="$RAW_DIR/read_warm_${bs}.json" >/dev/null 2>&1 || true
+
+    # Clean dirty pages so subsequent block sizes do not contend with writeback
+    sync
 done
 rm -f "$WARM_FILE"
 
 # ------------------------------------------------------------------------------
-# Cold sweep (caches dropped)
+# Cold sweep: caches dropped prior to allocation
 # ------------------------------------------------------------------------------
 COLD_FILE="$TARGET_DIR/fio_cold.dat"
 for bs in $BLOCK_SIZES; do
@@ -83,6 +103,7 @@ for bs in $BLOCK_SIZES; do
         --direct=0 \
         --buffered=1 \
         --rw=write \
+        --invalidate=1 \
         --bs="$bs" \
         --size=32m \
         --filename="$COLD_FILE" \
@@ -91,6 +112,8 @@ for bs in $BLOCK_SIZES; do
         --group_reporting=1 \
         --output-format=json \
         --output="$RAW_DIR/write_cold_${bs}.json" >/dev/null 2>&1 || true
+
+    sync
 done
 rm -f "$COLD_FILE"
 

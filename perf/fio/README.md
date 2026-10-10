@@ -33,13 +33,13 @@ The evaluation sweeps 12 power-of-two block sizes:
 `512, 1024, 2048, 4096, 8192, 16384, 32768, 65536, 131072, 262144, 524288, 1048576` bytes.
 
 ### 1. Warm Cache Sweep
-- **Configuration**: Synchronous I/O engine (`--ioengine=sync`), buffered I/O (`--buffered=1`, `--direct=0`), single thread (`--numjobs=1`, `--thread=1`), 32 MiB file size.
-- **Mechanism**: Pre-populates the target file in memory, followed by sequential writes and sequential reads.
-- **Purpose**: Measures pure memory access latency and thread-local PKRS MSR register updating cost on in-cache pages, completely bypassing disk I/O.
+- **Configuration**: Synchronous I/O engine (`--ioengine=sync`), buffered I/O (`--buffered=1`, `--direct=0`), in-place overwrite (`--overwrite=1`), cache preservation (`--invalidate=0`), single thread (`--numjobs=1`, `--thread=1`), 32 MiB file size.
+- **Mechanism**: Pre-populates the 32 MiB target file in memory, followed by in-place sequential overwrites and sequential reads. Before the run, dirty ratios are tuned to prevent background flusher interference, and a sync pass between block sizes prevents writeback queuing.
+- **Purpose**: Measures pure memory access latency and thread-local PKRS MSR register updating cost on in-cache resident pages, completely bypassing disk I/O and cache invalidation.
 
 ### 2. Cold Cache Sweep
-- **Configuration**: Synchronous write, dropped page cache (`drop_caches=3` and `sync`) prior to each block size iteration.
-- **Mechanism**: Writes to a newly allocated file, forcing the kernel to allocate and zero fresh page-cache frames.
+- **Configuration**: Synchronous write, dropped page cache (`drop_caches=3` and `sync`) and file removal prior to each block size iteration, forcing cache eviction (`--invalidate=1`).
+- **Mechanism**: Writes to a newly allocated file, forcing the kernel to allocate and zero fresh page-cache frames from the buddy allocator or static PKS pool.
 - **Allocation Cost Metric**: The difference between cold and warm write latencies (`lat4k_cold_write_us - lat4k_warm_write_us`) quantifies the additional time required to assign and protect direct-map pages in the supervisor pool during page-fault allocation paths.
 
 ---
