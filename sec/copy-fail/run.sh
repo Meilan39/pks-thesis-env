@@ -39,7 +39,11 @@ echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
 # ------------------------------------------------------------------------------
 # 4. Exploit Execution
 # ------------------------------------------------------------------------------
-su -s /bin/bash testuser -c "python3 '$EXPLOIT_BIN'" || true
+# python3 -u forces unbuffered stdout/stderr so the PoC's diagnostics reach the
+# serial transcript: under pcache_pks=on this task is SIGKILLed by the fault
+# callback mid-run, and block-buffered output (pipe to journald, not a tty) would
+# otherwise be discarded before any flush.
+su -s /bin/bash testuser -c "python3 -u '$EXPLOIT_BIN'" || true
 
 # ------------------------------------------------------------------------------
 # 5. Marker Inspection
