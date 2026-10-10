@@ -100,7 +100,12 @@ if [ -z "$TRANSCRIPT_PATH" ]; then
 fi
 
 mkdir -p "$(dirname "$TRANSCRIPT_PATH")"
-CMDLINE="$CMDLINE pks_run=${TARGET} pks_auto=${TARGET} panic=1 systemd.mask=serial-getty@ttyS0.service"
+# SYSTEMD_COLORS=0 reaches PID 1 via init's environment (the kernel forwards any
+# unrecognized name=value cmdline token there), disabling all of systemd's boot
+# colorization -- the green [ OK ] status and [0;1;39m unit highlights that would
+# otherwise litter the captured serial transcript. Headless only; interactive
+# `shell` sessions (above) keep their color.
+CMDLINE="$CMDLINE pks_run=${TARGET} pks_auto=${TARGET} panic=1 systemd.mask=serial-getty@ttyS0.service SYSTEMD_COLORS=0"
 
 TIMEOUT=()
 if [ -n "${BATCH_TIMEOUT_SEC:-}" ] && [ "$BATCH_TIMEOUT_SEC" -gt 0 ] 2>/dev/null && command -v timeout >/dev/null 2>&1; then
