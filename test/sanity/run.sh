@@ -22,8 +22,9 @@ if [ "$VARIANT" != "on" ]; then
     exit 0
 fi
 
-# Compile if absent
-if [ ! -x "$SANITY_BIN" ] && [ -f "$SCRIPT_DIR/pks_sanity_test.c" ]; then
+# Compile if missing or stale
+if [ -f "$SCRIPT_DIR/pks_sanity_test.c" ] \
+    && { [ ! -x "$SANITY_BIN" ] || [ "$SCRIPT_DIR/pks_sanity_test.c" -nt "$SANITY_BIN" ]; }; then
     gcc -O2 -Wall -o "$SANITY_BIN" "$SCRIPT_DIR/pks_sanity_test.c" 2>/dev/null || true
 fi
 

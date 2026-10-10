@@ -17,8 +17,9 @@ VARIANT="${1:-on}"
 TEST_BIN="$SCRIPT_DIR/test_pks"
 RUN_PKS_TRIGGER="/sys/kernel/debug/x86/run_pks"
 
-# Compile if absent
-if [ ! -x "$TEST_BIN" ] && [ -f "$SCRIPT_DIR/test_pks.c" ]; then
+# Compile if missing or stale
+if [ -f "$SCRIPT_DIR/test_pks.c" ] \
+    && { [ ! -x "$TEST_BIN" ] || [ "$SCRIPT_DIR/test_pks.c" -nt "$TEST_BIN" ]; }; then
     gcc -O2 -Wall -o "$TEST_BIN" "$SCRIPT_DIR/test_pks.c" -lpthread 2>/dev/null || true
 fi
 

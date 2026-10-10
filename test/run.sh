@@ -44,7 +44,7 @@ emit_leaf_checks() {
     while IFS=$'\t' read -r verdict desc; do
         [ -n "$verdict" ] && report_check "$desc" "$verdict"
     done < <(awk -v leaf="$leaf" '
-        function strip(s){ sub(/^\[[^]]*\][ ]+[^:]*:[ ]+/, "", s); return s }
+        function strip(s){ sub(/^\[[^]]*\][ ]+[^:]*:[ ]+/, "", s); gsub(/\r/, "", s); return s }
         {
             l = strip($0)
             if (l ~ /^STATUS node=/) {

@@ -162,15 +162,17 @@ emit_status() {
     printf '\n'
 }
 
+# tr -d '\r' first: serial transcripts are CRLF, so a value at end of line (e.g. a
+# bare verdict=PASS with no trailing k=v) would otherwise carry a stray \r.
 status_field() {
     local line="$1"
     local field_key="$2"
-    printf '%s\n' "$line" | tr ' ' '\n' | sed -n "s/^${field_key}=//p" | head -n1
+    printf '%s\n' "$line" | tr -d '\r' | tr ' ' '\n' | sed -n "s/^${field_key}=//p" | head -n1
 }
 
 # Trailing "k=v k=v ..." detail of a STATUS line (empty if none).
 status_detail_tail() {
-    printf '%s\n' "$1" | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//'
+    printf '%s\n' "$1" | tr -d '\r' | sed -E 's/^STATUS node=[^ ]+ variant=[^ ]+ verdict=[^ ]+ ?//'
 }
 
 # Pass predicate: PASS/NEUTRALIZED pass; VULNERABLE passes only under off.
