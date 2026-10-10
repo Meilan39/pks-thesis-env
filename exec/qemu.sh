@@ -146,25 +146,17 @@ echo "### exec/qemu exit=$qemu_rc elapsed=${elapsed_secs}s" >> "$TRANSCRIPT_PATH
 # ==============================================================================
 # 7. Diagnostic Validation
 # ==============================================================================
-if ! grep -q '^STATUS ' "$TRANSCRIPT_PATH" 2>/dev/null; then
-    guest_bytes=$(grep -vE '^### ' "$TRANSCRIPT_PATH" | wc -c | tr -d ' ')
-    log_warn "[exec/qemu] no STATUS (exit=$qemu_rc elapsed=${elapsed_secs}s, ${guest_bytes} bytes of guest output)."
-
-    case "$qemu_rc" in
-        124|137)
-            log_warn "[exec/qemu] QEMU terminated by timeout (exit $qemu_rc) -> serial output stalled or guest hung."
-            ;;
-        0)
-            if [ "$guest_bytes" -eq 0 ]; then
-                log_warn "[exec/qemu] QEMU exited 0 with no output -> guest failed to initialize."
-            fi
-            ;;
-        *)
-            log_warn "[exec/qemu] QEMU exited $qemu_rc before/at startup -> check arguments and environment."
-            ;;
-    esac
-
-    log_warn "[exec/qemu] full transcript ($(basename "$TRANSCRIPT_PATH")):"
-    sed 's/^/    | /' "$TRANSCRIPT_PATH" >&2
+# The full serial transcript is already saved verbatim at TRANSCRIPT_PATH, so we
+# never echo it to the console -- doing so is what bled every boot into the axis
+# logs. (The prior check tested for a '^STATUS ' line, but transcript lines carry
+# a "[ts] pks-autorun.sh[pid]: " journal prefix, so that anchor matched nothing on
+# any axis and the dump fired on every run.) A run is flagged -- one concise line,
+# no dump -- only when QEMU itself failed (timeout / abnormal exit) or the guest
+# emitted no serial output at all. Normal outcomes, including expected fail-closed
+# panics, exit 0 with ample output and are left silent; the axis runner resolves
+# the actual verdict from the saved transcript.
+guest_bytes=$({ grep -vE '^### ' "$TRANSCRIPT_PATH" 2>/dev/null || true; } | wc -c | tr -d ' ')
+if [ "$qemu_rc" -ne 0 ] || [ "$guest_bytes" -eq 0 ]; then
+    log_warn "[exec/qemu] run suspect: exit=$qemu_rc elapsed=${elapsed_secs}s guest_bytes=$guest_bytes; see $TRANSCRIPT_PATH"
 fi
 
