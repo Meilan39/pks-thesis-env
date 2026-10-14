@@ -231,12 +231,12 @@ def plot_figure1(fio_data: List[Dict], out_dir: Path):
 
     bs_keys = sorted(set(w_base.keys()) & set(w_mit.keys()))
     if bs_keys:
-        ax1.plot(bs_keys, [w_base[k] for k in bs_keys], linestyle=":", marker="o", color="#1f77b4", label="write() [Control]")
-        ax1.plot(bs_keys, [w_mit[k] for k in bs_keys], linestyle="-", marker="o", color="#1f77b4", label="write() [Mitigated]")
+        ax1.plot(bs_keys, [w_base[k] for k in bs_keys], linestyle=":", marker="o", markersize=4, color="#1f77b4", label="write() [Control]")
+        ax1.plot(bs_keys, [w_mit[k] for k in bs_keys], linestyle="-", marker="o", markersize=4, color="#1f77b4", label="write() [Mitigated]")
     if r_base and r_mit:
         r_keys = sorted(set(r_base.keys()) & set(r_mit.keys()))
-        ax1.plot(r_keys, [r_base[k] for k in r_keys], linestyle=":", marker="s", color="#2ca02c", label="read() [Control]")
-        ax1.plot(r_keys, [r_mit[k] for k in r_keys], linestyle="-", marker="s", color="#2ca02c", label="read() [Mitigated]")
+        ax1.plot(r_keys, [r_base[k] for k in r_keys], linestyle=":", marker="o", markersize=4, color="#2ca02c", label="read() [Control]")
+        ax1.plot(r_keys, [r_mit[k] for k in r_keys], linestyle="-", marker="o", markersize=4, color="#2ca02c", label="read() [Mitigated]")
 
     ax1.set_xscale("log", base=2)
     ax1.set_yscale("log")
@@ -251,10 +251,10 @@ def plot_figure1(fio_data: List[Dict], out_dir: Path):
     # Panel (b): Overhead Amortization %
     if bs_keys:
         w_ovh = [((w_mit[k] - w_base[k]) / w_base[k]) * 100.0 for k in bs_keys]
-        ax2.plot(bs_keys, w_ovh, marker="o", color="#1f77b4", label="write() [Scope Enter + Exit]")
+        ax2.plot(bs_keys, w_ovh, marker="o", markersize=4, color="#1f77b4", label="write() [Scope Enter + Exit]")
     if r_base and r_mit:
         r_ovh = [((r_mit[k] - r_base[k]) / r_base[k]) * 100.0 for k in r_keys]
-        ax2.plot(r_keys, r_ovh, marker="s", color="#2ca02c", linestyle="--", label="read() [Zero Domain Toggles]")
+        ax2.plot(r_keys, r_ovh, marker="o", markersize=4, color="#2ca02c", linestyle="--", label="read() [Zero Domain Toggles]")
 
     ax2.axhline(0, color="gray", linestyle=":", linewidth=1.5, alpha=0.8)
     ax2.set_xscale("log", base=2)
@@ -303,33 +303,37 @@ def plot_figure2(fio_data: List[Dict], out_dir: Path):
     xticks = [512, 4096, 65536, 262144, 1048576]
     xticklabels = [format_bytes(x) for x in xticks]
 
+    # Visual coding: purple=control, red=mitigated, warm=solid, cold=dotted
+    c_ctrl = "#7b1fa2"
+    c_mit = "#d32f2f"
+
     # Panel (a): 4-Curve Latency: Warm vs Cold across Control and Mitigated
-    ax1.plot(common_keys, [warm_ctrl[k] for k in common_keys], marker="o", linestyle="-", color="#7f7f7f", label="Control (Warm Overwrite)")
-    ax1.plot(common_keys, [cold_ctrl[k] for k in common_keys], marker="s", linestyle="--", color="#1f77b4", label="Control (Cold Allocation)")
-    ax1.plot(common_keys, [warm_mit[k] for k in common_keys], marker="^", linestyle="-", color="#ff7f0e", label="Mitigated PKS (Warm Overwrite)")
-    ax1.plot(common_keys, [cold_mit[k] for k in common_keys], marker="d", linestyle="--", color="#d62728", label="Mitigated PKS (Cold Allocation)")
+    ax1.plot(common_keys, [warm_ctrl[k] for k in common_keys], marker="o", markersize=4, linestyle="-", linewidth=1.8, color=c_ctrl, label="Control (Warm Overwrite)")
+    ax1.plot(common_keys, [cold_ctrl[k] for k in common_keys], marker="o", markersize=4, linestyle=":", linewidth=2.0, color=c_ctrl, label="Control (Cold Allocation)")
+    ax1.plot(common_keys, [warm_mit[k] for k in common_keys], marker="o", markersize=4, linestyle="-", linewidth=1.8, color=c_mit, label="Mitigated PKS (Warm Overwrite)")
+    ax1.plot(common_keys, [cold_mit[k] for k in common_keys], marker="o", markersize=4, linestyle=":", linewidth=2.0, color=c_mit, label="Mitigated PKS (Cold Allocation)")
     ax1.set_xscale("log", base=2)
     ax1.set_xlabel("Operation Size (Bytes)")
     ax1.set_ylabel("Mean System-Call Latency (µs)")
     ax1.set_title("(a) Write Latency: Cold vs. Warm Scaling")
     ax1.grid(True)
-    ax1.legend(fontsize=9)
+    ax1.legend(fontsize=9, handlelength=3.5)
     ax1.set_xticks(xticks)
     ax1.set_xticklabels(xticklabels)
 
-    # Panel (b): Allocation Delta Comparison (Cold - Warm)
+    # Panel (b): Allocation Delta Comparison (Cold - Warm) - both solid
     ctrl_deltas = [cold_ctrl[k] - warm_ctrl[k] for k in common_keys]
     mit_deltas = [cold_mit[k] - warm_mit[k] for k in common_keys]
 
-    ax2.plot(common_keys, ctrl_deltas, marker="s", linestyle="--", color="#1f77b4", label="Control (Buddy Allocator Delta)")
-    ax2.plot(common_keys, mit_deltas, marker="d", linestyle="-", color="#d62728", label="Mitigated (Static Pool Delta)")
+    ax2.plot(common_keys, ctrl_deltas, marker="o", markersize=4, linestyle="-", linewidth=1.8, color=c_ctrl, label="Control (Buddy Allocator Delta)")
+    ax2.plot(common_keys, mit_deltas, marker="o", markersize=4, linestyle="-", linewidth=1.8, color=c_mit, label="Mitigated (Static Pool Delta)")
     ax2.axhline(0, color="gray", linestyle=":", linewidth=1.5, alpha=0.7)
     ax2.set_xscale("log", base=2)
     ax2.set_xlabel("Operation Size (Bytes)")
     ax2.set_ylabel("First-Touch Allocation Delta (µs)")
     ax2.set_title("(b) First-Touch Allocation Cost (Cold − Warm)")
     ax2.grid(True)
-    ax2.legend(fontsize=9)
+    ax2.legend(fontsize=9, handlelength=3.5)
     ax2.set_xticks(xticks)
     ax2.set_xticklabels(xticklabels)
 
