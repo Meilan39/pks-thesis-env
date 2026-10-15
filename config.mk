@@ -18,8 +18,24 @@ DEBIAN_SUITE       ?= bookworm
 DEBIAN_ARCH        ?= amd64
 DEBIAN_MIRROR      ?= http://deb.debian.org/debian
 
-# Execution substrate. `qemu` today; `baremetal` is the future PKS-host adapter.
-EXECUTOR           ?= qemu
+# Execution substrate: auto | qemu | baremetal.
+#   auto      -> baremetal when this host runs the patched PKS kernel, else qemu
+#   qemu      -> QEMU/KVM guest adapter (exec/qemu.sh); KVM+PKS when available
+#   baremetal -> run leaves natively on this PKS host (exec/baremetal.sh)
+EXECUTOR           ?= auto
+
+# Bare-metal substrate (exec/baremetal.sh); consulted only when EXECUTOR
+# resolves to baremetal. PROTECTED_DEV is the dedicated evaluation partition --
+# NEVER the rootfs, since the security leaves overwrite it. It is mounted at
+# PROTECTED_MNT (which the leaves hard-code as /mnt/protected), with
+# -o pks_pagecache under 'on'.
+PROTECTED_DEV      ?= /dev/sdb1
+PROTECTED_MNT      ?= /mnt/protected
+
+# Build real-hardware drivers into the kernels (configs/baremetal.config) so the
+# bzImage can boot a physical host. Set to 1 for native bare-metal sweeps:
+#   make build BAREMETAL=1
+BAREMETAL          ?= 0
 
 # QEMU runtime.
 QEMU_BIN           ?= qemu-system-x86_64

@@ -19,7 +19,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/common.sh"
 
-EXECUTOR_SCRIPT="$REPO_ROOT/exec/${EXECUTOR:-qemu}.sh"
+EXECUTOR="$(resolve_executor "${EXECUTOR:-auto}")"
+EXECUTOR_SCRIPT="$REPO_ROOT/exec/${EXECUTOR}.sh"
 PERF_LEAVES=(fio concurrency sqlite)
 AXIS_CSV="$SCRIPT_DIR/result.csv"
 

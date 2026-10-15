@@ -27,13 +27,31 @@ Detailed reviewer guides for each exploit:
 
 ---
 
-## Execution Model: Isolated Virtual Machine Invocations
+## Execution Model: One Boot Per Mode, All Leaves Batched
 
-Unlike the compliance (`test/`) and performance (`perf/`) axes, where non-destructive workloads run in a single consolidated VM boot, the security axis executes **each exploit leaf in an independent virtual machine instance** for each mode (`off`, `on`).
+The security axis boots the substrate **once per mode** (`off`, then `on`) and runs
+all three exploit leaves in that single boot — the same consolidated model as the
+compliance (`test/`) and performance (`perf/`) axes. This supersedes the former
+one-isolated-VM-per-leaf model (six boots), which existed only because a fail-closed
+kernel panic would halt the VM.
 
 ### Rationale
-1. **Isolated Kernel Environments**: Running each exploit in an isolated invocation ensures that any memory perturbation or transient state does not pollute subsequent tests.
-2. **Victim State Cleanliness**: Each run mounts a fresh ext4 filesystem with a newly initialized victim file containing a unique sentinel marker, preventing cross-test pollution.
+1. **The stateless fault handler no longer panics.** Every vector is neutralized in
+   place (syscall context: the task is killed; softirq/workqueue context: each stray
+   store is suppressed by advancing past it). The kernel survives all three exploits
+   in one boot, so per-leaf isolation is unnecessary — and on bare metal this collapses
+   six reboots into two.
+2. **Victim-state cleanliness is preserved sequentially.** The dispatcher runs the
+   leaves in order; each re-seeds `/mnt/protected/victim_file` with its own unique
+   sentinel marker immediately before running, so sharing the file across leaves in one
+   boot cannot cross-pollute.
+3. **Per-leaf harvest from a shared transcript.** The dispatcher emits a
+   `### PKS-LEAF <leaf>` delimiter before each leaf; `sec/run.sh` isolates each leaf's
+   segment and reads its `marker=` line, so batching loses no attribution.
+
+The axis runs under either substrate via the executor contract: `EXECUTOR=qemu`
+(QEMU/KVM guest, default on a dev box) or `EXECUTOR=baremetal` (native on a booted
+PKS host). See the top-level README for substrate selection.
 
 ---
 
@@ -44,7 +62,11 @@ Each exploit leaf follows an identical five-step lifecycle:
 2. **Page-Cache Synchronization**: Invokes `sync` and flushes the page cache via `echo 3 > /proc/sys/vm/drop_caches` to force the kernel to re-read from physical storage upon next access.
 3. **PoC Execution**: Executes the unprivileged PoC under `testuser` credentials. Interactive shells (`execlp("/bin/bash")`, `su`) are patched out to support headless automated benchmarking.
 4. **Memory & Disk Inspection**: Inspects the first 256 bytes of `/mnt/protected/victim_file`. If the clean marker persists, the outcome is recorded as `marker=intact`; if overwritten, `marker=altered`.
-5. **Crash & Panic Harvesting**: The host aggregator parses the serial transcript. If an unexpected kernel panic occurs matching `PKS_PANIC_REGEX` while PKS is active, the outcome is recorded as `fail_closed_panic` and evaluated as `verdict=FAIL`.
+5. **Crash & Panic Harvesting**: The host aggregator parses the transcript (QEMU
+serial, or `/dev/kmsg` on bare metal). If an unexpected kernel panic/oops occurs
+matching `PKS_PANIC_REGEX`, the outcome is recorded as `fail_closed_panic` and
+evaluated as `verdict=FAIL` — with the stateless handler the kernel is expected to
+neutralize in place and survive, so a panic is a regression, not a pass.
 
 ### Verdict Resolution & Pass Criteria
 
@@ -70,13 +92,13 @@ Verdicts are strictly evaluated by [`sec/run.sh`](file:///Users/meilan/Documents
      +---------------+---------------+                   +---------------+---------------+
      |               |               |                   |                               |
   Header          Live Log        Footer            Transcripts                     Dataset
- 88-col banner  per-mode/leaf  Summary Table     sec/*/raw-{off,on}.log          sec/result.csv
-from sec/run.sh from sec/run.sh from sec/run.sh   (serial output)             (sole structured log)
+ 88-col banner  per-mode/leaf  Summary Table      sec/raw-{off,on}.log           sec/result.csv
+from sec/run.sh from sec/run.sh from sec/run.sh (serial or /dev/kmsg)         (sole structured log)
 ```
 
 1. **Terminal Console**: Driven entirely by [`sec/run.sh`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/run.sh). An 88-column header opens the run, followed by per-leaf live execution logs. The summary footer displays side-by-side comparison tables between `off` and `on` modes.
 2. **Persistent Storage**: All structured test records are stored strictly in [`sec/result.csv`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/result.csv). No intermediate or leaf `result.log` files are created.
-3. **Raw Transcripts**: Complete guest serial transcripts are preserved in `sec/<leaf>/raw-off.log` and `sec/<leaf>/raw-on.log` for post-run fault analysis.
+3. **Raw Transcripts**: One complete transcript per mode is preserved in `sec/raw-off.log` and `sec/raw-on.log` (all three leaves, delimited by `### PKS-LEAF <leaf>`) for post-run fault analysis.
 
 ---
 

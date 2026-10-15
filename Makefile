@@ -11,6 +11,7 @@ SHELL := /bin/bash
 -include config.mk
 export DEV_KERNEL_DIR CONTROL_KERNEL_DIR DISK_IMG DISK_SIZE ROOTFS_SIZE
 export DEBIAN_SUITE DEBIAN_ARCH DEBIAN_MIRROR EXECUTOR QEMU_BIN SMP MEM BATCH_TIMEOUT_SEC
+export PROTECTED_DEV PROTECTED_MNT EXECUTOR_FORCE BAREMETAL
 
 # Top-level results/ holds ONLY summaries: results/data/*.csv and preflight.json.
 # Raw transcripts + JSON live next to their producers (fio raw/ and axis raw-*.log);
@@ -55,7 +56,7 @@ perf: preflight
 	@./perf/run.sh
 
 run-qemu:
-	@./exec/$(or $(EXECUTOR),qemu).sh $(or $(VARIANT),perf) $(or $(MODE),on) shell
+	@./exec/qemu.sh $(or $(VARIANT),perf) $(or $(MODE),on) shell
 
 end-qemu:
 	@killall -9 $(or $(QEMU_BIN),qemu-system-x86_64) 2>/dev/null || true

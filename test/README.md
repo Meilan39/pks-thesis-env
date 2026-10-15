@@ -30,7 +30,7 @@ test/
 
 ## Execution Model: Consolidated Boot
 
-Unlike the security axis ([`sec/`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec)), where individual exploits intentionally trigger kernel panics or supervisor faults and require separate virtual machine invocations, compliance workloads are non-destructive.
+Like the security axis ([`sec/`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec)) — which, with the stateless fault handler, now also batches all its leaves into one boot per mode — compliance workloads are non-destructive and run consolidated.
 
 All three compliance leaves execute in sequence within a single virtual machine boot per mode (`off`, `on`):
 1. **Mode `off` (Baseline)**: Evaluates unmitigated kernel behavior on standard ext4 mounts.

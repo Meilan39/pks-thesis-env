@@ -102,13 +102,21 @@ fi
 # ------------------------------------------------------------------------------
 # Dispatch workload & shut down
 # ------------------------------------------------------------------------------
+# Emit a per-leaf delimiter before running so a batched transcript (several
+# leaves in one boot) can be segmented per leaf by the axis aggregator.
+run_leaf_script() {
+    local script="$1"
+    echo "### PKS-LEAF $(basename "$(dirname "$script")")"
+    "$script" "$LABEL"
+}
+
 run_axis() {
     local axis_dir="$1"
     local found=0
     for script in "$WORKSPACE_DIR/$axis_dir"/*/run.sh; do
         if [ -x "$script" ]; then
             found=1
-            "$script" "$LABEL"
+            run_leaf_script "$script"
         fi
     done
     if [ "$found" -eq 0 ]; then
@@ -123,7 +131,7 @@ case "$TARGET" in
         ;;
     */*)
         if [ -x "$WORKSPACE_DIR/$TARGET/run.sh" ]; then
-            "$WORKSPACE_DIR/$TARGET/run.sh" "$LABEL"
+            run_leaf_script "$WORKSPACE_DIR/$TARGET/run.sh"
         else
             hb "missing $WORKSPACE_DIR/$TARGET/run.sh"
         fi
@@ -131,7 +139,7 @@ case "$TARGET" in
     *)
         for axis in test sec perf; do
             if [ -x "$WORKSPACE_DIR/$axis/$TARGET/run.sh" ]; then
-                "$WORKSPACE_DIR/$axis/$TARGET/run.sh" "$LABEL"
+                run_leaf_script "$WORKSPACE_DIR/$axis/$TARGET/run.sh"
                 break
             fi
         done

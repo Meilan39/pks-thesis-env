@@ -12,7 +12,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/common.sh"
 
-EXECUTOR="${EXECUTOR:-qemu}"
+EXECUTOR="$(resolve_executor "${EXECUTOR:-auto}")"
 EXECUTOR_SCRIPT="$REPO_ROOT/exec/${EXECUTOR}.sh"
 COMPLIANCE_LEAVES=(fsx pks-unit sanity)
 AXIS_CSV="$SCRIPT_DIR/result.csv"

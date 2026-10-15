@@ -61,6 +61,47 @@ require_cmds() {
 }
 
 # ------------------------------------------------------------------------------
+# Execution substrate resolution
+# ------------------------------------------------------------------------------
+# Is THIS host already running the patched PKS kernel, so evaluation leaves can
+# execute natively (bare metal) instead of inside a QEMU guest? True only when
+# the CPU advertises PKS *and* the running kernel actually carries the pcache
+# pool -- a stock kernel on PKS silicon is not enough (we would have nothing to
+# measure), so such a host correctly falls back to QEMU.
+pks_host_ready() {
+    grep -qw pks /proc/cpuinfo 2>/dev/null || return 1
+    # Booted via a testbed grub entry (covers the 'off' and 'control' boots,
+    # where the pool is intentionally inactive but native execution is intended).
+    grep -qE 'pcache_pks=(on|off)|pcache_control=1' /proc/cmdline 2>/dev/null && return 0
+    # Pool actually active (the 'on' boot).
+    [ -e /sys/kernel/debug/pcache_pks/status ] && return 0
+    dmesg 2>/dev/null | grep -q 'pcache_pks: initialized' && return 0
+    zgrep -q '^CONFIG_PCACHE_PKS=y' /proc/config.gz 2>/dev/null && return 0
+    return 1
+}
+
+# Resolve a requested executor name to a concrete substrate adapter basename,
+# i.e. the <name> in exec/<name>.sh. Honors an explicit choice and otherwise
+# auto-detects, falling back to QEMU whenever native PKS is unavailable:
+#   qemu | baremetal -> taken verbatim
+#   auto (default)   -> baremetal when pks_host_ready (or EXECUTOR_FORCE=
+#                       baremetal), else qemu
+resolve_executor() {
+    local want="${1:-auto}"
+    case "$want" in
+        qemu|baremetal)
+            printf '%s' "$want"
+            return 0
+            ;;
+    esac
+    if [ "${EXECUTOR_FORCE:-}" = "baremetal" ] || pks_host_ready; then
+        printf 'baremetal'
+    else
+        printf 'qemu'
+    fi
+}
+
+# ------------------------------------------------------------------------------
 # Axis console report formatting
 # ------------------------------------------------------------------------------
 # One shared layout for all three axes: 88-col banner, per-leaf stream, footer.

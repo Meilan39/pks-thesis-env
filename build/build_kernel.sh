@@ -51,10 +51,15 @@ build_kernel() {
         make O="$out_dir" defconfig
         make O="$out_dir" kvm_guest.config || true
 
-        # Merge common + variant fragments
+        # Merge common + variant fragments. With BAREMETAL=1, layer the
+        # real-hardware driver fragment last so the kernel can boot a physical
+        # host (the base fragments are virtio-only for QEMU).
+        FRAGMENTS=("$repo_root/configs/common.config" "$repo_root/configs/${variant}.config")
+        if [ "${BAREMETAL:-0}" = "1" ] && [ -f "$repo_root/configs/baremetal.config" ]; then
+            FRAGMENTS+=("$repo_root/configs/baremetal.config")
+        fi
         ./scripts/kconfig/merge_config.sh -m -O "$out_dir" "$out_dir/.config" \
-            "$repo_root/configs/common.config" \
-            "$repo_root/configs/${variant}.config"
+            "${FRAGMENTS[@]}"
 
         make O="$out_dir" olddefconfig
 
