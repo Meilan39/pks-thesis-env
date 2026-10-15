@@ -5,7 +5,7 @@ The security axis evaluates end-to-end exploit neutralization of dirty page-cach
 
 Under the unmitigated Linux kernel, memory corruption flaws in asynchronous kernel subsystems allow unprivileged attackers to splice or write arbitrary data into clean, file-backed page-cache pages without standard discretionary access control (DAC) checks. The security axis empirically verifies that:
 1. Under `pcache_pks=off`, exploits successfully overwrite target victim pages on disk ([`marker=altered`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/dirty-frag/README.md)), confirming real vulnerability.
-2. Under `pcache_pks=on`, hardware write protection prevents unauthorized stores to protected direct-map pages, either blocking the store in syscall context so the victim data remains pristine ([`marker=intact`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/copy-fail/README.md)) or, in softirq/workqueue context, trapping the violation as an unhandled supervisor fault that fails closed ([`fail_closed_panic`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/fragnesia/README.md)).
+2. Under `pcache_pks=on`, hardware write protection prevents unauthorized stores to protected direct-map pages, neutralizing the unauthorized writes in place so the victim data remains pristine ([`marker=intact`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/copy-fail/README.md)) without crashing the kernel. Any kernel panic or oops is strictly evaluated as `FAIL`.
 
 ---
 
@@ -32,7 +32,7 @@ Detailed reviewer guides for each exploit:
 Unlike the compliance (`test/`) and performance (`perf/`) axes, where non-destructive workloads run in a single consolidated VM boot, the security axis executes **each exploit leaf in an independent virtual machine instance** for each mode (`off`, `on`).
 
 ### Rationale
-1. **Fail-Closed Kernel Panics**: Softirq and workqueue exploits trigger unhandled supervisor page faults when PKS write-disable is active, deliberately halting the kernel to prevent memory corruption. A fresh virtual machine boot is mandatory for subsequent tests.
+1. **Isolated Kernel Environments**: Running each exploit in an isolated invocation ensures that any memory perturbation or transient state does not pollute subsequent tests.
 2. **Victim State Cleanliness**: Each run mounts a fresh ext4 filesystem with a newly initialized victim file containing a unique sentinel marker, preventing cross-test pollution.
 
 ---
@@ -44,7 +44,14 @@ Each exploit leaf follows an identical five-step lifecycle:
 2. **Page-Cache Synchronization**: Invokes `sync` and flushes the page cache via `echo 3 > /proc/sys/vm/drop_caches` to force the kernel to re-read from physical storage upon next access.
 3. **PoC Execution**: Executes the unprivileged PoC under `testuser` credentials. Interactive shells (`execlp("/bin/bash")`, `su`) are patched out to support headless automated benchmarking.
 4. **Memory & Disk Inspection**: Inspects the first 256 bytes of `/mnt/protected/victim_file`. If the clean marker persists, the outcome is recorded as `marker=intact`; if overwritten, `marker=altered`.
-5. **Crash & Panic Harvesting**: The host aggregator parses the serial transcript. If a kernel panic occurs matching `PKS_PANIC_REGEX` while PKS is active, the outcome is recorded as `fail_closed_panic`.
+5. **Crash & Panic Harvesting**: The host aggregator parses the serial transcript. If an unexpected kernel panic occurs matching `PKS_PANIC_REGEX` while PKS is active, the outcome is recorded as `fail_closed_panic` and evaluated as `verdict=FAIL`.
+
+### Verdict Resolution & Pass Criteria
+
+Verdicts are strictly evaluated by [`sec/run.sh`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/sec/run.sh):
+- **Baseline Mode (`pcache_pks=off`)**: The exploit must alter the victim file (`marker=altered`) to confirm that the vulnerability is operational. An intact marker under `off` indicates the exploit failed to trigger, invalidating the negative control, and is evaluated strictly as `FAIL`.
+- **Mitigated Mode (`pcache_pks=on`)**: The exploit must be neutralized in place, preserving the victim data (`marker=intact`). An altered marker indicates security mitigation failure and is scored as `FAIL`.
+- **Panic & Crash Policy**: Any kernel oops, panic, or fault matching `PKS_PANIC_REGEX` sets `outcome=fail_closed_panic` and evaluates to `verdict=FAIL`.
 
 ---
 
@@ -82,8 +89,8 @@ node,variant,verdict,outcome
 copy-fail,off,PASS,altered
 copy-fail,on,PASS,intact
 dirty-frag,off,PASS,altered
-dirty-frag,on,PASS,fail_closed_panic
+dirty-frag,on,PASS,intact
 fragnesia,off,PASS,altered
-fragnesia,on,PASS,fail_closed_panic
+fragnesia,on,PASS,intact
 sec,all,PASS,passed=6_failed=0
 ```

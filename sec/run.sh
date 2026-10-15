@@ -2,10 +2,10 @@
 # ==============================================================================
 # sec/run.sh - Security Exploit Evaluation Runner
 # ==============================================================================
-# Runs each exploit leaf (copy-fail, dirty-frag, fragnesia) in its own guest
-# boot per mode (off, on), resolves the outcome from the victim-file marker and
-# any fail-closed kernel panic, and renders the shared axis console report.
-# Structured rows are appended to sec/result.csv.
+# Evaluates exploit leaves (copy-fail, dirty-frag, fragnesia) under off and on.
+# Under off, an altered marker confirms vulnerability (PASS); intact is a FAIL.
+# Under on, an intact marker confirms in-place neutralization (PASS); panic/altered is FAIL.
+# Structured rows are written to sec/result.csv.
 # ==============================================================================
 set -u
 
@@ -13,7 +13,8 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 source "$REPO_ROOT/common.sh"
 
-EXECUTOR_SCRIPT="$REPO_ROOT/exec/${EXECUTOR:-qemu}.sh"
+EXECUTOR="${EXECUTOR:-qemu}"
+EXECUTOR_SCRIPT="$REPO_ROOT/exec/${EXECUTOR}.sh"
 SECURITY_LEAVES=(copy-fail dirty-frag fragnesia)
 AXIS_CSV="$SCRIPT_DIR/result.csv"
 
@@ -28,70 +29,55 @@ echo "node,variant,verdict,outcome" > "$AXIS_CSV"
 # ------------------------------------------------------------------------------
 report_banner \
     "[sec] PKS Security Evaluation: End-to-End Exploit Neutralization" \
-    "Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: ${EXECUTOR:-qemu}"
+    "Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: $EXECUTOR"
 
+# ------------------------------------------------------------------------------
+# Boot each leaf per mode, evaluate outcomes and verdicts
+# ------------------------------------------------------------------------------
 pass_count=0
 fail_count=0
-# Per-leaf resolved verdict/outcome for the given mode (reset each leaf).
-leaf_verdict_off=""; leaf_outcome_off=""
-leaf_verdict_on="";  leaf_outcome_on=""
-
-# Resolves one leaf/mode: outcome from the victim-file marker, or fail_closed_panic
-# when a PKS-attributable panic trapped the store under 'on'. off passes when the
-# marker was altered (a real exploit); on passes when it survived or panicked.
-resolve_leaf() {
-    local leaf="$1"
-    local variant="$2"
-    local raw_log="$3"
-
-    local marker outcome verdict
-    marker=$(grep -aoE 'marker=(intact|altered)' "$raw_log" 2>/dev/null | tail -n1 | cut -d= -f2)
-
-    if [ "$variant" = "on" ] \
-        && grep -qE "$PKS_PANIC_REGEX" "$raw_log" 2>/dev/null \
-        && grep -qE "$PKS_ACTIVE_REGEX" "$raw_log" 2>/dev/null; then
-        outcome="fail_closed_panic"
-    else
-        outcome="${marker:-unresolved}"
-    fi
-
-    verdict="FAIL"
-    if [ "$variant" = "off" ]; then
-        [ "$outcome" = "altered" ] && verdict="PASS"
-    else
-        { [ "$outcome" = "intact" ] || [ "$outcome" = "fail_closed_panic" ]; } && verdict="PASS"
-    fi
-
-    if [ "$variant" = "off" ]; then
-        leaf_verdict_off="$verdict"; leaf_outcome_off="$outcome"
-    else
-        leaf_verdict_on="$verdict";  leaf_outcome_on="$outcome"
-    fi
-
-    if [ "$verdict" = "PASS" ]; then
-        pass_count=$((pass_count + 1))
-    else
-        fail_count=$((fail_count + 1))
-    fi
-
-    echo "$leaf,$variant,$verdict,$outcome" >> "$AXIS_CSV"
-    report_leaf "[${leaf}-${variant}]" "pcache_pks=${variant}" "$verdict" "outcome=$outcome"
-}
-
-# ------------------------------------------------------------------------------
-# Boot each leaf per mode, resolve
-# ------------------------------------------------------------------------------
 TABLE_ROWS=()
+
 for leaf in "${SECURITY_LEAVES[@]}"; do
     leaf_dir="$SCRIPT_DIR/$leaf"
     for variant in off on; do
         raw_log="$leaf_dir/raw-${variant}.log"
         "$EXECUTOR_SCRIPT" sec "$variant" "sec/$leaf" "$raw_log" >/dev/null
-        resolve_leaf "$leaf" "$variant" "$raw_log"
+
+        # Panic check: unhandled oops or panic is recorded as fail_closed_panic
+        if grep -qE "$PKS_PANIC_REGEX" "$raw_log" 2>/dev/null; then
+            outcome="fail_closed_panic"
+        else
+            marker=$(grep -aoE 'marker=(intact|altered)' "$raw_log" 2>/dev/null | tail -n1 | cut -d= -f2)
+            outcome="${marker:-unresolved}"
+        fi
+
+        # off passes iff altered (exploit works); on passes iff intact (isolated in place)
+        if [ "$variant" = "off" ] && [ "$outcome" = "altered" ]; then
+            verdict="PASS"
+        elif [ "$variant" = "on" ] && [ "$outcome" = "intact" ]; then
+            verdict="PASS"
+        else
+            verdict="FAIL"
+        fi
+
+        if [ "$verdict" = "PASS" ]; then
+            pass_count=$((pass_count + 1))
+        else
+            fail_count=$((fail_count + 1))
+        fi
+
+        echo "$leaf,$variant,$verdict,$outcome" >> "$AXIS_CSV"
+        report_leaf "[${leaf}-${variant}]" "pcache_pks=${variant}" "$verdict" "outcome=$outcome"
+
+        if [ "$variant" = "off" ]; then
+            v_off="$verdict"; out_off="$outcome"
+        else
+            v_on="$verdict";  out_on="$outcome"
+        fi
     done
-    TABLE_ROWS+=("$(report_compare_row "$leaf" \
-        "$leaf_verdict_off" "$leaf_outcome_off" \
-        "$leaf_verdict_on"  "$leaf_outcome_on")")
+
+    TABLE_ROWS+=("$(report_compare_row "$leaf" "$v_off" "$out_off" "$v_on" "$out_on")")
 done
 
 # ------------------------------------------------------------------------------

@@ -63,6 +63,12 @@ from test/run.sh from test/run.sh from test/run.sh   (serial output)            
 2. **Persistent Storage**: All structured test records are written strictly to [`test/result.csv`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/test/result.csv). No intermediate or per-leaf `result.log` files are created.
 3. **Raw Transcripts**: Serial console logs from the guest virtual machine are saved to [`test/raw-off.log`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/test/raw-off.log) and [`test/raw-on.log`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/test/raw-on.log) for auditing.
 
+### Verdict Resolution & Pass Criteria
+
+Verdicts are strictly evaluated by [`test/run.sh`](file:///Users/meilan/Documents/大学/学部卒論/pks-thesis-env/test/run.sh):
+- **Leaf-Level Invariant**: A compliance leaf passes overall if and only if it achieves `PASS` under **both** `pcache_pks=off` (baseline) and `pcache_pks=on` (hardware PKS).
+- **Panic & Crash Policy**: If an unexpected kernel oops, panic, or unhandled fault occurs matching `PKS_PANIC_REGEX`, the leaf is immediately scored as `verdict=FAIL` with `details=kernel_panic`.
+
 ---
 
 ## Result CSV Schema
@@ -77,5 +83,5 @@ sanity,off,PASS,not_applicable_when_off
 fsx,on,PASS,ops=10000 errors=0
 pks-unit,on,PASS,ok
 sanity,on,PASS,passed=13
-test,all,PASS,passed=6_failed=0
+test,all,PASS,passed=3_failed=0_of=3
 ```

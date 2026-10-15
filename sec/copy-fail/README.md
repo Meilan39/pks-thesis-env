@@ -39,5 +39,5 @@ a verdict (see the [security axis README](../README.md)):
   marker=altered
   ```
 Under `pcache_pks=off` an altered marker is the expected real vulnerability
-(`PASS`). Under `pcache_pks=on` the neutralization is either an intact marker or
-a PKS-attributable kernel panic captured on the serial transcript (`PASS`).
+(`PASS`). Under `pcache_pks=on` the exploit is neutralized in place and passes only
+when the marker remains intact (`PASS`). Any kernel panic is strictly treated as a failure (`FAIL`).
