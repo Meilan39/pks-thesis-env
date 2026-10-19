@@ -14,19 +14,19 @@
 //                                             protected file lies inside the
 //                                             pre-tagged PMD-aligned pool.
 //   Suite 3  Fail-closed rejection matrix     writes/mutations *into* a
-//                                             protected file -- mmap(PROT_WRITE),
-//                                             O_DIRECT, splice, copy_file_range,
+//                                             protected file -- shared mmap(PROT_WRITE),
+//                                             direct write, splice, copy_file_range,
 //                                             AIO, EXT4_IOC_MOVE_EXT -- are
 //                                             rejected with -EOPNOTSUPP. Only
 //                                             writes are gated, so reads (incl.
 //                                             zero-copy reads out of a protected
 //                                             file, e.g. sendfile as source) are
 //                                             always permitted and not tested here.
-//   Suite 4  Permitted-operation controls     buffered I/O, truncation, and
-//                                             read-only mappings still work, and
-//                                             a private mapping cannot be
-//                                             upgraded to writable (no false
-//                                             rejections / no over-blocking).
+//   Suite 4  Permitted-operation controls     buffered I/O, truncation, read-only
+//                                             mappings, copy-on-write private
+//                                             mappings and direct reads still
+//                                             work (no false rejections / no
+//                                             over-blocking).
 //
 // Output contract: one "[PASS]"/"[FAIL]" line per assertion (tallied by
 // test/sanity/run.sh) and "[SKIP]"/"[INFO]"/"[WARN]" lines that are ignored.
@@ -397,6 +397,33 @@ static int expect_rejected(const char *label, int did_succeed, int err)
 	return 1;
 }
 
+// Direct write: an O_DIRECT open is permitted (direct reads are allowed, see
+// Suite 4), but each direct write must be refused.
+static int check_direct_write_rejected(const char *test_file)
+{
+	void *buf = NULL;
+	int rc;
+
+	int dfd = open(test_file, O_RDWR | O_DIRECT);
+	if (dfd < 0) {
+		printf("    [FAIL] open(O_DIRECT) failed (errno=%d: %s); direct reads must remain possible\n",
+		       errno, strerror(errno));
+		return 1;
+	}
+	if (posix_memalign(&buf, 4096, 4096) != 0) {
+		printf("    [SKIP] aligned buffer allocation failed\n");
+		close(dfd);
+		return 0;
+	}
+	memset(buf, 'D', 4096);
+	errno = 0;
+	ssize_t n = pwrite(dfd, buf, 4096, 0);
+	rc = expect_rejected("pwrite(O_DIRECT)", n >= 0, errno);
+	free(buf);
+	close(dfd);
+	return rc;
+}
+
 // splice(2): foreign zero-copy pipeline writing into the protected page cache.
 static int check_splice_rejected(int fd)
 {
@@ -574,12 +601,8 @@ static int test_fail_closed_policy(const char *test_file, const char *mount_dir)
 	if (wm != MAP_FAILED)
 		munmap(wm, 4096);
 
-	// 2. Direct I/O - bypasses the page cache entirely.
-	errno = 0;
-	int dfd = open(test_file, O_RDWR | O_DIRECT);
-	rc |= expect_rejected("open(O_DIRECT)", dfd >= 0, errno);
-	if (dfd >= 0)
-		close(dfd);
+	// 2. Direct write - bypasses the page cache and its write scope.
+	rc |= check_direct_write_rejected(test_file);
 
 	// 3-7. Zero-copy pipelines, async submission, and online defrag.
 	rc |= check_splice_rejected(fd);
@@ -595,8 +618,9 @@ static int test_fail_closed_policy(const char *test_file, const char *mount_dir)
 // ----------------------------------------------------------------------------
 // Suite 4 - permitted-operation positive controls
 // ----------------------------------------------------------------------------
-// A private read-only mapping must be permitted (execve / dynamic linking),
-// but VM_MAYWRITE is stripped, so it can never be upgraded to writable.
+// A private read-only mapping must be permitted (execve / dynamic linking), and
+// so must upgrading it to writable: stores copy on write and never reach the
+// page cache, which the file contents must confirm.
 static int check_private_ro_mapping(int fd)
 {
 	int rc = 0;
@@ -608,14 +632,52 @@ static int check_private_ro_mapping(int fd)
 	}
 	printf("    [PASS] MAP_PRIVATE|PROT_READ permitted (execve / dynamic-linking path intact)\n");
 
-	if (mprotect(m, 4096, PROT_READ | PROT_WRITE) == 0) {
-		printf("    [FAIL] mprotect(+PROT_WRITE) succeeded on a private mapping (VM_MAYWRITE not stripped)\n");
+	if (mprotect(m, 4096, PROT_READ | PROT_WRITE) != 0) {
+		printf("    [FAIL] mprotect(+PROT_WRITE) on a private mapping blocked (errno=%d: %s); copy-on-write must be permitted\n",
+		       errno, strerror(errno));
 		rc = 1;
 	} else {
-		printf("    [PASS] mprotect(+PROT_WRITE) blocked (errno=%d: %s); VM_MAYWRITE strip confirmed\n",
-		       errno, strerror(errno));
+		char on_disk;
+
+		((volatile char *)m)[0] ^= (char)0xff;
+		if (pread(fd, &on_disk, 1, 0) != 1 || on_disk == ((char *)m)[0]) {
+			printf("    [FAIL] private-mapping store reached the file (copy-on-write broken)\n");
+			rc = 1;
+		} else {
+			printf("    [PASS] private mapping upgraded to writable; store stayed private (copy-on-write)\n");
+		}
 	}
 	munmap(m, 4096);
+	return rc;
+}
+
+// A direct read copies from disk into user memory without storing into the
+// page cache, so it must be permitted on a protected file.
+static int check_direct_read_permitted(const char *test_file)
+{
+	void *buf = NULL;
+	int rc = 0;
+
+	int dfd = open(test_file, O_RDONLY | O_DIRECT);
+	if (dfd < 0) {
+		printf("    [FAIL] open(O_RDONLY|O_DIRECT) rejected (errno=%d: %s); direct reads must be permitted\n",
+		       errno, strerror(errno));
+		return 1;
+	}
+	if (posix_memalign(&buf, 4096, 4096) != 0) {
+		printf("    [SKIP] aligned buffer allocation failed\n");
+		close(dfd);
+		return 0;
+	}
+	if (pread(dfd, buf, 4096, 0) < 0) {
+		printf("    [FAIL] direct pread rejected (errno=%d: %s); direct reads must be permitted\n",
+		       errno, strerror(errno));
+		rc = 1;
+	} else {
+		printf("    [PASS] direct pread(O_DIRECT) permitted (no page-cache store)\n");
+	}
+	free(buf);
+	close(dfd);
 	return rc;
 }
 
@@ -679,8 +741,11 @@ static int test_permitted_ops(const char *test_file)
 		munmap(sm, 4096);
 	}
 
-	// 4. Private read-only mapping permitted; writable upgrade blocked.
+	// 4. Private mapping permitted, including a copy-on-write upgrade.
 	rc |= check_private_ro_mapping(fd);
+
+	// 5. Direct read permitted.
+	rc |= check_direct_read_permitted(test_file);
 
 	close(fd);
 	unlink(test_file);

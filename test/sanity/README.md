@@ -36,7 +36,7 @@ The mechanism gates **writes only** — reads are never disabled. Reading a prot
 | Check | Operation | Threat it closes |
 | :--- | :--- | :--- |
 | 1 | `mmap(PROT_WRITE, MAP_SHARED)` | direct user-space writes into protected folios |
-| 2 | `open(O_DIRECT)` | page-cache-bypassing unbuffered I/O |
+| 2 | `pwrite` on an `O_DIRECT` fd | page-cache-bypassing direct writes (opening with `O_DIRECT` and direct *reads* are permitted; see Suite 4) |
 | 3 | `splice(pipe -> file)` | zero-copy pipeline writing into the page cache |
 | 4 | `copy_file_range(-> protected)` | in-kernel copy pipeline writing a protected destination |
 | 5 | AIO `io_submit(PWRITE)` | async submission decoupled from execution context (shared with `io_uring`/io-wq) |
@@ -53,7 +53,8 @@ Proves the mechanism does **not** over-block legitimate use — the "no false re
 | 2 | `ftruncate` grow then shrink | `st_size` tracks 65536 → 1024 |
 | 3 | `mmap(PROT_READ, MAP_SHARED)` | permitted (read-only consumers unaffected) |
 | 4 | `mmap(PROT_READ, MAP_PRIVATE)` | permitted (`execve` / dynamic-linking path) |
-| 4b | `mprotect(+PROT_WRITE)` on that private map | **blocked** — `VM_MAYWRITE` was stripped |
+| 4b | `mprotect(+PROT_WRITE)` on that private map, then a store | permitted; the store stays in the private copy and the file is unchanged (copy-on-write) |
+| 5 | `pread` on an `O_DIRECT` fd | permitted (copies disk to user memory; no page-cache store) |
 
 ---
 
