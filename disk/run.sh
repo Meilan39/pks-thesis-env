@@ -128,9 +128,13 @@ refresh_image() {
         install_packages "$mount_point" || echo "[disk] WARN: package refresh failed (offline?); some benchmark tools may be unavailable"
         install_autorun "$mount_point" || rc=1
 
-        # Verify autorun installation marker
-        if ! sudo grep -q 'HB autorun:' "$mount_point/usr/local/bin/pks-autorun.sh" 2>/dev/null; then
-            echo "autorun marker not found after installation"
+        # Verify autorun installation marker. Grep for PKS-LEAF (the per-leaf
+        # delimiter emitted by run_leaf_script), not just "HB autorun:", so a
+        # baked copy predating the delimiters is detected as stale rather than
+        # silently kept -- a stale copy produces a transcript the sec/test
+        # aggregators cannot segment per leaf.
+        if ! sudo grep -q 'PKS-LEAF' "$mount_point/usr/local/bin/pks-autorun.sh" 2>/dev/null; then
+            echo "autorun marker not found after installation (stale or failed copy)"
             rc=1
         fi
 

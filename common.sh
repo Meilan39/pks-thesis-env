@@ -186,6 +186,16 @@ PKS_ACTIVE_REGEX="${PKS_ACTIVE_REGEX:-pcache_pks: initialized}"
 PKS_PANIC_REGEX="${PKS_PANIC_REGEX:-Kernel panic|unable to handle .*page fault|BUG: |Oops|general protection|protection key}"
 PKS_SUPPRESS_REGEX="${PKS_SUPPRESS_REGEX:-pcache_pks: (unauthorized write|.*suppressed.*)}"
 
+# True if a transcript contains a genuine kernel panic/oops. Userspace output
+# forwarded to the console is tagged "pks-autorun.sh[PID]:" and is excluded so
+# an exploit's own banner -- e.g. copy-fail printing "BUG: changed ... byte
+# range" -- is never mistaken for a kernel "BUG:" line. Real panic/oops lines
+# come from the kernel and carry no such tag.
+pks_kernel_panicked() {
+    grep -avE 'pks-autorun\.sh\[[0-9]+\]:' "$1" 2>/dev/null \
+        | grep -qE "$PKS_PANIC_REGEX"
+}
+
 # ------------------------------------------------------------------------------
 # STATUS protocol: emit & parse
 # ------------------------------------------------------------------------------

@@ -69,7 +69,7 @@ for variant in off on; do
 
     for leaf in "${COMPLIANCE_LEAVES[@]}"; do
         # Panic check: unhandled oops or panic is recorded as fail
-        if grep -qE "$PKS_PANIC_REGEX" "$raw_log" 2>/dev/null; then
+        if pks_kernel_panicked "$raw_log"; then
             verdict="FAIL"
             details="kernel_panic"
         else

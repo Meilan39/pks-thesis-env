@@ -38,19 +38,30 @@ report_banner \
     "[sec] PKS Security Evaluation: End-to-End Exploit Neutralization" \
     "Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: $EXECUTOR"
 
-# Extract one leaf's marker from a batched transcript: isolate the segment that
-# follows "### PKS-LEAF <leaf>" (up to the next leaf delimiter) and read its last
-# marker= line. CR is stripped because serial transcripts are CRLF.
+# Extract one leaf's marker from a batched transcript. Preferred path: isolate
+# the segment that follows this leaf's "### PKS-LEAF <leaf>" delimiter (up to the
+# next delimiter) and read its last marker= line. Fallback: if the guest emitted
+# no delimiters at all -- e.g. a stale baked /usr/local/bin/pks-autorun.sh that
+# predates them -- leaves still run in SECURITY_LEAVES order, one marker each, so
+# the Nth marker in the transcript belongs to the Nth leaf. CR is stripped
+# because serial transcripts are CRLF.
 extract_marker() {
     local raw_log="$1"
     local leaf="$2"
-    awk -v leaf="$leaf" '
-        { gsub(/\r/, "") }
-        index($0, "### PKS-LEAF " leaf) { cap = 1; next }
-        cap == 1 && index($0, "### PKS-LEAF ") { exit }
-        cap == 1 { print }
-    ' "$raw_log" 2>/dev/null \
-        | grep -aoE 'marker=(intact|altered)' | tail -n1 | cut -d= -f2
+    local idx="$3"
+
+    if grep -q '### PKS-LEAF ' "$raw_log" 2>/dev/null; then
+        awk -v leaf="$leaf" '
+            { gsub(/\r/, "") }
+            index($0, "### PKS-LEAF " leaf) { cap = 1; next }
+            cap == 1 && index($0, "### PKS-LEAF ") { exit }
+            cap == 1 { print }
+        ' "$raw_log" 2>/dev/null \
+            | grep -aoE 'marker=(intact|altered)' | tail -n1 | cut -d= -f2
+    else
+        grep -aoE 'marker=(intact|altered)' "$raw_log" 2>/dev/null \
+            | sed -n "$((idx + 1))p" | cut -d= -f2
+    fi
 }
 
 # Per-leaf resolved verdict/outcome, indexed in lockstep with SECURITY_LEAVES.
@@ -71,14 +82,14 @@ for variant in off on; do
     # With the stateless handler this must not happen under 'on'; if it does it
     # is a real regression, so it fails closed below.
     panicked=0
-    grep -qE "$PKS_PANIC_REGEX" "$raw_log" 2>/dev/null && panicked=1
+    pks_kernel_panicked "$raw_log" && panicked=1
 
     idx=0
     for leaf in "${SECURITY_LEAVES[@]}"; do
         if [ "$panicked" -eq 1 ]; then
             outcome="fail_closed_panic"
         else
-            marker="$(extract_marker "$raw_log" "$leaf")"
+            marker="$(extract_marker "$raw_log" "$leaf" "$idx")"
             outcome="${marker:-unresolved}"
         fi
 
