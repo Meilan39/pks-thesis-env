@@ -123,3 +123,24 @@ make: *** [Makefile:53: sec] Error 1
 [INFO] Generated Figure 5 -> /home/vmuser/src/env/tools/plotting/figures/figure5_sqlite_macro.pdf
 [INFO] Generated Table 1 -> /home/vmuser/src/env/tools/plotting/figures/table1_tost.md and /home/vmuser/src/env/tools/plotting/figures/table1_tost.tex
 [INFO] All thesis figures and tables generated in /home/vmuser/src/env/tools/plotting/figures
+[WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
+[DONE] Preflight recorded (executor=qemu substrate=tcg) -> results/preflight.json
+========================================================================================
+ [sec] PKS Security Evaluation: End-to-End Exploit Neutralization
+ Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: qemu
+========================================================================================
+ [copy-fail-off]      pcache_pks=off  ... PASS (outcome=altered)
+ [dirty-frag-off]     pcache_pks=off  ... PASS (outcome=altered)
+ [fragnesia-off]      pcache_pks=off  ... PASS (outcome=altered)
+ [copy-fail-on]       pcache_pks=on   ... PASS (outcome=intact)
+ [dirty-frag-on]      pcache_pks=on   ... PASS (outcome=intact)
+ [fragnesia-on]       pcache_pks=on   ... PASS (outcome=intact)
+----------------------------------------------------------------------------------------
+ Exploit         pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
+----------------------------------------------------------------------------------------
+ copy-fail       PASS (altered)                         PASS (intact)                 
+ dirty-frag      PASS (altered)                         PASS (intact)                 
+ fragnesia       PASS (altered)                         PASS (intact)                 
+----------------------------------------------------------------------------------------
+ OVERALL: PASS (6/6 passing, 0 failing)
+========================================================================================

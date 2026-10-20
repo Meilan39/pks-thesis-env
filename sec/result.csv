@@ -1,8 +1,8 @@
 node,variant,verdict,outcome
-copy-fail,off,FAIL,fail_closed_panic
-dirty-frag,off,FAIL,fail_closed_panic
-fragnesia,off,FAIL,fail_closed_panic
-copy-fail,on,FAIL,unresolved
-dirty-frag,on,FAIL,unresolved
-fragnesia,on,FAIL,unresolved
-sec,all,FAIL,passed=0_failed=6
+copy-fail,off,PASS,altered
+dirty-frag,off,PASS,altered
+fragnesia,off,PASS,altered
+copy-fail,on,PASS,intact
+dirty-frag,on,PASS,intact
+fragnesia,on,PASS,intact
+sec,all,PASS,passed=6_failed=0
