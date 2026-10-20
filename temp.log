@@ -1,5 +1,5 @@
 [WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
-[DONE] Preflight recorded (tcg) -> results/preflight.json
+[DONE] Preflight recorded (executor=qemu substrate=tcg) -> results/preflight.json
 ========================================================================================
  [test] PKS Compliance Evaluation: Kernel Invariants & POSIX Semantics
  Leaves: fsx, pks-unit, sanity | Modes: off, on | Executor: qemu
@@ -28,10 +28,10 @@
      [PASS] ftruncate(2) scoped cleanly (+1 begin, +1 end)
      [PASS] fallocate(2) scoped cleanly (+1 begin, +1 end)
      [PASS] read(2) executed with 0 write-scope toggles (read-path parity confirmed)
-     [PASS] Total scope balance verified: 196951 entries == 196951 exits (leak-free invariant)
+     [PASS] Total scope balance verified: 11918 entries == 11918 exits (leak-free invariant)
      [PASS] 100% of resident page-cache folios reside strictly in the PKS static pool
      [PASS] mmap(PROT_WRITE, MAP_SHARED) rejected with -EOPNOTSUPP
-     [PASS] open(O_DIRECT) rejected with -EOPNOTSUPP
+     [PASS] pwrite(O_DIRECT) rejected with -EOPNOTSUPP
      [PASS] splice(pipe -> protected file) rejected with -EOPNOTSUPP
      [PASS] copy_file_range(protected -> protected) rejected with -EOPNOTSUPP
      [PASS] AIO pwrite completion rejected with -EOPNOTSUPP
@@ -40,7 +40,8 @@
      [PASS] ftruncate grow/shrink updates file size correctly (65536 -> 1024)
      [PASS] MAP_SHARED|PROT_READ permitted (read-only consumers unaffected)
      [PASS] MAP_PRIVATE|PROT_READ permitted (execve / dynamic-linking path intact)
-     [PASS] mprotect(+PROT_WRITE) blocked (errno=13: Permission denied); VM_MAYWRITE strip confirmed
+     [PASS] private mapping upgraded to writable; store stayed private (copy-on-write)
+     [PASS] direct pread(O_DIRECT) permitted (no page-cache store)
      [PASS] pks test
 ----------------------------------------------------------------------------------------
  Test            pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
@@ -52,50 +53,51 @@
  OVERALL: PASS (3/3 leaves passing, 0 failing)
 ========================================================================================
 [WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
-[DONE] Preflight recorded (tcg) -> results/preflight.json
+[DONE] Preflight recorded (executor=qemu substrate=tcg) -> results/preflight.json
 ========================================================================================
  [sec] PKS Security Evaluation: End-to-End Exploit Neutralization
  Leaves: copy-fail, dirty-frag, fragnesia | Modes: off, on | Executor: qemu
 ========================================================================================
- [copy-fail-off]      pcache_pks=off  ... PASS (outcome=altered)
- [copy-fail-on]       pcache_pks=on   ... PASS (outcome=intact)
- [dirty-frag-off]     pcache_pks=off  ... PASS (outcome=altered)
- [dirty-frag-on]      pcache_pks=on   ... PASS (outcome=intact)
- [fragnesia-off]      pcache_pks=off  ... PASS (outcome=altered)
- [fragnesia-on]       pcache_pks=on   ... PASS (outcome=fail_closed_panic)
+ [copy-fail-off]      pcache_pks=off  ... FAIL (outcome=fail_closed_panic)
+ [dirty-frag-off]     pcache_pks=off  ... FAIL (outcome=fail_closed_panic)
+ [fragnesia-off]      pcache_pks=off  ... FAIL (outcome=fail_closed_panic)
+ [copy-fail-on]       pcache_pks=on   ... FAIL (outcome=unresolved)
+ [dirty-frag-on]      pcache_pks=on   ... FAIL (outcome=unresolved)
+ [fragnesia-on]       pcache_pks=on   ... FAIL (outcome=unresolved)
 ----------------------------------------------------------------------------------------
  Exploit         pcache_pks=off (Baseline)              pcache_pks=on (Hardware PKS)  
 ----------------------------------------------------------------------------------------
- copy-fail       PASS (altered)                         PASS (intact)                 
- dirty-frag      PASS (altered)                         PASS (intact)                 
- fragnesia       PASS (altered)                         PASS (fail_closed_panic)      
+ copy-fail       FAIL (fail_closed_panic)               FAIL (unresolved)             
+ dirty-frag      FAIL (fail_closed_panic)               FAIL (unresolved)             
+ fragnesia       FAIL (fail_closed_panic)               FAIL (unresolved)             
 ----------------------------------------------------------------------------------------
- OVERALL: PASS (6/6 passing, 0 failing)
+ OVERALL: FAIL (0/6 passing, 6 failing)
 ========================================================================================
+make: *** [Makefile:53: sec] Error 1
 [WARN] Substrate: TCG emulation (no /dev/kvm). PKS enforcement is emulated; negative controls validate behavior.
-[DONE] Preflight recorded (tcg) -> results/preflight.json
+[DONE] Preflight recorded (executor=qemu substrate=tcg) -> results/preflight.json
 ========================================================================================
  [perf] PKS Performance Evaluation: Micro- & Macrobenchmarks
  Workloads: fio (warm/cold), concurrency, sqlite | Variants: control, off, on
 ========================================================================================
- [fio-control]        control         ... PASS (iops4k_warm_write=23206.8 lat4k_warm_write_us=33.55 lat4k_warm_read_us=25.28 lat4k_cold_write_us=56.75 alloc_overhead_us=23.2 bw1m_seq_read_kbs=239182.0)
- [concurrency-control] control         ... PASS (bw_1t_mbps=62.5 bw_2t_mbps=47.8 bw_4t_mbps=51.3 scaling_pct=20.5)
- [sqlite-control]     control         ... PASS (tps_syncoff=553.94 tps_syncfull=5.53 lat_syncoff_us=1805.26 lat_syncfull_us=180977.95)
- [fio-off]            off             ... PASS (iops4k_warm_write=22629.83 lat4k_warm_write_us=34.93 lat4k_warm_read_us=26.27 lat4k_cold_write_us=61.24 alloc_overhead_us=26.31 bw1m_seq_read_kbs=206088.0)
- [concurrency-off]    off             ... PASS (bw_1t_mbps=41.5 bw_2t_mbps=51.1 bw_4t_mbps=50.7 scaling_pct=30.5)
- [sqlite-off]         off             ... PASS (tps_syncoff=511.94 tps_syncfull=5.63 lat_syncoff_us=1953.37 lat_syncfull_us=177574.67)
- [fio-on]             on              ... PASS (iops4k_warm_write=5610.96 lat4k_warm_write_us=150.24 lat4k_warm_read_us=26.42 lat4k_cold_write_us=177.16 alloc_overhead_us=26.92 bw1m_seq_read_kbs=201030.0)
- [concurrency-on]     on              ... PASS (bw_1t_mbps=18.9 bw_2t_mbps=14.7 bw_4t_mbps=13.4 scaling_pct=17.7)
- [sqlite-on]          on              ... PASS (tps_syncoff=295.9 tps_syncfull=5.41 lat_syncoff_us=3379.56 lat_syncfull_us=184828.37)
+ [fio-control]        control         ... PASS (iops4k_warm_write=22818.94 lat4k_warm_write_us=34.38 lat4k_warm_read_us=28.15 lat4k_cold_write_us=53.03 alloc_overhead_us=18.65 bw1m_seq_read_kbs=214169.0)
+ [concurrency-control] control         ... PASS (bw_1t_mbps=50.5 bw_2t_mbps=52.5 bw_4t_mbps=50.9 scaling_pct=25.2)
+ [sqlite-control]     control         ... PASS (tps_syncoff=550.52 tps_syncfull=5.66 lat_syncoff_us=1816.47 lat_syncfull_us=176677.51)
+ [fio-off]            off             ... PASS (iops4k_warm_write=20897.96 lat4k_warm_write_us=37.99 lat4k_warm_read_us=25.45 lat4k_cold_write_us=51.65 alloc_overhead_us=13.66 bw1m_seq_read_kbs=206088.0)
+ [concurrency-off]    off             ... PASS (bw_1t_mbps=59.7 bw_2t_mbps=53.2 bw_4t_mbps=46.1 scaling_pct=19.3)
+ [sqlite-off]         off             ... PASS (tps_syncoff=514.42 tps_syncfull=5.49 lat_syncoff_us=1943.93 lat_syncfull_us=182037.28)
+ [fio-on]             on              ... PASS (iops4k_warm_write=5906.27 lat4k_warm_write_us=143.13 lat4k_warm_read_us=26.69 lat4k_cold_write_us=170.52 alloc_overhead_us=27.39 bw1m_seq_read_kbs=204800.0)
+ [concurrency-on]     on              ... PASS (bw_1t_mbps=17.8 bw_2t_mbps=13.9 bw_4t_mbps=14.3 scaling_pct=20.1)
+ [sqlite-on]          on              ... PASS (tps_syncoff=297.29 tps_syncfull=5.31 lat_syncoff_us=3363.73 lat_syncfull_us=188356.72)
 
 ========================================================================================
  Table 1: Fio Latency & Allocation Cost Breakdown
 ----------------------------------------------------------------------------------------
  Variant      4K Warm (us)     4K Cold (us)     Alloc Delta (us)   4K IOPS      1M Read (MB/s)
 ----------------------------------------------------------------------------------------
- control      33.55            56.75            23.2               23206.8      233.6       
- off          34.93            61.24            26.31              22629.83     201.3       
- on           150.24           177.16           26.92              5610.96      196.3       
+ control      34.38            53.03            18.65              22818.94     209.1       
+ off          37.99            51.65            13.66              20897.96     201.3       
+ on           143.13           170.52           27.39              5906.27      200.0       
 ----------------------------------------------------------------------------------------
 
 ========================================================================================
@@ -103,12 +105,12 @@
 ----------------------------------------------------------------------------------------
  Benchmark        Metric               Control      Off          On           PKS Overhead (%)
 ----------------------------------------------------------------------------------------
- fio 4KB warm     Write Lat (us)       33.55        34.93        150.24       +347.81%        
- fio 4KB warm     Read Lat (us)        25.28        26.27        26.42        +4.51%          
- fio 4KB cold     Write Lat (us)       56.75        61.24        177.16       +212.18%        
- concurrency      4-Thread BW (MB/s)   51.3         50.7         13.4         -73.88%         
- sqlite           Tx/s (sync=OFF)      553.94       511.94       295.9        -46.58%         
- sqlite           Tx/s (sync=FULL)     5.53         5.63         5.41         -2.17%          
+ fio 4KB warm     Write Lat (us)       34.38        37.99        143.13       +316.32%        
+ fio 4KB warm     Read Lat (us)        28.15        25.45        26.69        -5.19%          
+ fio 4KB cold     Write Lat (us)       53.03        51.65        170.52       +221.55%        
+ concurrency      4-Thread BW (MB/s)   50.9         46.1         14.3         -71.91%         
+ sqlite           Tx/s (sync=OFF)      550.52       514.42       297.29       -46.00%         
+ sqlite           Tx/s (sync=FULL)     5.66         5.49         5.31         -6.18%          
 ----------------------------------------------------------------------------------------
  OVERALL: PASS (9/9 benchmark runs completed, 0 failing)
 ========================================================================================
