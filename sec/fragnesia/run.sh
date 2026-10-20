@@ -4,9 +4,9 @@
 # ==============================================================================
 # Builds the PoC if needed, seeds a marker in the protected victim file, drops
 # caches to force a real page-cache re-fault, runs it as testuser, and reports
-# whether the marker survived. Under on the unauthorized store is trapped and the
-# attacking task is killed without crashing the system, keeping the marker
-# intact; under off the marker is overwritten.
+# whether the marker survived. Under on each store of the workqueue decrypt loop
+# is suppressed by advancing the instruction pointer past it, without crashing
+# the system, keeping the marker intact; under off the marker is overwritten.
 # ==============================================================================
 set -u
 

@@ -4,9 +4,9 @@
 # ==============================================================================
 # Builds the PoC if needed, seeds a marker in the protected victim file, drops
 # caches to force a real page-cache re-fault, runs it as testuser, and reports
-# whether the marker survived. Under on the asynchronous softirq store is
-# suppressed via instruction-pointer advance (panic fallback on unhandled paths);
-# under off the marker is overwritten.
+# whether the marker survived. Under on each asynchronous softirq store is
+# suppressed by advancing the instruction pointer past it, without crashing the
+# system; under off the marker is overwritten.
 # ==============================================================================
 set -u
 

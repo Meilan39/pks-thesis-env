@@ -4,9 +4,9 @@
 # ==============================================================================
 # Seeds a marker in the protected victim file, drops caches to force a real
 # page-cache re-fault, runs the unprivileged PoC as testuser, and reports whether
-# the marker survived. Under on the store is trapped in syscall context (-EFAULT)
-# and the marker stays intact; under off it is overwritten. sec/run.sh turns the
-# emitted marker line into the verdict.
+# the marker survived. Under on the store is trapped in syscall context and the
+# offending task is killed, so the marker stays intact; under off it is
+# overwritten. sec/run.sh turns the emitted marker line into the verdict.
 # ==============================================================================
 set -u
 

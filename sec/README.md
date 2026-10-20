@@ -47,7 +47,13 @@ kernel panic would halt the VM.
    boot cannot cross-pollute.
 3. **Per-leaf harvest from a shared transcript.** The dispatcher emits a
    `### PKS-LEAF <leaf>` delimiter before each leaf; `sec/run.sh` isolates each leaf's
-   segment and reads its `marker=` line, so batching loses no attribution.
+   segment and reads its `marker=` line, so batching loses no attribution. If no
+   delimiters are present (a baked `/usr/local/bin/pks-autorun.sh` older than the
+   delimiters; run `make disk` to refresh it), the Nth marker is attributed to the
+   Nth leaf, which holds because the leaves always run in the same order.
+
+The per-leaf transcripts of the old model (`sec/<leaf>/raw-{off,on}.log`) are no
+longer produced; the only transcripts are `sec/raw-off.log` and `sec/raw-on.log`.
 
 The axis runs under either substrate via the executor contract: `EXECUTOR=qemu`
 (QEMU/KVM guest, default on a dev box) or `EXECUTOR=baremetal` (native on a booted
@@ -66,7 +72,10 @@ Each exploit leaf follows an identical five-step lifecycle:
 serial, or `/dev/kmsg` on bare metal). If an unexpected kernel panic/oops occurs
 matching `PKS_PANIC_REGEX`, the outcome is recorded as `fail_closed_panic` and
 evaluated as `verdict=FAIL` — with the stateless handler the kernel is expected to
-neutralize in place and survive, so a panic is a regression, not a pass.
+neutralize in place and survive, so a panic is a regression, not a pass. Lines
+forwarded from userspace (tagged `pks-autorun.sh[PID]:`) are excluded before the
+match, so a PoC's own output (e.g. a `BUG:` banner) is never mistaken for a kernel
+panic.
 
 ### Verdict Resolution & Pass Criteria
 

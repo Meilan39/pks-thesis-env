@@ -66,8 +66,9 @@ VIRTFS=("-virtfs" "local,path=${REPO_ROOT},mount_tag=pks_env,security_model=none
 # ------------------------------------------------------------------------------
 # Kernel command line
 # ------------------------------------------------------------------------------
-# Panic is the expected fail-closed behavior for security tests, so panic=1 plus
-# -no-reboot halt the VM cleanly and exit QEMU with the transcript intact.
+# A kernel panic is never an expected outcome (every axis scores it FAIL), but if
+# one happens panic=1 plus -no-reboot halt the VM cleanly and exit QEMU with the
+# transcript intact for the axis runner to harvest.
 CMDLINE="root=/dev/vda1 rw console=ttyS0 nokaslr"
 if [ "$KERNEL_VARIANT" = "control" ]; then
     CMDLINE="$CMDLINE pcache_control=1"
@@ -148,8 +149,8 @@ echo "### exec/qemu exit=$qemu_rc elapsed=${elapsed_secs}s" >> "$TRANSCRIPT_PATH
 # The transcript is saved verbatim at TRANSCRIPT_PATH and never echoed (echoing
 # it is what bled every boot into the axis logs). Flag a run -- one line, no dump
 # -- only on real trouble: QEMU failed (timeout / abnormal exit) or the guest
-# emitted nothing. Expected fail-closed panics exit 0 with output and stay
-# silent; the axis runner resolves the verdict from the transcript.
+# emitted nothing. A guest panic exits 0 with output and stays silent here; the
+# axis runner detects it in the transcript and scores it.
 guest_bytes=$({ grep -vE '^### ' "$TRANSCRIPT_PATH" 2>/dev/null || true; } | wc -c | tr -d ' ')
 if [ "$qemu_rc" -ne 0 ] || [ "$guest_bytes" -eq 0 ]; then
     log_warn "[exec/qemu] run suspect: exit=$qemu_rc elapsed=${elapsed_secs}s guest_bytes=$guest_bytes; see $TRANSCRIPT_PATH"
