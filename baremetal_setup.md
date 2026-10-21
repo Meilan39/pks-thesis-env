@@ -24,7 +24,7 @@ sudo reboot
 3. Revert test via a managed entry — BMC console open.
 sudo grub-reboot pks-sec-off && sudo reboot
 After it boots:
-cat /proc/cmdline     # expect: ... pcache_pks=off pks_auto
+cat /proc/cmdline     # ... root=PARTUUID=757cd99c-... pcache_pks=off pks_auto
 uname -r              # expect: 5.18.0-rc3-00056-g27ba7abe61fc
 sudo reboot           # must land back on Ubuntu
 
