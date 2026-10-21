@@ -87,9 +87,15 @@ echo "installed watchdog drop-in (RuntimeWatchdogSec=60)"
 systemctl daemon-reload
 systemctl enable pks-sweep.service
 mkdir -p /var/lib/pks-sweep
+# Full matrix (8 boots): sec control/off/on, compliance off/on, perf control/off/on.
+# One axis per boot (exec/baremetal.sh takes a single target), so a kernel that
+# serves two axes is booted twice; grouped by kernel to keep that obvious.
 tee /var/lib/pks-sweep/queue >/dev/null <<'Q_EOF'
 control control pks-control  sec
+control control pks-control  perf
+sec     off     pks-sec-off  test
 sec     off     pks-sec-off  sec
+sec     on      pks-sec-on   test
 sec     on      pks-sec-on   sec
 perf    off     pks-perf-off perf
 perf    on      pks-perf-on  perf
