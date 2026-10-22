@@ -1,1 +1,1 @@
-STATUS node=build-perf variant=perf verdict=PASS bytes=10884096 secs=29
+STATUS node=build-perf variant=perf verdict=PASS bytes=11544704 secs=20
