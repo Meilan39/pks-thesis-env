@@ -1,0 +1,26 @@
+### exec/baremetal host=inawashiro 5.18.0-rc3-00056-g27ba7abe61fc kernel=perf mode=on target=perf
+### cmdline: BOOT_IMAGE=/boot/vmlinuz-pks-perf root=PARTUUID=757cd99c-7fda-4037-bcba-b7f6395f1129 ro console=ttyS0,115200 console=tty0 panic=20 pks_auto pcache_pks=on isolcpus=2-47 nohz_full=2-47 rcu_nocbs=2-47 intel_idle.max_cstate=1
+
+[  131.498913] EXT4-fs (loop8): mounted filesystem with ordered data mode. Quota mode: none.
+### PKS-LEAF concurrency
+[  131.547487] bash (896): drop_caches: 3
+[  131.990160] bash (896): drop_caches: 3
+[  132.541488] bash (896): drop_caches: 3
+STATUS node=concurrency variant=on verdict=PASS bw_1t_mbps=1600.0 bw_2t_mbps=2666.7 bw_4t_mbps=2782.6 scaling_pct=43.5
+### PKS-LEAF fio
+[  141.202410] bash (946): drop_caches: 3
+[  141.693553] bash (946): drop_caches: 3
+[  142.159304] bash (946): drop_caches: 3
+[  142.600130] bash (946): drop_caches: 3
+[  143.032538] bash (946): drop_caches: 3
+[  143.464177] bash (946): drop_caches: 3
+[  143.896791] bash (946): drop_caches: 3
+[  144.327706] bash (946): drop_caches: 3
+[  144.761168] bash (946): drop_caches: 3
+[  145.189758] bash (946): drop_caches: 3
+[  145.617878] bash (946): drop_caches: 3
+[  146.041707] bash (946): drop_caches: 3
+STATUS node=fio variant=on verdict=PASS iops4k_warm_write=630153.85 lat4k_warm_write_us=1.3 lat4k_warm_read_us=0.85 lat4k_cold_write_us=1.89 alloc_overhead_us=0.59 bw1m_seq_read_kbs=6553600.0
+### PKS-LEAF sqlite
+STATUS node=sqlite variant=on verdict=PASS tps_syncoff=15538.44 tps_syncfull=1879.98 lat_syncoff_us=64.36 lat_syncfull_us=531.92
+### exec/baremetal done

@@ -1,0 +1,273 @@
+### exec/baremetal host=inawashiro 5.18.0-rc3-00056-g27ba7abe61fc kernel=sec mode=off target=test
+### cmdline: BOOT_IMAGE=/boot/vmlinuz-pks-sec root=PARTUUID=757cd99c-7fda-4037-bcba-b7f6395f1129 ro console=ttyS0,115200 console=tty0 panic=20 pks_auto pcache_pks=off
+
+[  131.043621] EXT4-fs (loop8): mounted filesystem with ordered data mode. Quota mode: none.
+### PKS-LEAF fsx
+STATUS node=fsx variant=off verdict=PASS ops=10000 errors=0
+### PKS-LEAF pks-unit
+[  140.090050] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  140.090055] pks_test:pks_write_file:635: Begin...
+[  140.090057] pks_test:pks_write_file:657: check defaults test: 0x55555564
+[  140.090060] pks_test:check_pkey_settings:501: cpu 32 0x55555564
+[  140.090062] pks_test:check_pkey_settings:501: cpu 8 0x55555564
+[  140.090063] pks_test:check_pkey_settings:501: cpu 47 0x55555564
+[  140.090063] pks_test:check_pkey_settings:501: cpu 23 0x55555564
+[  140.090063] pks_test:check_pkey_settings:501: cpu 28 0x55555564
+[  140.090063] pks_test:check_pkey_settings:501: cpu 4 0x55555564
+[RUN]	check_defaults
+[  140.090064] pks_test:check_pkey_settings:501: cpu 10 0x55555564
+[OK]
+[RUN]	single
+[OK]
+[RUN]	context_switch
+[  140.090064] pks_test:check_pkey_settings:501: cpu 19 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 45 0x55555564
+[  140.090065] pks_test:check_pkey_settings:501: cpu 25 0x55555564
+[  140.090065] pks_test:check_pkey_settings:501: cpu 24 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 20 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 41 0x55555564
+[  140.090065] pks_test:check_pkey_settings:501: cpu 33 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 17 0x55555564
+[  140.090065] pks_test:check_pkey_settings:501: cpu 1 0x55555564
+[  140.090065] pks_test:check_pkey_settings:501: cpu 0 0x55555564
+[  140.090065] pks_test:check_pkey_settings:501: cpu 44 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 29 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 5 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 22 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 43 0x55555564
+[  140.090065] pks_test:check_pkey_settings:501: cpu 9 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 46 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 21 0x55555564
+[  140.090064] pks_test:check_pkey_settings:501: cpu 34 0x55555564
+[  140.090153] pks_test:check_pkey_settings:501: cpu 35 0x55555564
+[  140.090153] pks_test:check_pkey_settings:501: cpu 11 0x55555564
+[  140.090154] pks_test:check_pkey_settings:501: cpu 26 0x55555564
+[  140.090154] pks_test:check_pkey_settings:501: cpu 2 0x55555564
+[  140.090157] pks_test:check_pkey_settings:501: cpu 16 0x55555564
+[  140.090157] pks_test:check_pkey_settings:501: cpu 40 0x55555564
+[  140.090156] pks_test:check_pkey_settings:501: cpu 27 0x55555564
+[  140.090156] pks_test:check_pkey_settings:501: cpu 3 0x55555564
+[  140.090157] pks_test:check_pkey_settings:501: cpu 42 0x55555564
+[  140.090157] pks_test:check_pkey_settings:501: cpu 18 0x55555564
+[  140.090158] pks_test:check_pkey_settings:501: cpu 15 0x55555564
+[  140.090158] pks_test:check_pkey_settings:501: cpu 39 0x55555564
+[  140.090159] pks_test:check_pkey_settings:501: cpu 7 0x55555564
+[  140.090160] pks_test:check_pkey_settings:501: cpu 30 0x55555564
+[  140.090159] pks_test:check_pkey_settings:501: cpu 31 0x55555564
+[  140.090161] pks_test:check_pkey_settings:501: cpu 13 0x55555564
+[  140.090160] pks_test:check_pkey_settings:501: cpu 14 0x55555564
+[  140.090160] pks_test:check_pkey_settings:501: cpu 38 0x55555564
+do_context_switch: Parent: Waiting for child
+do_context_switch: Child: running on cpu 0...
+[  140.090160] pks_test:check_pkey_settings:501: cpu 6 0x55555564
+do_context_switch: Child: Tell parent to go
+[  140.090161] pks_test:check_pkey_settings:501: cpu 37 0x55555564
+do_context_switch: Parent: running on cpu 0
+[  140.090162] pks_test:check_pkey_settings:501: cpu 12 0x55555564
+[  140.090162] pks_test:check_pkey_settings:501: cpu 36 0x55555564
+do_context_switch: Parent: Signaling child
+[  140.090173] pks_test:pks_write_file:694: Clearing crash test arm
+do_context_switch: Child: Waiting for parent...
+do_context_switch: Child: Checking result
+[  140.090175] pks_test:debug_result:107: Test complete [0]: PASS
+do_context_switch: Child: Result (P) PASS
+
+do_context_switch: Parent: exiting with rc (P) 0
+[  140.090177] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test PASS
+[  140.090183] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[OK]
+[RUN]	exception
+[  140.090185] pks_test:pks_write_file:635: Begin...
+[  140.090186] pks_test:pks_write_file:661: Single key
+[  140.090192] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000054f67369
+[  140.090194] pks_test:set_ctx_data:371: Setting context data; 0000000047775bb4
+[OK]
+[RUN]	exception_update
+[  140.090197] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 0000000047775bb4
+[OK]
+[RUN]	run_all
+[  140.090199] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 0000000047775bb4
+[  140.090201] pks_test:pks_write_file:694: Clearing crash test arm
+[SKIP] Test not supported
+[  140.090202] pks_test:debug_result:107: Test complete [1]: PASS
+[  140.090204] pks_test:debug_session:95: Freeing session ctx 0000000047775bb4; unlock 0; crash 0; last test PASS
+[  140.090260] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  140.090420] pks_test:pks_write_file:635: Begin...
+[  140.090423] pks_test:pks_write_file:661: Single key
+[  140.090430] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000b3265e8b
+[  140.090433] pks_test:set_ctx_data:371: Setting context data; 000000007628edfe
+[  140.090437] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  140.090440] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  140.090442] pks_test:pks_write_file:694: Clearing crash test arm
+[  140.090443] pks_test:debug_result:107: Test complete [1]: PASS
+[  140.090446] pks_test:pks_write_file:635: Begin...
+[  140.090448] pks_test:pks_write_file:665: Arming Context switch test
+[  140.090450] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000052f25f1c
+[  140.090452] pks_test:set_ctx_data:368: Context data already set
+[  140.090457] pks_test:set_ctx_data:371: Setting context data; 000000009df263da
+[  140.090459] pks_test:pks_write_file:694: Clearing crash test arm
+[  140.090460] pks_test:debug_result:107: Test complete [2]: PASS
+[  140.090480] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  140.090483] pks_test:pks_write_file:635: Begin...
+[  140.090484] pks_test:pks_write_file:661: Single key
+[  140.090487] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000b7280458
+[  140.090489] pks_test:set_ctx_data:371: Setting context data; 000000007628edfe
+[  140.090491] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  140.090494] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  140.090496] pks_test:pks_write_file:694: Clearing crash test arm
+[  140.090497] pks_test:debug_result:107: Test complete [1]: PASS
+[  140.090507] pks_test:pks_write_file:635: Begin...
+[  140.090509] pks_test:pks_write_file:669: Checking Context switch test
+[  140.090510] pks_test:pks_write_file:694: Clearing crash test arm
+[  140.090512] pks_test:debug_result:107: Test complete [3]: PASS
+[  140.090522] pks_test:debug_session:95: Freeing session ctx 000000007628edfe; unlock 0; crash 0; last test PASS
+[  140.090535] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  140.090538] pks_test:pks_write_file:635: Begin...
+[  140.090540] pks_test:pks_write_file:673: Exception checking
+[  140.090542] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000e0364389
+[  140.090544] pks_test:set_ctx_data:371: Setting context data; 000000007628edfe
+[  140.090546] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  140.090549] pks_test:pks_write_file:694: Clearing crash test arm
+[  140.090550] pks_test:debug_result:107: Test complete [4]: PASS
+[  140.090552] pks_test:debug_session:95: Freeing session ctx 000000007628edfe; unlock 0; crash 0; last test PASS
+[  140.090561] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  140.090563] pks_test:pks_write_file:635: Begin...
+[  140.090564] pks_test:pks_write_file:677: Fault clear test
+[  140.090567] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000003ebfdd79
+[  140.090568] pks_test:set_ctx_data:371: Setting context data; 000000007628edfe
+[  140.090571] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  140.090572] pks_test:handle_update_exception:171: Updating pkey 1 during exception
+[  140.090574] pks_test:pks_write_file:694: Clearing crash test arm
+[  140.090575] pks_test:debug_result:107: Test complete [5]: PASS
+[  140.090578] pks_test:debug_session:95: Freeing session ctx 000000007628edfe; unlock 0; crash 0; last test PASS
+[  140.090598] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  140.090600] pks_test:pks_write_file:635: Begin...
+[  140.090602] pks_test:pks_write_file:687: Unknown test
+[  140.090603] pks_test:pks_write_file:694: Clearing crash test arm
+[  140.090604] pks_test:debug_result:107: Test complete [6]: FAIL
+[  140.090608] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[Oct21 17:55] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  +0.000005] pks_test:pks_write_file:635: Begin...
+[  +0.000002] pks_test:pks_write_file:657: check defaults test: 0x55555564
+[  +0.000003] pks_test:check_pkey_settings:501: cpu 32 0x55555564
+[  +0.000002] pks_test:check_pkey_settings:501: cpu 8 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 47 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 23 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 28 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 4 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 10 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 19 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 45 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 25 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 24 0x55555564
+[  -0.000001] pks_test:check_pkey_settings:501: cpu 20 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 41 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 33 0x55555564
+[  -0.000001] pks_test:check_pkey_settings:501: cpu 17 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 1 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 0 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 44 0x55555564
+[  -0.000001] pks_test:check_pkey_settings:501: cpu 29 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 5 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 22 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 43 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 9 0x55555564
+[  -0.000001] pks_test:check_pkey_settings:501: cpu 46 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 21 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 34 0x55555564
+[  +0.000089] pks_test:check_pkey_settings:501: cpu 35 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 11 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 26 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 2 0x55555564
+[  +0.000003] pks_test:check_pkey_settings:501: cpu 16 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 40 0x55555564
+[  -0.000001] pks_test:check_pkey_settings:501: cpu 27 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 3 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 42 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 18 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 15 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 39 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 7 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 30 0x55555564
+[  -0.000001] pks_test:check_pkey_settings:501: cpu 31 0x55555564
+[  +0.000002] pks_test:check_pkey_settings:501: cpu 13 0x55555564
+[  -0.000001] pks_test:check_pkey_settings:501: cpu 14 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 38 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 6 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 37 0x55555564
+[  +0.000001] pks_test:check_pkey_settings:501: cpu 12 0x55555564
+[  +0.000000] pks_test:check_pkey_settings:501: cpu 36 0x55555564
+[  +0.000011] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000002] pks_test:debug_result:107: Test complete [0]: PASS
+[  +0.000002] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test PASS
+[  +0.000006] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  +0.000002] pks_test:pks_write_file:635: Begin...
+[  +0.000001] pks_test:pks_write_file:661: Single key
+[  +0.000006] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000054f67369
+[  +0.000002] pks_test:set_ctx_data:371: Setting context data; 0000000047775bb4
+[  +0.000003] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 0000000047775bb4
+[  +0.000002] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 0000000047775bb4
+[  +0.000002] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000001] pks_test:debug_result:107: Test complete [1]: PASS
+[  +0.000002] pks_test:debug_session:95: Freeing session ctx 0000000047775bb4; unlock 0; crash 0; last test PASS
+[  +0.000056] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  +0.000160] pks_test:pks_write_file:635: Begin...
+[  +0.000003] pks_test:pks_write_file:661: Single key
+[  +0.000007] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000b3265e8b
+[  +0.000003] pks_test:set_ctx_data:371: Setting context data; 000000007628edfe
+[  +0.000004] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  +0.000003] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  +0.000002] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000001] pks_test:debug_result:107: Test complete [1]: PASS
+[  +0.000003] pks_test:pks_write_file:635: Begin...
+[  +0.000002] pks_test:pks_write_file:665: Arming Context switch test
+[  +0.000002] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 0000000052f25f1c
+[  +0.000002] pks_test:set_ctx_data:368: Context data already set
+[  +0.000005] pks_test:set_ctx_data:371: Setting context data; 000000009df263da
+[  +0.000002] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000001] pks_test:debug_result:107: Test complete [2]: PASS
+[  +0.000020] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  +0.000003] pks_test:pks_write_file:635: Begin...
+[  +0.000001] pks_test:pks_write_file:661: Single key
+[  +0.000003] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000b7280458
+[  +0.000002] pks_test:set_ctx_data:371: Setting context data; 000000007628edfe
+[  +0.000002] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  +0.000003] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  +0.000002] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000001] pks_test:debug_result:107: Test complete [1]: PASS
+[  +0.000010] pks_test:pks_write_file:635: Begin...
+[  +0.000002] pks_test:pks_write_file:669: Checking Context switch test
+[  +0.000001] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000002] pks_test:debug_result:107: Test complete [3]: PASS
+[  +0.000010] pks_test:debug_session:95: Freeing session ctx 000000007628edfe; unlock 0; crash 0; last test PASS
+[  +0.000013] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  +0.000003] pks_test:pks_write_file:635: Begin...
+[  +0.000002] pks_test:pks_write_file:673: Exception checking
+[  +0.000002] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 00000000e0364389
+[  +0.000002] pks_test:set_ctx_data:371: Setting context data; 000000007628edfe
+[  +0.000002] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  +0.000003] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000001] pks_test:debug_result:107: Test complete [4]: PASS
+[  +0.000002] pks_test:debug_session:95: Freeing session ctx 000000007628edfe; unlock 0; crash 0; last test PASS
+[  +0.000009] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  +0.000002] pks_test:pks_write_file:635: Begin...
+[  +0.000001] pks_test:pks_write_file:677: Fault clear test
+[  +0.000003] pks_test:debug_context:79: Context allocated [1] DEADBEEF <-> 000000003ebfdd79
+[  +0.000001] pks_test:set_ctx_data:371: Setting context data; 000000007628edfe
+[  +0.000003] pks_test:pks_test_fault_callback:200: PKS Fault callback: ctx 000000007628edfe
+[  +0.000001] pks_test:handle_update_exception:171: Updating pkey 1 during exception
+[  +0.000002] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000001] pks_test:debug_result:107: Test complete [5]: PASS
+[  +0.000003] pks_test:debug_session:95: Freeing session ctx 000000007628edfe; unlock 0; crash 0; last test PASS
+[  +0.000020] pks_test:debug_session:95: Allocated session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+[  +0.000002] pks_test:pks_write_file:635: Begin...
+[  +0.000002] pks_test:pks_write_file:687: Unknown test
+[  +0.000001] pks_test:pks_write_file:694: Clearing crash test arm
+[  +0.000001] pks_test:debug_result:107: Test complete [6]: FAIL
+[  +0.000004] pks_test:debug_session:95: Freeing session ctx 0000000000000000; unlock 0; crash 0; last test FAIL
+	Debug output command (approximate start time):
+		dmesg -H --since '2026-10-21 17:55:31' | grep pks_test
+STATUS node=pks-unit variant=off verdict=PASS
+### PKS-LEAF sanity
+STATUS node=sanity variant=off verdict=PASS note=not_applicable_when_off
+### exec/baremetal done
