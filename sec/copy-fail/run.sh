@@ -34,6 +34,18 @@ printf '%s\n' "$CLEAN_MARKER" > "$TARGET_FILE"
 chmod 644 "$TARGET_FILE"
 sync
 echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
+cat "$TARGET_FILE" > /dev/null 2>&1 || true
+
+# ------------------------------------------------------------------------------
+# Verify the seed BEFORE attacking (see sec/fragnesia/run.sh for the shared-file
+# rationale): a failed or stale re-seed is a harness fault, never "altered".
+# ------------------------------------------------------------------------------
+if ! grep -qF "$CLEAN_MARKER" <(head -c 256 "$TARGET_FILE" 2>/dev/null); then
+    echo "seed=failed"
+    echo "marker=unresolved"
+    exit 1
+fi
+echo "seed=ok"
 
 # ------------------------------------------------------------------------------
 # Run exploit
@@ -44,8 +56,10 @@ echo 3 > /proc/sys/vm/drop_caches 2>/dev/null || true
 su -s /bin/bash testuser -c "python3 -u '$EXPLOIT_BIN'" || true
 
 # ------------------------------------------------------------------------------
-# Inspect marker
+# Inspect marker (record the bytes so a verdict is never a bare word)
 # ------------------------------------------------------------------------------
+echo "[evidence] copy-fail victim first 64 bytes after exploit:"
+head -c 64 "$TARGET_FILE" 2>/dev/null | od -An -tx1 || true
 if grep -qF "$CLEAN_MARKER" <(head -c 256 "$TARGET_FILE" 2>/dev/null); then
     echo "marker=intact"
 else
